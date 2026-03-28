@@ -1,0 +1,8 @@
+<mat-toolbar color="primary">
+  <span>Plateforme Comptable</span>
+  <span class="spacer"></span>
+  <span class="user-name">{{ (authService.currentUser$ | async)?.first_name }} {{ (authService.currentUser$ | async)?.last_name }}</span>
+  <button mat-icon-button (click)="logout()" aria-label="Logout">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>

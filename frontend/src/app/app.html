@@ -1,0 +1,13 @@
+<div class="app-container">
+  @if (authService.isLoggedIn()) {
+    <app-navbar></app-navbar>
+    <div class="app-body">
+      <app-sidebar></app-sidebar>
+      <main class="app-content">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  } @else {
+    <router-outlet></router-outlet>
+  }
+</div>
