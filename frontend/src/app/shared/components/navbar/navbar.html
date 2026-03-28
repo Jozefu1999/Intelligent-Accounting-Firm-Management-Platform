@@ -1,8 +1,15 @@
-<mat-toolbar color="primary">
-  <span>Plateforme Comptable</span>
-  <span class="spacer"></span>
-  <span class="user-name">{{ (authService.currentUser$ | async)?.first_name }} {{ (authService.currentUser$ | async)?.last_name }}</span>
-  <button mat-icon-button (click)="logout()" aria-label="Logout">
-    <mat-icon>logout</mat-icon>
-  </button>
-</mat-toolbar>
+<nav class="bg-blue-700 text-white shadow-md px-6 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <mat-icon class="text-white">account_balance</mat-icon>
+    <span class="text-lg font-semibold tracking-wide">Plateforme Comptable</span>
+  </div>
+  <div class="flex items-center gap-4">
+    <span class="text-sm opacity-90">
+      {{ (authService.currentUser$ | async)?.first_name }}
+      {{ (authService.currentUser$ | async)?.last_name }}
+    </span>
+    <button mat-icon-button (click)="logout()" class="text-white hover:bg-blue-600 rounded-full" aria-label="Logout">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</nav>

@@ -1,0 +1,27 @@
+{
+  "name": "pfe",
+  "version": "1.0.0",
+  "description": "An intelligent web platform that centralizes client and project management for accounting firms, integrated with AI/ML capabilities for business plan generation, recommendations, and risk prediction.",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky",
+    "lint:backend": "cd backend && npm run lint",
+    "build:frontend": "cd frontend && npx ng build",
+    "lint": "npm run lint:backend && npm run build:frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jozefu1999/Intelligent-Accounting-Firm-Management-Platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jozefu1999/Intelligent-Accounting-Firm-Management-Platform/issues"
+  },
+  "homepage": "https://github.com/Jozefu1999/Intelligent-Accounting-Firm-Management-Platform#readme",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}

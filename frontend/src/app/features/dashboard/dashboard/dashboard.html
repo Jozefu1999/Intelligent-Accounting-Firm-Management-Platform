@@ -1,1 +1,94 @@
-<p>dashboard works!</p>
+<div>
+  <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
+
+  @if (stats) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <!-- Total Clients -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Total Clients</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.totalClients }}</p>
+          </div>
+          <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+            <mat-icon>people</mat-icon>
+          </div>
+        </div>
+        <p class="text-xs text-green-600 mt-3">{{ stats.activeClients }} active</p>
+      </div>
+
+      <!-- Total Projects -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Total Projects</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.totalProjects }}</p>
+          </div>
+          <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
+            <mat-icon>folder</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Users -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Total Users</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.totalUsers }}</p>
+          </div>
+          <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+            <mat-icon>person</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Clients -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Active Clients</p>
+            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.activeClients }}</p>
+          </div>
+          <div class="bg-orange-100 text-orange-600 p-3 rounded-lg">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts area placeholder -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Projects by Status</h3>
+        <div class="space-y-3">
+          @for (item of stats.projectsByStatus; track item.status) {
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 capitalize">{{ item.status }}</span>
+              <span class="text-sm font-medium bg-gray-100 px-3 py-1 rounded-full">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Clients by Risk Level</h3>
+        <div class="space-y-3">
+          @for (item of stats.clientsByRisk; track item.risk_level) {
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 capitalize">{{ item.risk_level }}</span>
+              <span class="text-sm font-medium px-3 py-1 rounded-full"
+                [class]="item.risk_level === 'high' ? 'bg-red-100 text-red-600' : item.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'">
+                {{ item.count }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="flex items-center justify-center h-64">
+      <p class="text-gray-400">Loading dashboard data...</p>
+    </div>
+  }
+</div>

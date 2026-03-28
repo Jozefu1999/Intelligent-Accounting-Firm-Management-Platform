@@ -3,10 +3,21 @@ const { exec } = require('child_process');
 const path = require('path');
 const { AiBusinessPlan, Project, Client } = require('../models');
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Lazy-initialize OpenAI client only when AI features are actually used
+let openai = null;
+function getOpenAIClient() {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY is not configured. AI features are not available yet.');
+    }
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openai;
+}
 
 const generateBusinessPlan = async (req, res, next) => {
   try {
+    const client = getOpenAIClient();
     const { project_id } = req.body;
 
     const project = await Project.findByPk(project_id, {
@@ -26,7 +37,7 @@ const generateBusinessPlan = async (req, res, next) => {
       Include: Executive Summary, Market Analysis, Financial Projections, Risks, Recommendations.
       Respond in JSON format with keys: executive_summary, market_analysis, financial_projections, risks, recommendations.`;
 
-    const response = await openai.chat.completions.create({
+    const response = await client.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
@@ -48,6 +59,7 @@ const generateBusinessPlan = async (req, res, next) => {
 
 const getRecommendations = async (req, res, next) => {
   try {
+    const aiClient = getOpenAIClient();
     const { client_id } = req.body;
 
     const client = await Client.findByPk(client_id, {
@@ -66,7 +78,7 @@ const getRecommendations = async (req, res, next) => {
       
       Provide 3-5 actionable recommendations in JSON array format with keys: title, description, priority (high/medium/low).`;
 
-    const response = await openai.chat.completions.create({
+    const response = await aiClient.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
