@@ -1,0 +1,15 @@
+# Lint backend
+cd backend && npm run lint
+BACKEND_EXIT=$?
+
+# Build frontend (type check)
+cd ../frontend && npx ng build --configuration production
+FRONTEND_EXIT=$?
+
+# Exit with error if any failed
+if [ $BACKEND_EXIT -ne 0 ] || [ $FRONTEND_EXIT -ne 0 ]; then
+  echo "❌ Pre-commit checks failed. Fix lint/build errors before committing."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed."

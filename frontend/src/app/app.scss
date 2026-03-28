@@ -1,18 +1,1 @@
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.app-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.app-content {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
-  background-color: #f5f5f5;
-}
+// App-level styles handled by Tailwind classes in the template

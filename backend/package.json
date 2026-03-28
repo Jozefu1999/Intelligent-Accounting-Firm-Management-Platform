@@ -7,7 +7,7 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "lint": "eslint src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Tests will be added later\" && exit 0"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +27,7 @@
     "sequelize": "^6.37.8"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "eslint": "^10.1.0",
     "nodemon": "^3.1.14"
   }
