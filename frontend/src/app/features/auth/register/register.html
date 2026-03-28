@@ -1,49 +1,157 @@
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800">
-  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-    <div class="text-center mb-8">
-      <mat-icon class="text-blue-600 text-5xl mb-2">account_balance</mat-icon>
-      <h1 class="text-2xl font-bold text-gray-800">Create Account</h1>
-      <p class="text-gray-500 text-sm mt-1">Join the platform</p>
+<div class="min-h-screen flex">
+
+  <!-- Left panel: branding -->
+  <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-700 via-blue-600 to-blue-700 flex-col justify-between p-12 relative overflow-hidden">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
     </div>
 
-    @if (errorMessage) {
-      <div class="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-4">
-        {{ errorMessage }}
+    <!-- Logo & title -->
+    <div class="relative z-10">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="bg-white/20 backdrop-blur-sm p-2.5 rounded-xl">
+          <mat-icon class="text-white text-3xl">account_balance</mat-icon>
+        </div>
+        <span class="text-white font-bold text-xl">Plateforme Comptable</span>
       </div>
-    }
+      <h2 class="text-white text-4xl font-extrabold leading-tight">
+        Rejoignez la plateforme<br/>dès aujourd'hui.
+      </h2>
+      <p class="text-blue-100 mt-4 text-base leading-relaxed">
+        Créez votre compte en quelques secondes<br/>
+        et commencez à gérer votre cabinet.
+      </p>
+    </div>
 
-    <form (ngSubmit)="onSubmit()" class="space-y-4">
-      <div class="flex gap-3">
-        <mat-form-field appearance="outline" class="flex-1">
-          <mat-label>First Name</mat-label>
-          <input matInput [(ngModel)]="first_name" name="first_name" required />
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="flex-1">
-          <mat-label>Last Name</mat-label>
-          <input matInput [(ngModel)]="last_name" name="last_name" required />
-        </mat-form-field>
+    <!-- Steps -->
+    <div class="relative z-10 space-y-5">
+      <p class="text-white/70 text-xs uppercase tracking-widest font-semibold">Comment ça fonctionne</p>
+      <div class="flex items-start gap-4">
+        <div class="bg-white/20 text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5">1</div>
+        <div>
+          <p class="text-white text-sm font-medium">Créez votre compte</p>
+          <p class="text-blue-200 text-xs mt-0.5">Renseignez vos informations basiques</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="bg-white/20 text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5">2</div>
+        <div>
+          <p class="text-white text-sm font-medium">Ajoutez vos clients</p>
+          <p class="text-blue-200 text-xs mt-0.5">Importez et gérez votre portefeuille</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="bg-white/20 text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5">3</div>
+        <div>
+          <p class="text-white text-sm font-medium">Utilisez les outils IA</p>
+          <p class="text-blue-200 text-xs mt-0.5">Générez des analyses et prédictions</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel: form -->
+  <div class="flex-1 flex items-center justify-center bg-gray-50 p-8">
+    <div class="w-full max-w-md">
+
+      <!-- Mobile logo -->
+      <div class="flex items-center gap-2 mb-8 lg:hidden">
+        <mat-icon class="text-blue-600">account_balance</mat-icon>
+        <span class="font-bold text-gray-800">Plateforme Comptable</span>
       </div>
 
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Email</mat-label>
-        <input matInput type="email" [(ngModel)]="email" name="email" required />
-        <mat-icon matPrefix>email</mat-icon>
-      </mat-form-field>
+      <h1 class="text-3xl font-bold text-gray-900 mb-1">Créer un compte</h1>
+      <p class="text-gray-500 text-sm mb-8">Remplissez le formulaire pour rejoindre la plateforme.</p>
 
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Password</mat-label>
-        <input matInput type="password" [(ngModel)]="password" name="password" required minlength="6" />
-        <mat-icon matPrefix>lock</mat-icon>
-      </mat-form-field>
+      @if (errorMessage) {
+        <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-6">
+          <mat-icon class="text-base">error_outline</mat-icon>
+          {{ errorMessage }}
+        </div>
+      }
 
-      <button mat-flat-button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition" type="submit" [disabled]="loading">
-        {{ loading ? "Creating account..." : "Register" }}
-      </button>
-    </form>
+      <form (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Name row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Prénom</label>
+            <input
+              type="text"
+              [(ngModel)]="first_name"
+              name="first_name"
+              required
+              placeholder="Jean"
+              class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom</label>
+            <input
+              type="text"
+              [(ngModel)]="last_name"
+              name="last_name"
+              required
+              placeholder="Dupont"
+              class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            />
+          </div>
+        </div>
 
-    <p class="text-center text-sm text-gray-500 mt-6">
-      Already have an account?
-      <a routerLink="/login" class="text-blue-600 font-medium hover:underline">Sign In</a>
-    </p>
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl pointer-events-none">email</mat-icon>
+            <input
+              type="email"
+              [(ngModel)]="email"
+              name="email"
+              required
+              placeholder="vous@exemple.com"
+              class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl pointer-events-none">lock</mat-icon>
+            <input
+              type="password"
+              [(ngModel)]="password"
+              name="password"
+              required
+              minlength="6"
+              placeholder="6 caractères minimum"
+              class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            />
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2"
+        >
+          @if (loading) {
+            <mat-icon class="animate-spin text-base">refresh</mat-icon>
+            Création du compte...
+          } @else {
+            Créer mon compte
+            <mat-icon class="text-base">arrow_forward</mat-icon>
+          }
+        </button>
+      </form>
+
+      <p class="text-center text-sm text-gray-500 mt-8">
+        Déjà un compte ?
+        <a routerLink="/login" class="text-blue-600 font-semibold hover:underline ml-1">Se connecter</a>
+      </p>
+    </div>
   </div>
 </div>
