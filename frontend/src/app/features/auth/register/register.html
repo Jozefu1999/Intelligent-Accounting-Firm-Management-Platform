@@ -1,1 +1,49 @@
-<p>register works!</p>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800">
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <mat-icon class="text-blue-600 text-5xl mb-2">account_balance</mat-icon>
+      <h1 class="text-2xl font-bold text-gray-800">Create Account</h1>
+      <p class="text-gray-500 text-sm mt-1">Join the platform</p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-4">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" class="space-y-4">
+      <div class="flex gap-3">
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>First Name</mat-label>
+          <input matInput [(ngModel)]="first_name" name="first_name" required />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Last Name</mat-label>
+          <input matInput [(ngModel)]="last_name" name="last_name" required />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" [(ngModel)]="email" name="email" required />
+        <mat-icon matPrefix>email</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" [(ngModel)]="password" name="password" required minlength="6" />
+        <mat-icon matPrefix>lock</mat-icon>
+      </mat-form-field>
+
+      <button mat-flat-button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition" type="submit" [disabled]="loading">
+        {{ loading ? "Creating account..." : "Register" }}
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-500 mt-6">
+      Already have an account?
+      <a routerLink="/login" class="text-blue-600 font-medium hover:underline">Sign In</a>
+    </p>
+  </div>
+</div>

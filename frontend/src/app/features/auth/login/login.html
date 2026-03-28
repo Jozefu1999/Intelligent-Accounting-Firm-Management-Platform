@@ -1,1 +1,38 @@
-<p>login works!</p>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800">
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <mat-icon class="text-blue-600 text-5xl mb-2">account_balance</mat-icon>
+      <h1 class="text-2xl font-bold text-gray-800">Plateforme Comptable</h1>
+      <p class="text-gray-500 text-sm mt-1">Sign in to your account</p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-4">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" class="space-y-5">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" [(ngModel)]="email" name="email" required placeholder="you@example.com" />
+        <mat-icon matPrefix>email</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" [(ngModel)]="password" name="password" required placeholder="Enter your password" />
+        <mat-icon matPrefix>lock</mat-icon>
+      </mat-form-field>
+
+      <button mat-flat-button class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition" type="submit" [disabled]="loading">
+        {{ loading ? "Signing in..." : "Sign In" }}
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-500 mt-6">
+      Don't have an account?
+      <a routerLink="/register" class="text-blue-600 font-medium hover:underline">Register</a>
+    </p>
+  </div>
+</div>

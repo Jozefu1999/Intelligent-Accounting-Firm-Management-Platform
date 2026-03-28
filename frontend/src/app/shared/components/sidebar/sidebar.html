@@ -1,28 +1,52 @@
-<nav class="sidebar">
-  <mat-nav-list>
-    <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
-      <mat-icon matListItemIcon>dashboard</mat-icon>
-      <span matListItemTitle>Dashboard</span>
-    </a>
-    <a mat-list-item routerLink="/clients" routerLinkActive="active">
-      <mat-icon matListItemIcon>people</mat-icon>
-      <span matListItemTitle>Clients</span>
-    </a>
-    <a mat-list-item routerLink="/projects" routerLinkActive="active">
-      <mat-icon matListItemIcon>folder</mat-icon>
-      <span matListItemTitle>Projects</span>
-    </a>
-    <a mat-list-item routerLink="/ai-tools/business-plan" routerLinkActive="active">
-      <mat-icon matListItemIcon>auto_awesome</mat-icon>
-      <span matListItemTitle>Business Plan (AI)</span>
-    </a>
-    <a mat-list-item routerLink="/ai-tools/recommendations" routerLinkActive="active">
-      <mat-icon matListItemIcon>lightbulb</mat-icon>
-      <span matListItemTitle>Recommendations</span>
-    </a>
-    <a mat-list-item routerLink="/ai-tools/risk-prediction" routerLinkActive="active">
-      <mat-icon matListItemIcon>warning</mat-icon>
-      <span matListItemTitle>Risk Prediction</span>
-    </a>
-  </mat-nav-list>
-</nav>
+<aside class="w-60 bg-white border-r border-gray-200 flex flex-col h-full">
+  <nav class="flex-1 py-4">
+    <ul class="space-y-1 px-3">
+      <li>
+        <a routerLink="/dashboard" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          <mat-icon class="text-xl">dashboard</mat-icon>
+          <span class="text-sm">Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/clients" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          <mat-icon class="text-xl">people</mat-icon>
+          <span class="text-sm">Clients</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/projects" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          <mat-icon class="text-xl">folder</mat-icon>
+          <span class="text-sm">Projects</span>
+        </a>
+      </li>
+
+      <li class="pt-4">
+        <p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">AI Tools</p>
+      </li>
+      <li>
+        <a routerLink="/ai-tools/business-plan" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          <mat-icon class="text-xl">auto_awesome</mat-icon>
+          <span class="text-sm">Business Plan</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/ai-tools/recommendations" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          <mat-icon class="text-xl">lightbulb</mat-icon>
+          <span class="text-sm">Recommendations</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/ai-tools/risk-prediction" routerLinkActive="bg-blue-50 text-blue-700 font-semibold"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+          <mat-icon class="text-xl">warning</mat-icon>
+          <span class="text-sm">Risk Prediction</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>
