@@ -1,94 +1,100 @@
-<div>
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
+<div class="space-y-6">
+  <section class="rounded-3xl border border-slate-200/80 bg-white/80 px-6 py-6 shadow-sm backdrop-blur sm:px-8 sm:py-7">
+    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-700">Vue générale</p>
+    <h1 class="mt-2 font-['Sora'] text-3xl font-semibold tracking-tight text-slate-900">
+      Bonjour {{ (authService.currentUser$ | async)?.first_name || 'équipe' }},
+      pilotons le cabinet.
+    </h1>
+    <p class="mt-2 max-w-3xl text-sm text-slate-500">
+      Suivez vos indicateurs clés, détectez les risques et gardez une vision claire de vos opérations.
+    </p>
+  </section>
 
   @if (stats) {
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-      <!-- Total Clients -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <article class="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-sm text-gray-500">Total Clients</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.totalClients }}</p>
+            <p class="text-sm text-slate-500">Total Clients</p>
+            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ stats.totalClients }}</p>
           </div>
-          <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-100 text-cyan-700">
             <mat-icon>people</mat-icon>
-          </div>
+          </span>
         </div>
-        <p class="text-xs text-green-600 mt-3">{{ stats.activeClients }} active</p>
-      </div>
+        <p class="mt-4 text-xs font-medium text-emerald-700">{{ stats.activeClients }} actifs</p>
+      </article>
 
-      <!-- Total Projects -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
+      <article class="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-sm text-gray-500">Total Projects</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.totalProjects }}</p>
+            <p class="text-sm text-slate-500">Total Projets</p>
+            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ stats.totalProjects }}</p>
           </div>
-          <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700">
             <mat-icon>folder</mat-icon>
-          </div>
+          </span>
         </div>
-      </div>
+      </article>
 
-      <!-- Total Users -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
+      <article class="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-sm text-gray-500">Total Users</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.totalUsers }}</p>
+            <p class="text-sm text-slate-500">Utilisateurs</p>
+            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ stats.totalUsers }}</p>
           </div>
-          <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
             <mat-icon>person</mat-icon>
-          </div>
+          </span>
         </div>
-      </div>
+      </article>
 
-      <!-- Active Clients -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div class="flex items-center justify-between">
+      <article class="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur">
+        <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-sm text-gray-500">Active Clients</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats.activeClients }}</p>
+            <p class="text-sm text-slate-500">Clients Actifs</p>
+            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ stats.activeClients }}</p>
           </div>
-          <div class="bg-orange-100 text-orange-600 p-3 rounded-lg">
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-100 text-orange-700">
             <mat-icon>trending_up</mat-icon>
-          </div>
+          </span>
         </div>
-      </div>
-    </div>
+      </article>
+    </section>
 
-    <!-- Charts area placeholder -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Projects by Status</h3>
-        <div class="space-y-3">
+    <section class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+      <article class="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
+        <h2 class="font-['Sora'] text-lg font-semibold text-slate-900">Projets par Statut</h2>
+        <div class="mt-5 space-y-3">
           @for (item of stats.projectsByStatus; track item.status) {
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 capitalize">{{ item.status }}</span>
-              <span class="text-sm font-medium bg-gray-100 px-3 py-1 rounded-full">{{ item.count }}</span>
+            <div class="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3">
+              <span class="text-sm font-medium capitalize text-slate-600">{{ item.status }}</span>
+              <span class="rounded-full bg-slate-200/80 px-3 py-1 text-xs font-semibold text-slate-700">{{ item.count }}</span>
             </div>
           }
         </div>
-      </div>
+      </article>
 
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Clients by Risk Level</h3>
-        <div class="space-y-3">
+      <article class="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
+        <h2 class="font-['Sora'] text-lg font-semibold text-slate-900">Clients par Niveau de Risque</h2>
+        <div class="mt-5 space-y-3">
           @for (item of stats.clientsByRisk; track item.risk_level) {
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 capitalize">{{ item.risk_level }}</span>
-              <span class="text-sm font-medium px-3 py-1 rounded-full"
-                [class]="item.risk_level === 'high' ? 'bg-red-100 text-red-600' : item.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'">
+            <div class="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3">
+              <span class="text-sm font-medium capitalize text-slate-600">{{ item.risk_level }}</span>
+              <span
+                class="rounded-full px-3 py-1 text-xs font-semibold"
+                [class]="item.risk_level === 'high' ? 'bg-rose-100 text-rose-700' : item.risk_level === 'medium' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'"
+              >
                 {{ item.count }}
               </span>
             </div>
           }
         </div>
-      </div>
-    </div>
+      </article>
+    </section>
   } @else {
-    <div class="flex items-center justify-center h-64">
-      <p class="text-gray-400">Loading dashboard data...</p>
-    </div>
+    <section class="rounded-3xl border border-slate-200/80 bg-white/75 p-10 text-center shadow-sm backdrop-blur">
+      <p class="text-sm text-slate-500">Chargement du tableau de bord...</p>
+    </section>
   }
 </div>
