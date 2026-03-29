@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth';
 import { ClientService } from '../../../core/services/client';
@@ -22,7 +21,6 @@ import { Client } from '../../../core/models';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatSelectModule,
   ],
   templateUrl: './client-form.html',
   styleUrl: './client-form.scss',
@@ -36,18 +34,12 @@ export class ClientForm implements OnInit {
   private clientId: number | null = null;
 
   clientForm = new FormGroup({
+    username: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    phone: new FormControl('', [Validators.required]),
     company_name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    contact_person: new FormControl(''),
-    email: new FormControl('', [Validators.email]),
-    phone: new FormControl(''),
-    sector: new FormControl(''),
-    siret: new FormControl('', [Validators.maxLength(14)]),
-    city: new FormControl(''),
-    address: new FormControl(''),
-    annual_revenue: new FormControl(''),
-    status: new FormControl('prospect'),
-    risk_level: new FormControl('medium'),
-    notes: new FormControl(''),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    city: new FormControl('', [Validators.required]),
   });
 
   constructor(
@@ -97,19 +89,22 @@ export class ClientForm implements OnInit {
 
   private patchForm(client: Client): void {
     this.clientForm.patchValue({
-      company_name: client.company_name || '',
-      contact_person: client.contact_person || '',
-      email: client.email || '',
+      username: this.parseUsernameFromNotes(client.notes),
+      name: client.contact_person || '',
       phone: client.phone || '',
-      sector: client.sector || '',
-      siret: client.siret || '',
+      company_name: client.company_name || '',
+      email: client.email || '',
       city: client.city || '',
-      address: client.address || '',
-      annual_revenue: client.annual_revenue !== undefined && client.annual_revenue !== null ? String(client.annual_revenue) : '',
-      status: client.status || 'prospect',
-      risk_level: client.risk_level || 'medium',
-      notes: client.notes || '',
     });
+  }
+
+  private parseUsernameFromNotes(notes: string | undefined): string {
+    if (!notes) {
+      return '';
+    }
+
+    const usernameMatch = notes.match(/Username:\s*([^|]+)/i);
+    return usernameMatch ? usernameMatch[1].trim() : '';
   }
 
   private cleanOptionalText(value: string | null | undefined): string | undefined {
@@ -123,27 +118,16 @@ export class ClientForm implements OnInit {
 
   private buildPayload(): Partial<Client> {
     const formValue = this.clientForm.value;
-    const annualRevenueValue = this.cleanOptionalText(formValue.annual_revenue);
-
-    let annualRevenue;
-    if (annualRevenueValue !== undefined) {
-      const parsedAnnualRevenue = Number(annualRevenueValue);
-      annualRevenue = Number.isNaN(parsedAnnualRevenue) ? undefined : parsedAnnualRevenue;
-    }
+    const username = this.cleanOptionalText(formValue.username);
+    const name = this.cleanOptionalText(formValue.name);
 
     const payload = {
       company_name: (formValue.company_name || '').trim(),
-      contact_person: this.cleanOptionalText(formValue.contact_person),
+      contact_person: name,
       email: this.cleanOptionalText(formValue.email)?.toLowerCase(),
       phone: this.cleanOptionalText(formValue.phone),
-      sector: this.cleanOptionalText(formValue.sector),
-      siret: this.cleanOptionalText(formValue.siret),
       city: this.cleanOptionalText(formValue.city),
-      address: this.cleanOptionalText(formValue.address),
-      annual_revenue: annualRevenue,
-      status: formValue.status as Client['status'],
-      risk_level: formValue.risk_level as Client['risk_level'],
-      notes: this.cleanOptionalText(formValue.notes),
+      notes: username ? `Username: ${username}` : undefined,
       assigned_expert_id: this.isAssistant ? this.authService.getCurrentUser()?.id : undefined,
     };
 

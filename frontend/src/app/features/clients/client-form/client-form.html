@@ -42,7 +42,31 @@
 	} @else {
 		<form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="rounded-2xl border border-slate-200 bg-white/85 p-5 shadow-sm sm:p-6">
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-				<mat-form-field appearance="outline" class="w-full md:col-span-2">
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>Username</mat-label>
+					<input matInput formControlName="username" placeholder="Ex: client_demo" />
+					@if (isFieldInvalid('username')) {
+						<mat-error>Le username est obligatoire (3 caracteres minimum).</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>Name</mat-label>
+					<input matInput formControlName="name" placeholder="Nom complet" />
+					@if (isFieldInvalid('name')) {
+						<mat-error>Le nom est obligatoire.</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>Phone Number</mat-label>
+					<input matInput formControlName="phone" placeholder="+212 ..." />
+					@if (isFieldInvalid('phone')) {
+						<mat-error>Le numero de telephone est obligatoire.</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
 					<mat-label>Nom de l'entreprise</mat-label>
 					<input matInput formControlName="company_name" placeholder="Ex: Atlas Conseil" />
 					@if (isFieldInvalid('company_name')) {
@@ -51,72 +75,19 @@
 				</mat-form-field>
 
 				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Personne de contact</mat-label>
-					<input matInput formControlName="contact_person" placeholder="Nom du contact" />
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Email</mat-label>
+					<mat-label>Mail</mat-label>
 					<input matInput type="email" formControlName="email" placeholder="contact@entreprise.com" />
 					@if (isFieldInvalid('email')) {
-						<mat-error>Format d'email invalide.</mat-error>
+						<mat-error>Le mail est obligatoire et doit etre valide.</mat-error>
 					}
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Telephone</mat-label>
-					<input matInput formControlName="phone" placeholder="+212 ..." />
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>SIRET</mat-label>
-					<input matInput formControlName="siret" maxlength="14" placeholder="14 caracteres max" />
-					@if (isFieldInvalid('siret')) {
-						<mat-error>Le SIRET doit contenir au maximum 14 caracteres.</mat-error>
-					}
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Secteur</mat-label>
-					<input matInput formControlName="sector" placeholder="Ex: Finance, Industrie..." />
 				</mat-form-field>
 
 				<mat-form-field appearance="outline" class="w-full">
 					<mat-label>Ville</mat-label>
 					<input matInput formControlName="city" placeholder="Casablanca" />
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Chiffre d'affaires annuel</mat-label>
-					<input matInput type="number" min="0" formControlName="annual_revenue" placeholder="0" />
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Statut</mat-label>
-					<mat-select formControlName="status">
-						<mat-option value="prospect">Prospect</mat-option>
-						<mat-option value="active">Actif</mat-option>
-						<mat-option value="inactive">Inactif</mat-option>
-					</mat-select>
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Niveau de risque</mat-label>
-					<mat-select formControlName="risk_level">
-						<mat-option value="low">Faible</mat-option>
-						<mat-option value="medium">Moyen</mat-option>
-						<mat-option value="high">Eleve</mat-option>
-					</mat-select>
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full md:col-span-2">
-					<mat-label>Adresse</mat-label>
-					<textarea matInput rows="3" formControlName="address" placeholder="Adresse complete"></textarea>
-				</mat-form-field>
-
-				<mat-form-field appearance="outline" class="w-full md:col-span-2">
-					<mat-label>Notes</mat-label>
-					<textarea matInput rows="3" formControlName="notes" placeholder="Informations supplementaires"></textarea>
+					@if (isFieldInvalid('city')) {
+						<mat-error>La ville est obligatoire.</mat-error>
+					}
 				</mat-form-field>
 			</div>
 

@@ -41,6 +41,7 @@ const getById = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     const {
+      username,
       company_name,
       siret,
       address,
@@ -57,8 +58,16 @@ const create = async (req, res, next) => {
     } = req.body;
 
     const normalizedCompanyName = cleanOptionalString(company_name);
-    if (!normalizedCompanyName) {
-      return res.status(400).json({ message: 'Company name is required.' });
+    const normalizedContactPerson = cleanOptionalString(contact_person);
+    const normalizedPhone = cleanOptionalString(phone);
+    const normalizedEmail = cleanOptionalString(email, true);
+    const normalizedCity = cleanOptionalString(city);
+    const normalizedUsername = cleanOptionalString(username);
+
+    if (!normalizedCompanyName || !normalizedContactPerson || !normalizedPhone || !normalizedEmail || !normalizedCity || !normalizedUsername) {
+      return res.status(400).json({
+        message: 'Username, name, phone, company, email and city are required.',
+      });
     }
 
     let normalizedAnnualRevenue;
@@ -69,19 +78,25 @@ const create = async (req, res, next) => {
       }
     }
 
+    const normalizedNotes = cleanOptionalString(notes);
+    const combinedNotes = [
+      `Username: ${normalizedUsername}`,
+      normalizedNotes,
+    ].filter(Boolean).join(' | ');
+
     const clientPayload = {
       company_name: normalizedCompanyName,
       siret: cleanOptionalString(siret),
       address: cleanOptionalString(address),
-      city: cleanOptionalString(city),
-      phone: cleanOptionalString(phone),
-      email: cleanOptionalString(email, true),
-      contact_person: cleanOptionalString(contact_person),
+      city: normalizedCity,
+      phone: normalizedPhone,
+      email: normalizedEmail,
+      contact_person: normalizedContactPerson,
       annual_revenue: normalizedAnnualRevenue,
       sector: cleanOptionalString(sector),
       risk_level: cleanOptionalString(risk_level),
       status: cleanOptionalString(status),
-      notes: cleanOptionalString(notes),
+      notes: combinedNotes || undefined,
     };
 
     if (req.user.role === 'assistant') {
