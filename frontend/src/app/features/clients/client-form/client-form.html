@@ -43,7 +43,7 @@
 		<form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="rounded-2xl border border-slate-200 bg-white/85 p-5 shadow-sm sm:p-6">
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Username</mat-label>
+					<mat-label>prenom</mat-label>
 					<input matInput formControlName="username" placeholder="Ex: client_demo" />
 					@if (isFieldInvalid('username')) {
 						<mat-error>Le username est obligatoire (3 caracteres minimum).</mat-error>
@@ -51,7 +51,7 @@
 				</mat-form-field>
 
 				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Name</mat-label>
+					<mat-label>nom</mat-label>
 					<input matInput formControlName="name" placeholder="Nom complet" />
 					@if (isFieldInvalid('name')) {
 						<mat-error>Le nom est obligatoire.</mat-error>
@@ -59,7 +59,7 @@
 				</mat-form-field>
 
 				<mat-form-field appearance="outline" class="w-full">
-					<mat-label>Phone Number</mat-label>
+					<mat-label>num tel</mat-label>
 					<input matInput formControlName="phone" placeholder="+212 ..." />
 					@if (isFieldInvalid('phone')) {
 						<mat-error>Le numero de telephone est obligatoire.</mat-error>
