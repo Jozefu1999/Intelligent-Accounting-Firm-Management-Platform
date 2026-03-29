@@ -122,6 +122,7 @@ export class ClientForm implements OnInit {
     const name = this.cleanOptionalText(formValue.name);
 
     const payload = {
+      username,
       company_name: (formValue.company_name || '').trim(),
       contact_person: name,
       email: this.cleanOptionalText(formValue.email)?.toLowerCase(),
