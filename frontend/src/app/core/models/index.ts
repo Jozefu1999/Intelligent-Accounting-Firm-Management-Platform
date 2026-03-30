@@ -10,6 +10,7 @@ export interface User {
 
 export interface Client {
   id: number;
+  username?: string;
   company_name: string;
   siret?: string;
   address?: string;

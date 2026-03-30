@@ -89,22 +89,13 @@ export class ClientForm implements OnInit {
 
   private patchForm(client: Client): void {
     this.clientForm.patchValue({
-      username: this.parseUsernameFromNotes(client.notes),
+      username: client.username || '',
       name: client.contact_person || '',
       phone: client.phone || '',
       company_name: client.company_name || '',
       email: client.email || '',
       city: client.city || '',
     });
-  }
-
-  private parseUsernameFromNotes(notes: string | undefined): string {
-    if (!notes) {
-      return '';
-    }
-
-    const usernameMatch = notes.match(/Username:\s*([^|]+)/i);
-    return usernameMatch ? usernameMatch[1].trim() : '';
   }
 
   private cleanOptionalText(value: string | null | undefined): string | undefined {
@@ -128,7 +119,6 @@ export class ClientForm implements OnInit {
       email: this.cleanOptionalText(formValue.email)?.toLowerCase(),
       phone: this.cleanOptionalText(formValue.phone),
       city: this.cleanOptionalText(formValue.city),
-      notes: username ? `Username: ${username}` : undefined,
       assigned_expert_id: this.isAssistant ? this.authService.getCurrentUser()?.id : undefined,
     };
 
