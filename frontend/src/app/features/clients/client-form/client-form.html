@@ -1,1 +1,113 @@
-<p>client-form works!</p>
+<div class="mx-auto w-full max-w-6xl">
+	<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Clients</p>
+			<h1 class="mt-1 text-2xl font-semibold text-slate-900">
+				@if (isEditMode) {
+					Modifier un client
+				} @else {
+					Ajouter un client
+				}
+			</h1>
+			<p class="mt-1 text-sm text-slate-500">
+				Renseignez les informations du client pour le suivi commercial et projet.
+			</p>
+		</div>
+
+		<a routerLink="/clients" mat-stroked-button class="!rounded-xl !border-slate-300 !text-slate-700">
+			<mat-icon>arrow_back</mat-icon>
+			Retour a la liste
+		</a>
+	</div>
+
+	@if (errorMessage) {
+		<div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+			{{ errorMessage }}
+		</div>
+	}
+
+	@if (isAssistant) {
+		<div class="mb-5 rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-800">
+			En tant qu'assistant, le client sera automatiquement rattache a votre compte.
+		</div>
+	}
+
+	@if (loading) {
+		<div class="flex min-h-[240px] items-center justify-center rounded-2xl border border-slate-200 bg-white/80">
+			<div class="flex items-center gap-2 text-slate-500">
+				<mat-icon class="animate-spin">refresh</mat-icon>
+				Chargement des donnees client...
+			</div>
+		</div>
+	} @else {
+		<form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="rounded-2xl border border-slate-200 bg-white/85 p-5 shadow-sm sm:p-6">
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>prenom</mat-label>
+					<input matInput formControlName="username" placeholder="Ex: client_demo" />
+					@if (isFieldInvalid('username')) {
+						<mat-error>Le username est obligatoire (3 caracteres minimum).</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>nom</mat-label>
+					<input matInput formControlName="name" placeholder="Nom complet" />
+					@if (isFieldInvalid('name')) {
+						<mat-error>Le nom est obligatoire.</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>num tel</mat-label>
+					<input matInput formControlName="phone" placeholder="+212 ..." />
+					@if (isFieldInvalid('phone')) {
+						<mat-error>Le numero de telephone est obligatoire.</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>Nom de l'entreprise</mat-label>
+					<input matInput formControlName="company_name" placeholder="Ex: Atlas Conseil" />
+					@if (isFieldInvalid('company_name')) {
+						<mat-error>Le nom de l'entreprise est obligatoire.</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>Mail</mat-label>
+					<input matInput type="email" formControlName="email" placeholder="contact@entreprise.com" />
+					@if (isFieldInvalid('email')) {
+						<mat-error>Le mail est obligatoire et doit etre valide.</mat-error>
+					}
+				</mat-form-field>
+
+				<mat-form-field appearance="outline" class="w-full">
+					<mat-label>Ville</mat-label>
+					<input matInput formControlName="city" placeholder="Casablanca" />
+					@if (isFieldInvalid('city')) {
+						<mat-error>La ville est obligatoire.</mat-error>
+					}
+				</mat-form-field>
+			</div>
+
+			<div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+				<a routerLink="/clients" mat-stroked-button class="!rounded-xl !border-slate-300 !text-slate-700">
+					Annuler
+				</a>
+
+				@if (saving) {
+					<button mat-flat-button type="submit" [disabled]="true" class="!rounded-xl !bg-cyan-400 !px-5 !text-white">
+						<mat-icon class="animate-spin">refresh</mat-icon>
+						Enregistrement...
+					</button>
+				} @else {
+					<button mat-flat-button type="submit" class="!rounded-xl !bg-cyan-700 !px-5 !text-white hover:!bg-cyan-800">
+						<mat-icon>save</mat-icon>
+						{{ isEditMode ? 'Mettre a jour' : 'Creer le client' }}
+					</button>
+				}
+			</div>
+		</form>
+	}
+</div>

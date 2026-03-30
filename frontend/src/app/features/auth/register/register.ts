@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,7 +22,11 @@ export class Register {
   errorMessage = '';
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
 
   onSubmit(): void {
     this.loading = true;
@@ -34,7 +38,8 @@ export class Register {
       last_name: this.last_name,
     }).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
+        this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Registration failed.';

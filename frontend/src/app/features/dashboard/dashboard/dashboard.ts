@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { DashboardService } from '../../../core/services/dashboard';
+import { AuthService } from '../../../core/services/auth';
 import { DashboardStats } from '../../../core/models';
 
 @Component({
@@ -14,7 +15,10 @@ import { DashboardStats } from '../../../core/models';
 export class Dashboard implements OnInit {
   stats: DashboardStats | null = null;
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    public authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
     this.dashboardService.getStats().subscribe({
