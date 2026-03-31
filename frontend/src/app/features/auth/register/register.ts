@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/services/auth';
+import { UserRole } from '../../../core/models';
 
 @Component({
   selector: 'app-register',
@@ -19,8 +20,16 @@ export class Register {
   last_name = '';
   email = '';
   password = '';
+  role: UserRole = 'assistant';
   errorMessage = '';
   loading = false;
+
+  readonly roleOptions: ReadonlyArray<{ value: UserRole; label: string }> = [
+    { value: 'admin', label: 'Administrateur' },
+    { value: 'expert', label: 'Expert' },
+    { value: 'assistant', label: 'Assistant' },
+    { value: 'client', label: 'Client' },
+  ];
 
   constructor(
     private authService: AuthService,
@@ -36,6 +45,7 @@ export class Register {
       password: this.password,
       first_name: this.first_name,
       last_name: this.last_name,
+      role: this.role,
     }).subscribe({
       next: () => {
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';

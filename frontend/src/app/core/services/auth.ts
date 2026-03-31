@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, User } from '../models';
+import { AuthResponse, User, UserRole } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -63,7 +63,7 @@ export class AuthService {
     );
   }
 
-  register(data: { email: string; password: string; first_name: string; last_name: string }): Observable<AuthResponse> {
+  register(data: { email: string; password: string; first_name: string; last_name: string; role: UserRole }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data).pipe(
       tap((res) => {
         this.setSession(res.token, res.user);

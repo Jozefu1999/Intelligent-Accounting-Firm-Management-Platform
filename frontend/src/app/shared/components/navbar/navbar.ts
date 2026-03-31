@@ -29,6 +29,8 @@ export class Navbar {
         return 'Administrateur';
       case 'expert':
         return 'Expert';
+      case 'client':
+        return 'Client';
       default:
         return 'Assistant';
     }

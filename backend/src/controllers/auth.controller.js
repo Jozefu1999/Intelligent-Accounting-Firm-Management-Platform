@@ -2,9 +2,15 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
+const ALLOWED_ROLES = ['admin', 'expert', 'assistant', 'client'];
+
 const register = async (req, res, next) => {
   try {
     const { email, password, first_name, last_name, role } = req.body;
+
+    if (role && !ALLOWED_ROLES.includes(role)) {
+      return res.status(400).json({ message: 'Invalid role.' });
+    }
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
