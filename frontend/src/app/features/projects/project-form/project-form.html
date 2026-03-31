@@ -1,1 +1,97 @@
-<p>project-form works!</p>
+<div class="form-container">
+	<div class="form-header">
+		<h2>{{ projectToEdit ? 'Modifier le projet' : 'Nouveau projet' }}</h2>
+		<button type="button" class="close-btn" (click)="onCancel()">✕</button>
+	</div>
+
+	<form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+		<div class="form-group">
+			<label>Titre du projet <span class="required">*</span></label>
+			<input
+				type="text"
+				formControlName="titre"
+				placeholder="Ex: Audit fiscal 2024"
+				[class.error-input]="projectForm.get('titre')?.invalid && projectForm.get('titre')?.touched"
+			/>
+			<span
+				class="error-msg"
+				*ngIf="projectForm.get('titre')?.invalid && projectForm.get('titre')?.touched"
+			>
+				Le titre est obligatoire
+			</span>
+		</div>
+
+		<div class="form-group">
+			<label>Description</label>
+			<textarea
+				formControlName="description"
+				rows="3"
+				placeholder="Décrivez le projet..."
+			>
+			</textarea>
+		</div>
+
+		<div class="form-group">
+			<label>Client <span class="required">*</span></label>
+			<select
+				formControlName="client_id"
+				[class.error-input]="projectForm.get('client_id')?.invalid && projectForm.get('client_id')?.touched"
+			>
+				<option [ngValue]="null" disabled selected>
+					-- Sélectionner un client --
+				</option>
+				<option *ngFor="let client of clients" [value]="client.id">
+					{{ client.nom }}
+				</option>
+			</select>
+			<span
+				class="error-msg"
+				*ngIf="projectForm.get('client_id')?.invalid && projectForm.get('client_id')?.touched"
+			>
+				Veuillez sélectionner un client
+			</span>
+		</div>
+
+		<div class="form-group">
+			<label>Type <span class="required">*</span></label>
+			<select formControlName="type">
+				<option value="">-- Sélectionner un type --</option>
+				<option value="audit">Audit</option>
+				<option value="comptabilite">Comptabilité</option>
+				<option value="fiscalite">Fiscalité</option>
+				<option value="conseil">Conseil</option>
+				<option value="juridique">Juridique</option>
+			</select>
+		</div>
+
+		<div class="form-row">
+			<div class="form-group">
+				<label>Statut</label>
+				<select formControlName="statut">
+					<option value="en_cours">En cours</option>
+					<option value="terminé">Terminé</option>
+					<option value="suspendu">Suspendu</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label>Priorité</label>
+				<select formControlName="priority">
+					<option value="faible">Faible</option>
+					<option value="moyenne">Moyenne</option>
+					<option value="élevée">Élevée</option>
+					<option value="critique">Critique</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form-footer">
+			<button type="button" class="btn-cancel" (click)="onCancel()">
+				Annuler
+			</button>
+			<button type="submit" class="btn-submit">
+				{{ projectToEdit ? 'Modifier' : 'Créer le projet' }}
+			</button>
+		</div>
+	</form>
+</div>
