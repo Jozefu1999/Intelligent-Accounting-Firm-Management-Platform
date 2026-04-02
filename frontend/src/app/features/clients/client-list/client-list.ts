@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,15 +18,24 @@ export class ClientList implements OnInit {
   clients: Client[] = [];
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private clientService: ClientService,
     private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
+    this.handleCreatedFlashMessage();
     this.loadClients();
+  }
+
+  clearSuccessMessage(): void {
+    this.successMessage = '';
+    this.cdr.detectChanges();
   }
 
   loadClients(): void {
@@ -61,5 +70,25 @@ export class ClientList implements OnInit {
         },
       });
     }
+  }
+
+  private handleCreatedFlashMessage(): void {
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params.get('created') !== '1') {
+          return;
+        }
+
+        this.successMessage = 'Client created successfully.';
+        this.cdr.detectChanges();
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { created: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
+      });
   }
 }

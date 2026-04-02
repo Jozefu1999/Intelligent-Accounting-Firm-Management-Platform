@@ -54,7 +54,8 @@ async function start() {
     await sequelize.authenticate();
     console.log('Database connected successfully.');
 
-    await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
+    const shouldAlterSchema = process.env.DB_SYNC_ALTER === 'true';
+    await sequelize.sync({ alter: shouldAlterSchema });
     console.log('Database synced.');
 
     app.listen(PORT, () => {
