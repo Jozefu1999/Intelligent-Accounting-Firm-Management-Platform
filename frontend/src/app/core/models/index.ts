@@ -8,6 +8,25 @@ export interface User {
   updated_at?: string;
 }
 
+export interface ClientProjectSummary {
+  id: number;
+  name: string;
+  status?: string;
+  priority?: string;
+}
+
+export interface CreateClientPayload {
+  name: string;
+  username: string;
+  phone?: string;
+  mail?: string;
+  adresse?: string;
+  company_name?: string;
+  contact_person?: string;
+  email?: string;
+  address?: string;
+}
+
 export interface Client {
   id: number;
   company_name: string;
@@ -24,6 +43,7 @@ export interface Client {
   notes?: string;
   assigned_expert_id?: number;
   assignedExpert?: User;
+  projects?: ClientProjectSummary[];
   created_at?: string;
   updated_at?: string;
 }
