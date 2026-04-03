@@ -31,6 +31,23 @@ const upload = multer({
   },
 });
 
+const getAll = async (req, res, next) => {
+  try {
+    const where = ['assistant', 'visiteur'].includes(req.user.role)
+      ? { uploaded_by: req.user.id }
+      : undefined;
+
+    const documents = await Document.findAll({
+      where,
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.json(documents);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const uploadDocument = async (req, res, next) => {
   try {
     if (!req.file) {
@@ -91,4 +108,4 @@ const remove = async (req, res, next) => {
   }
 };
 
-module.exports = { upload, uploadDocument, downloadDocument, remove };
+module.exports = { getAll, upload, uploadDocument, downloadDocument, remove };

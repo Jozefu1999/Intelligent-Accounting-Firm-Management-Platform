@@ -1,9 +1,13 @@
+export type UserRole = 'expert_comptable' | 'assistant' | 'administrateur' | 'visiteur';
+
 export interface User {
   id: number;
   email: string;
-  first_name: string;
-  last_name: string;
-  role: 'admin' | 'expert' | 'assistant';
+  first_name?: string;
+  last_name?: string;
+  nom?: string;
+  prenom?: string;
+  role: UserRole;
   created_at?: string;
   updated_at?: string;
 }

@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/services/auth';
+import { UserRole } from '../../../core/models';
 
 @Component({
   selector: 'app-register',
@@ -19,8 +20,16 @@ export class Register {
   last_name = '';
   email = '';
   password = '';
+  role: UserRole | '' = '';
   errorMessage = '';
   loading = false;
+
+  readonly roles: Array<{ label: string; value: UserRole }> = [
+    { label: 'Expert Comptable', value: 'expert_comptable' },
+    { label: 'Assistant', value: 'assistant' },
+    { label: 'Administrateur', value: 'administrateur' },
+    { label: 'Client / Visiteur', value: 'visiteur' },
+  ];
 
   constructor(
     private authService: AuthService,
@@ -29,6 +38,11 @@ export class Register {
   ) {}
 
   onSubmit(): void {
+    if (!this.role) {
+      this.errorMessage = 'Veuillez selectionner un role.';
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = '';
     this.authService.register({
@@ -36,10 +50,12 @@ export class Register {
       password: this.password,
       first_name: this.first_name,
       last_name: this.last_name,
+      role: this.role,
     }).subscribe({
       next: () => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
-        this.router.navigateByUrl(returnUrl);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        const destination = returnUrl || this.authService.getHomeForCurrentUser();
+        this.router.navigateByUrl(destination);
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Registration failed.';

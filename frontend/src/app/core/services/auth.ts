@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, User } from '../models';
+import { AuthResponse, User, UserRole } from '../models';
+import { getHomeForRole, normalizeRole } from '../utils/role-home';
 
 @Injectable({
   providedIn: 'root',
@@ -20,12 +21,23 @@ export class AuthService {
     const user = this.readStoredUser();
 
     if (token && user) {
-      this.currentUserSubject.next(user);
+      this.currentUserSubject.next(this.normalizeUser(user));
     }
 
     if (!token && user) {
       localStorage.removeItem(this.userKey);
     }
+  }
+
+  private normalizeUser(user: User): User {
+    return {
+      ...user,
+      first_name: user.first_name ?? user.prenom ?? '',
+      last_name: user.last_name ?? user.nom ?? '',
+      prenom: user.prenom ?? user.first_name ?? '',
+      nom: user.nom ?? user.last_name ?? '',
+      role: normalizeRole(user.role),
+    };
   }
 
   private readStoredUser(): User | null {
@@ -44,9 +56,11 @@ export class AuthService {
   }
 
   private setSession(token: string, user: User): void {
+    const normalizedUser = this.normalizeUser(user);
+
     localStorage.setItem(this.tokenKey, token);
-    localStorage.setItem(this.userKey, JSON.stringify(user));
-    this.currentUserSubject.next(user);
+    localStorage.setItem(this.userKey, JSON.stringify(normalizedUser));
+    this.currentUserSubject.next(normalizedUser);
   }
 
   private clearSession(): void {
@@ -63,7 +77,7 @@ export class AuthService {
     );
   }
 
-  register(data: { email: string; password: string; first_name: string; last_name: string }): Observable<AuthResponse> {
+  register(data: { email: string; password: string; first_name: string; last_name: string; role: UserRole }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data).pipe(
       tap((res) => {
         this.setSession(res.token, res.user);
@@ -71,11 +85,29 @@ export class AuthService {
     );
   }
 
+  updateProfile(data: {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    nom?: string;
+    prenom?: string;
+    password?: string;
+  }): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/profile`, data).pipe(
+      tap((user) => {
+        const normalizedUser = this.normalizeUser(user);
+        localStorage.setItem(this.userKey, JSON.stringify(normalizedUser));
+        this.currentUserSubject.next(normalizedUser);
+      })
+    );
+  }
+
   fetchCurrentUser(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/me`).pipe(
       tap((user) => {
-        localStorage.setItem(this.userKey, JSON.stringify(user));
-        this.currentUserSubject.next(user);
+        const normalizedUser = this.normalizeUser(user);
+        localStorage.setItem(this.userKey, JSON.stringify(normalizedUser));
+        this.currentUserSubject.next(normalizedUser);
       })
     );
   }
@@ -109,5 +141,13 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  getHomeForCurrentUser(): string {
+    return getHomeForRole(this.currentUserSubject.value?.role);
+  }
+
+  getHomeForRole(role: string | undefined | null): string {
+    return getHomeForRole(role);
   }
 }

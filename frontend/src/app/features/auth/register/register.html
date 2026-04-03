@@ -132,6 +132,25 @@
             </div>
           </div>
 
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Role</label>
+            <div class="relative">
+              <mat-icon class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl text-slate-400">badge</mat-icon>
+              <select
+                [(ngModel)]="role"
+                name="role"
+                required
+                class="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-11 py-3.5 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              >
+                <option value="" disabled>Selectionnez un role</option>
+                @for (item of roles; track item.value) {
+                  <option [value]="item.value">{{ item.label }}</option>
+                }
+              </select>
+              <mat-icon class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xl text-slate-400">expand_more</mat-icon>
+            </div>
+          </div>
+
           <button
             type="submit"
             [disabled]="loading"

@@ -5,9 +5,9 @@ const { authMiddleware, authorize } = require('../middleware/auth.middleware');
 
 router.use(authMiddleware);
 
-router.get('/', authorize('admin'), getAll);
+router.get('/', authorize('administrateur'), getAll);
 router.get('/:id', getById);
-router.put('/:id', authorize('admin'), update);
-router.delete('/:id', authorize('admin'), remove);
+router.put('/:id', authorize('administrateur'), update);
+router.delete('/:id', authorize('administrateur'), remove);
 
 module.exports = router;

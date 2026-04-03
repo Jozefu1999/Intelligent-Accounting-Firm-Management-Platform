@@ -1,4 +1,5 @@
 const { User } = require('../models');
+const { isValidRole, normalizeRole } = require('../utils/roles');
 
 const getAll = async (req, res, next) => {
   try {
@@ -33,9 +34,17 @@ const update = async (req, res, next) => {
     }
 
     const { first_name, last_name, email, role } = req.body;
-    await user.update({ first_name, last_name, email, role });
 
-    const { password_hash, ...userData } = user.toJSON();
+    if (role && !isValidRole(role)) {
+      return res.status(400).json({ message: 'Invalid role value.' });
+    }
+
+    const normalizedRole = role ? normalizeRole(role) : user.role;
+
+    await user.update({ first_name, last_name, email, role: normalizedRole });
+
+    const userData = user.toJSON();
+    delete userData.password_hash;
     res.json(userData);
   } catch (error) {
     next(error);

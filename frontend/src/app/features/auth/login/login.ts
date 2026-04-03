@@ -36,8 +36,9 @@ export class Login {
     this.errorMessage = '';
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
-        this.router.navigateByUrl(returnUrl);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        const destination = returnUrl || this.authService.getHomeForCurrentUser();
+        this.router.navigateByUrl(destination);
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Login failed.';

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { guestGuard } from './core/guards/guest-guard';
+import { AdminGuard, AssistantGuard, ClientGuard, ExpertGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -17,11 +18,26 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard),
-    canActivate: [authGuard],
+    canActivate: [authGuard, ExpertGuard],
+  },
+  {
+    path: 'assistant-dashboard',
+    loadComponent: () => import('./pages/assistant-dashboard/assistant-dashboard.component').then(m => m.AssistantDashboardComponent),
+    canActivate: [authGuard, AssistantGuard],
+  },
+  {
+    path: 'admin-dashboard',
+    loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    canActivate: [authGuard, AdminGuard],
+  },
+  {
+    path: 'client-dashboard',
+    loadComponent: () => import('./pages/client-dashboard/client-dashboard.component').then(m => m.ClientDashboardComponent),
+    canActivate: [authGuard, ClientGuard],
   },
   {
     path: 'clients',
-    canActivate: [authGuard],
+    canActivate: [authGuard, ExpertGuard],
     children: [
       {
         path: '',
@@ -43,7 +59,7 @@ export const routes: Routes = [
   },
   {
     path: 'projects',
-    canActivate: [authGuard],
+    canActivate: [authGuard, ExpertGuard],
     children: [
       {
         path: '',
@@ -65,7 +81,7 @@ export const routes: Routes = [
   },
   {
     path: 'ai-tools',
-    canActivate: [authGuard],
+    canActivate: [authGuard, ExpertGuard],
     children: [
       {
         path: 'business-plan',
