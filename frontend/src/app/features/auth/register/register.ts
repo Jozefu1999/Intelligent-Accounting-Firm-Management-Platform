@@ -24,7 +24,7 @@ export class Register {
   errorMessage = '';
   loading = false;
 
-  readonly roles: Array<{ label: string; value: UserRole }> = [
+  readonly roles: ReadonlyArray<{ label: string; value: UserRole }> = [
     { label: 'Expert Comptable', value: 'expert_comptable' },
     { label: 'Assistant', value: 'assistant' },
     { label: 'Administrateur', value: 'administrateur' },

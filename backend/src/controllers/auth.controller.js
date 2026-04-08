@@ -14,6 +14,16 @@ const buildSafeUserPayload = (user) => ({
   created_at: user.created_at || user.createdAt,
 });
 
+const ALLOWED_ROLES = [
+  'admin',
+  'expert',
+  'assistant',
+  'client',
+  'expert_comptable',
+  'administrateur',
+  'visiteur',
+];
+
 const register = async (req, res, next) => {
   try {
     const { email, password, first_name, last_name, prenom, nom, role } = req.body;
@@ -30,6 +40,10 @@ const register = async (req, res, next) => {
     }
 
     const resolvedRole = normalizeRole(requestedRole);
+
+    if (role && !ALLOWED_ROLES.includes(role)) {
+      return res.status(400).json({ message: 'Invalid role.' });
+    }
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
