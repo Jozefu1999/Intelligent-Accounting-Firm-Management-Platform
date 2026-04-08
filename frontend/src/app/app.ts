@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './shared/components/navbar/navbar';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { AuthService } from './core/services/auth';
@@ -12,9 +12,17 @@ import { CommonModule } from '@angular/common';
   styleUrl: './app.scss'
 })
 export class App {
-  constructor(public authService: AuthService) {}
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+  ) {}
 
   get currentRole(): string {
     return this.authService.getCurrentUser()?.role ?? 'visiteur';
+  }
+
+  get useAssistantLayout(): boolean {
+    const currentUrl = this.router.url ?? '';
+    return currentUrl.startsWith('/assistant');
   }
 }

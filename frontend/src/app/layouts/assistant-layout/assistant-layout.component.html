@@ -1,0 +1,49 @@
+<div class="layout-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <p class="sidebar-eyebrow">Espace Assistant</p>
+      <h2 class="sidebar-title">Navigation</h2>
+    </div>
+
+    <nav class="nav-menu">
+      <a
+        routerLink="/assistant/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+      >
+        <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
+        <span class="nav-label">Tableau de bord</span>
+      </a>
+
+      <a
+        routerLink="/assistant/projets"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+      >
+        <span class="nav-icon"><mat-icon>work</mat-icon></span>
+        <span class="nav-label">Mes Projets assignes</span>
+      </a>
+
+      <a
+        routerLink="/assistant/documents"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+      >
+        <span class="nav-icon"><mat-icon>description</mat-icon></span>
+        <span class="nav-label">Documents</span>
+      </a>
+
+      <a class="nav-item logout" role="button" tabindex="0" (click)="logout()" (keydown.enter)="logout()">
+        <span class="nav-icon"><mat-icon>logout</mat-icon></span>
+        <span class="nav-label">Deconnexion</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

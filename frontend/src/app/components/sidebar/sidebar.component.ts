@@ -35,9 +35,9 @@ export class SidebarComponent {
       { label: 'Risk Prediction', subtitle: 'Anticipation', icon: 'warning', path: '/ai-tools/risk-prediction' },
     ],
     assistant: [
-      { label: 'Tableau de bord', subtitle: 'Vue operationnelle', icon: 'space_dashboard', path: '/assistant-dashboard', exact: true },
-      { label: 'Mes Projets', subtitle: 'Missions assignees', icon: 'work', path: '/assistant-dashboard', fragment: 'projects' },
-      { label: 'Documents', subtitle: 'Upload et suivi', icon: 'description', path: '/assistant-dashboard', fragment: 'documents' },
+      { label: 'Tableau de bord', subtitle: 'Vue operationnelle', icon: 'space_dashboard', path: '/assistant/dashboard', exact: true },
+      { label: 'Mes Projets assignes', subtitle: 'Missions assignees', icon: 'work', path: '/assistant/projets', exact: true },
+      { label: 'Documents', subtitle: 'Upload et suivi', icon: 'description', path: '/assistant/documents', exact: true },
     ],
     administrateur: [
       { label: 'Tableau de bord', subtitle: 'Pilotage global', icon: 'insights', path: '/admin-dashboard', exact: true },
