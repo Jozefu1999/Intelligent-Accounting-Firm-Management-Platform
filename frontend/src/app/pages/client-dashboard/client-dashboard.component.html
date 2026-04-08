@@ -1,0 +1,141 @@
+<div class="space-y-6">
+  @if (feedbackError) {
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      {{ feedbackError }}
+    </div>
+  }
+
+  @if (feedbackSuccess) {
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      {{ feedbackSuccess }}
+    </div>
+  }
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h1 class="text-2xl font-semibold text-slate-900">Bienvenue, {{ displayPrenom }} {{ displayNom }}</h1>
+    <p class="mt-2 text-sm text-slate-600">
+      Cette plateforme vous permet de suivre vos dossiers et de contacter votre expert comptable.
+    </p>
+  </section>
+
+  <section id="profil" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Mon Profil</h2>
+        <dl class="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+          <div>
+            <dt class="font-semibold text-slate-500">Nom</dt>
+            <dd>{{ displayNom }}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-slate-500">Prenom</dt>
+            <dd>{{ displayPrenom }}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-slate-500">Email</dt>
+            <dd>{{ displayEmail }}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-slate-500">Role</dt>
+            <dd>{{ displayRole }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <button
+        type="button"
+        (click)="openEditProfile()"
+        class="rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+      >
+        Modifier mon profil
+      </button>
+    </div>
+
+    @if (showEditProfile) {
+      <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <h3 class="text-sm font-semibold text-slate-800">Edition du profil</h3>
+
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">
+          <input
+            type="text"
+            [(ngModel)]="profileForm.nom"
+            name="nom"
+            placeholder="Nom"
+            class="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800"
+          />
+          <input
+            type="text"
+            [(ngModel)]="profileForm.prenom"
+            name="prenom"
+            placeholder="Prenom"
+            class="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800"
+          />
+          <input
+            type="email"
+            [(ngModel)]="profileForm.email"
+            name="email"
+            placeholder="Email"
+            class="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 sm:col-span-2"
+          />
+          <input
+            type="password"
+            [(ngModel)]="profileForm.password"
+            name="password"
+            placeholder="Mot de passe (optionnel)"
+            class="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 sm:col-span-2"
+          />
+        </div>
+
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            (click)="cancelEditProfile()"
+            class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            [disabled]="isSavingProfile"
+            (click)="saveProfile()"
+            class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            {{ isSavingProfile ? 'Mise a jour...' : 'Enregistrer' }}
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section id="contact" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="text-lg font-semibold text-slate-900">Contacter le cabinet</h2>
+
+    <form class="mt-4 space-y-3" (ngSubmit)="submitContact()">
+      <input
+        type="text"
+        [(ngModel)]="sujet"
+        name="sujet"
+        required
+        placeholder="Sujet"
+        class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800"
+      />
+
+      <textarea
+        [(ngModel)]="message"
+        name="message"
+        rows="5"
+        required
+        placeholder="Message"
+        class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800"
+      ></textarea>
+
+      <button
+        type="submit"
+        [disabled]="isSendingMessage"
+        class="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
+      >
+        {{ isSendingMessage ? 'Envoi...' : 'Envoyer' }}
+      </button>
+    </form>
+  </section>
+</div>

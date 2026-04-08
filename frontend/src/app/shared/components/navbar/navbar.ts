@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/services/auth';
 import { CommonModule } from '@angular/common';
+import { getRoleLabel } from '../../../core/utils/role-home';
 
 @Component({
   selector: 'app-navbar',
@@ -24,16 +25,15 @@ export class Navbar {
   }
 
   getRoleLabel(role: string | undefined): string {
-    switch (role) {
-      case 'admin':
-        return 'Administrateur';
-      case 'expert':
-        return 'Expert';
-      case 'client':
-        return 'Client';
-      default:
-        return 'Assistant';
-    }
+    return getRoleLabel(role);
+  }
+
+  getUserFirstName(user: any): string {
+    return user?.first_name || user?.prenom || '';
+  }
+
+  getUserLastName(user: any): string {
+    return user?.last_name || user?.nom || '';
   }
 
   logout(): void {

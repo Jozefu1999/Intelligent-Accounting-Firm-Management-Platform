@@ -1,0 +1,161 @@
+<div class="space-y-6">
+  @if (errorMessage) {
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      {{ successMessage }}
+    </div>
+  }
+
+  <section id="overview" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h1 class="text-2xl font-semibold text-slate-900">Tableau de bord Assistant</h1>
+        <p class="mt-1 text-sm text-slate-600">
+          Bonjour {{ fullName || 'Assistant' }}
+          <span class="ml-2 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">Assistant</span>
+        </p>
+      </div>
+      <button
+        type="button"
+        (click)="openUploadModal()"
+        class="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+      >
+        + Uploader un document
+      </button>
+    </div>
+  </section>
+
+  <section class="grid gap-4 md:grid-cols-2">
+    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-slate-500">Projets assignes</p>
+      <p class="mt-2 text-3xl font-semibold text-slate-900">{{ assignedProjectsCount }}</p>
+    </article>
+
+    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p class="text-sm text-slate-500">Documents uploades</p>
+      <p class="mt-2 text-3xl font-semibold text-slate-900">{{ uploadedDocumentsCount }}</p>
+    </article>
+  </section>
+
+  <section id="projects" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-slate-900">Projets assignes</h2>
+      @if (isLoading) {
+        <span class="text-sm text-slate-500">Chargement...</span>
+      }
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[760px] text-left">
+        <thead class="border-b border-slate-200 bg-slate-50">
+          <tr>
+            <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Titre</th>
+            <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Client</th>
+            <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
+            <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Priorite</th>
+            <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (project of projects; track project.id) {
+            <tr>
+              <td class="px-3 py-3 text-sm font-medium text-slate-900">{{ project.name }}</td>
+              <td class="px-3 py-3 text-sm text-slate-600">{{ project.client?.company_name || 'N/A' }}</td>
+              <td class="px-3 py-3 text-sm text-slate-700">{{ getStatusLabel(project.status) }}</td>
+              <td class="px-3 py-3 text-sm text-slate-700">{{ getPriorityLabel(project.priority) }}</td>
+              <td class="px-3 py-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <a
+                    [routerLink]="['/projects', project.id]"
+                    class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    Voir details
+                  </a>
+
+                  <select
+                    #statusSelect
+                    [value]="project.status"
+                    (change)="updateStatus(project, statusSelect.value)"
+                    class="rounded-xl border border-slate-200 px-2 py-1.5 text-xs text-slate-700 focus:border-cyan-500 focus:outline-none"
+                  >
+                    @for (option of statusOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">
+                Aucun projet assigne pour le moment.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="documents" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="text-lg font-semibold text-slate-900">Documents</h2>
+    <p class="mt-2 text-sm text-slate-600">
+      Importez des documents et rattachez-les rapidement a un projet.
+    </p>
+  </section>
+</div>
+
+@if (showUploadModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 px-4">
+    <div class="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
+      <h3 class="text-lg font-semibold text-slate-900">Uploader un document</h3>
+
+      <div class="mt-4 space-y-4">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Selectionner le projet</label>
+          <select
+            [(ngModel)]="selectedProjectId"
+            class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-500 focus:outline-none"
+          >
+            <option [ngValue]="null">Choisissez un projet</option>
+            @for (project of projects; track project.id) {
+              <option [ngValue]="project.id">{{ project.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Fichier</label>
+          <input
+            type="file"
+            (change)="onFileSelected($event)"
+            class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700"
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeUploadModal()"
+          class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+        >
+          Annuler
+        </button>
+        <button
+          type="button"
+          [disabled]="isUploading"
+          (click)="submitUpload()"
+          class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+        >
+          {{ isUploading ? 'Upload en cours...' : 'Envoyer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

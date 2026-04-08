@@ -1,13 +1,34 @@
-export type UserRole = 'admin' | 'expert' | 'assistant' | 'client';
+export type UserRole = 'expert_comptable' | 'assistant' | 'administrateur' | 'visiteur';
 
 export interface User {
   id: number;
   email: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
+  nom?: string;
+  prenom?: string;
   role: UserRole;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface ClientProjectSummary {
+  id: number;
+  name: string;
+  status?: string;
+  priority?: string;
+}
+
+export interface CreateClientPayload {
+  name: string;
+  username: string;
+  phone?: string;
+  mail?: string;
+  adresse?: string;
+  company_name?: string;
+  contact_person?: string;
+  email?: string;
+  address?: string;
 }
 
 export interface Client {
@@ -26,6 +47,7 @@ export interface Client {
   notes?: string;
   assigned_expert_id?: number;
   assignedExpert?: User;
+  projects?: ClientProjectSummary[];
   created_at?: string;
   updated_at?: string;
 }

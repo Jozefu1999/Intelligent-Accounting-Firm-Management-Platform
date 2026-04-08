@@ -20,15 +20,15 @@ export class Register {
   last_name = '';
   email = '';
   password = '';
-  role: UserRole = 'assistant';
+  role: UserRole | '' = '';
   errorMessage = '';
   loading = false;
 
-  readonly roleOptions: ReadonlyArray<{ value: UserRole; label: string }> = [
-    { value: 'admin', label: 'Administrateur' },
-    { value: 'expert', label: 'Expert' },
-    { value: 'assistant', label: 'Assistant' },
-    { value: 'client', label: 'Client' },
+  readonly roles: ReadonlyArray<{ label: string; value: UserRole }> = [
+    { label: 'Expert Comptable', value: 'expert_comptable' },
+    { label: 'Assistant', value: 'assistant' },
+    { label: 'Administrateur', value: 'administrateur' },
+    { label: 'Client / Visiteur', value: 'visiteur' },
   ];
 
   constructor(
@@ -38,6 +38,11 @@ export class Register {
   ) {}
 
   onSubmit(): void {
+    if (!this.role) {
+      this.errorMessage = 'Veuillez selectionner un role.';
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = '';
     this.authService.register({
@@ -48,8 +53,9 @@ export class Register {
       role: this.role,
     }).subscribe({
       next: () => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
-        this.router.navigateByUrl(returnUrl);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        const destination = returnUrl || this.authService.getHomeForCurrentUser();
+        this.router.navigateByUrl(destination);
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Registration failed.';

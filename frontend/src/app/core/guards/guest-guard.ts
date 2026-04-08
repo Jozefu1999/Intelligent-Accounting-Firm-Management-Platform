@@ -6,16 +6,17 @@ import { AuthService } from '../services/auth';
 export const guestGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const getRoleHome = () => authService.getHomeForCurrentUser();
 
   if (!authService.getToken()) {
     return true;
   }
 
   if (authService.getCurrentUser()) {
-    return router.createUrlTree(['/dashboard']);
+    return router.createUrlTree([getRoleHome()]);
   }
 
   return authService.initializeSession().pipe(
-    map((isAuthenticated) => (isAuthenticated ? router.createUrlTree(['/dashboard']) : true))
+    map((isAuthenticated) => (isAuthenticated ? router.createUrlTree([getRoleHome()]) : true))
   );
 };

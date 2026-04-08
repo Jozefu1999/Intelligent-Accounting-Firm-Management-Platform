@@ -1,1 +1,148 @@
-<p>project-form works!</p>
+<div class="mx-auto max-w-4xl">
+	<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Project management</p>
+			<h1 class="mt-1 text-2xl font-bold text-slate-900">
+				{{ isEditMode ? 'Edit project' : 'Add new project' }}
+			</h1>
+			<p class="mt-1 text-sm text-slate-500">Create projects from this page. Client creation no longer creates projects.</p>
+		</div>
+
+		<a routerLink="/projects" mat-stroked-button class="border-slate-300 text-slate-700">
+			<mat-icon>arrow_back</mat-icon>
+			Back to list
+		</a>
+	</div>
+
+	@if (errorMessage) {
+		<div class="mb-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+			<mat-icon class="text-base">error_outline</mat-icon>
+			<span>{{ errorMessage }}</span>
+		</div>
+	}
+
+	<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+		@if (isLoading) {
+			<div class="py-12 text-center text-sm text-slate-500">Loading project data...</div>
+		} @else {
+			<form (ngSubmit)="onSubmit()" class="space-y-6">
+				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+					<div>
+						<label class="mb-1.5 block text-sm font-medium text-slate-700">Client</label>
+						<select
+							[(ngModel)]="selectedClientId"
+							name="selectedClientId"
+							required
+							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						>
+							<option value="">Select a client</option>
+							@for (client of clients; track client.id) {
+								<option [value]="client.id">{{ client.company_name }}</option>
+							}
+						</select>
+					</div>
+
+					<div>
+						<label class="mb-1.5 block text-sm font-medium text-slate-700">Project name</label>
+						<input
+							type="text"
+							[(ngModel)]="name"
+							name="name"
+							required
+							placeholder="Tax Optimization 2026"
+							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						/>
+					</div>
+
+					<div>
+						<label class="mb-1.5 block text-sm font-medium text-slate-700">Type</label>
+						<select
+							[(ngModel)]="type"
+							name="type"
+							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						>
+							<option value="creation">Creation</option>
+							<option value="development">Development</option>
+							<option value="audit">Audit</option>
+							<option value="consulting">Consulting</option>
+							<option value="other">Other</option>
+						</select>
+					</div>
+
+					<div>
+						<label class="mb-1.5 block text-sm font-medium text-slate-700">Status</label>
+						<select
+							[(ngModel)]="status"
+							name="status"
+							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						>
+							<option value="draft">Draft</option>
+							<option value="in_progress">In progress</option>
+							<option value="completed">Completed</option>
+							<option value="cancelled">Cancelled</option>
+						</select>
+					</div>
+
+					<div>
+						<label class="mb-1.5 block text-sm font-medium text-slate-700">Priority</label>
+						<select
+							[(ngModel)]="priority"
+							name="priority"
+							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						>
+							<option value="low">Low</option>
+							<option value="medium">Medium</option>
+							<option value="high">High</option>
+						</select>
+					</div>
+
+					<div>
+						<label class="mb-1.5 block text-sm font-medium text-slate-700">Start date</label>
+						<input
+							type="date"
+							[(ngModel)]="startDate"
+							name="startDate"
+							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						/>
+					</div>
+				</div>
+
+				<div>
+					<label class="mb-1.5 block text-sm font-medium text-slate-700">Due date</label>
+					<input
+						type="date"
+						[(ngModel)]="dueDate"
+						name="dueDate"
+						class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+					/>
+				</div>
+
+				<div>
+					<label class="mb-1.5 block text-sm font-medium text-slate-700">Description</label>
+					<textarea
+						[(ngModel)]="description"
+						name="description"
+						rows="4"
+						placeholder="Project details"
+						class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+					></textarea>
+				</div>
+
+				<div class="flex flex-wrap items-center justify-end gap-3 border-t border-slate-100 pt-4">
+					<button type="button" routerLink="/projects" mat-button class="text-slate-600">Cancel</button>
+
+					<button type="submit" [disabled]="isSubmitting" mat-flat-button class="bg-blue-600 text-white">
+						@if (isSubmitting) {
+							<span class="inline-flex items-center gap-1.5">
+								<mat-icon class="animate-spin text-base">refresh</mat-icon>
+								<span>{{ isEditMode ? 'Saving...' : 'Creating...' }}</span>
+							</span>
+						} @else {
+							<span>{{ isEditMode ? 'Save project' : 'Create project' }}</span>
+						}
+					</button>
+				</div>
+			</form>
+		}
+	</div>
+</div>
