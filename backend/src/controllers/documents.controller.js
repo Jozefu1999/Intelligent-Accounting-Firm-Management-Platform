@@ -39,7 +39,7 @@ const getAll = async (req, res, next) => {
 
     const documents = await Document.findAll({
       where,
-      order: [['createdAt', 'DESC']],
+      order: [['created_at', 'DESC']],
     });
 
     res.json(documents);
