@@ -1,8 +1,9 @@
-<div class="layout-wrapper">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <p class="sidebar-eyebrow">Espace Assistant</p>
-      <h2 class="sidebar-title">Navigation</h2>
+<div class="assistant-shell">
+  <aside class="assistant-sidebar">
+    <div class="brand-card">
+      <p class="brand-eyebrow">Assistant workspace</p>
+      <h1 class="brand-title">Operations Hub</h1>
+      <p class="brand-meta">{{ todayLabel }}</p>
     </div>
 
     <nav class="nav-menu">
@@ -23,7 +24,7 @@
         class="nav-item"
       >
         <span class="nav-icon"><mat-icon>work</mat-icon></span>
-        <span class="nav-label">Mes Projets assignes</span>
+        <span class="nav-label">Mes projets</span>
       </a>
 
       <a
@@ -35,15 +36,21 @@
         <span class="nav-icon"><mat-icon>description</mat-icon></span>
         <span class="nav-label">Documents</span>
       </a>
-
-      <a class="nav-item logout" role="button" tabindex="0" (click)="logout()" (keydown.enter)="logout()">
-        <span class="nav-icon"><mat-icon>logout</mat-icon></span>
-        <span class="nav-label">Deconnexion</span>
-      </a>
     </nav>
+
+    <div class="user-card">
+      <p class="user-name">{{ fullName || 'Assistant' }}</p>
+      <p class="user-role">Assistant</p>
+      <button type="button" class="logout-btn" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Deconnexion</span>
+      </button>
+    </div>
   </aside>
 
-  <main class="main-content">
-    <router-outlet></router-outlet>
+  <main class="assistant-main">
+    <div class="content-surface">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>
