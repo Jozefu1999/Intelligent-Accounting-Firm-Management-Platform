@@ -1,0 +1,128 @@
+<div class="space-y-6">
+  @if (errorMessage) {
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      {{ successMessage }}
+    </div>
+  }
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-2xl font-semibold text-slate-900">Documents</h1>
+        <p class="mt-2 text-sm text-slate-500">Consultez et uploadez vos fichiers de mission.</p>
+      </div>
+      <button
+        type="button"
+        (click)="openUploadModal()"
+        class="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+      >
+        + Uploader un document
+      </button>
+    </div>
+  </section>
+
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    @if (isLoading) {
+      <div class="flex items-center justify-center py-8">
+        <div class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-600"></div>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[900px] text-left">
+          <thead class="border-b border-slate-200 bg-slate-50">
+            <tr>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Nom fichier</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Projet</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Taille</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Date upload</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (document of documents; track document.id) {
+              <tr>
+                <td class="px-3 py-3 text-sm font-medium text-slate-900">{{ document.name }}</td>
+                <td class="px-3 py-3 text-sm text-slate-600">{{ getProjectName(document.project_id) }}</td>
+                <td class="px-3 py-3 text-sm text-slate-600">{{ formatFileSize(document.size_bytes) }}</td>
+                <td class="px-3 py-3 text-sm text-slate-600">{{ formatDate(document.created_at) }}</td>
+                <td class="px-3 py-3">
+                  <button
+                    type="button"
+                    (click)="downloadDocument(document.id, document.name)"
+                    class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    Download
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">
+                  Aucun document disponible.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>
+
+@if (showUploadModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h2>Uploader un document</h2>
+
+      <div class="mt-4 space-y-4">
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Selectionner le projet</label>
+          <select
+            [value]="selectedProjectId"
+            (change)="selectedProjectId = +$any($event.target).value"
+            class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-500 focus:outline-none"
+          >
+            <option [value]="null">Choisissez un projet</option>
+            @for (project of projects; track project.id) {
+              <option [value]="project.id">{{ project.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Fichier</label>
+          <input
+            type="file"
+            accept="*/*"
+            (change)="onFileSelected($event)"
+            class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700"
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+        >
+          Annuler
+        </button>
+        <button
+          type="button"
+          [disabled]="isUploading"
+          (click)="uploadDocument()"
+          class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+        >
+          {{ isUploading ? 'Upload en cours...' : 'Uploader' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

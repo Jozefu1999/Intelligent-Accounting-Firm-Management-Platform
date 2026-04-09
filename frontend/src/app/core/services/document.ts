@@ -26,7 +26,7 @@ export class DocumentService {
   }
 
   download(id: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/${id}/download`, { responseType: 'blob' });
+    return this.http.get(`${this.apiUrl}/download/${id}`, { responseType: 'blob' });
   }
 
   delete(id: number): Observable<void> {

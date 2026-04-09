@@ -1,0 +1,48 @@
+:host {
+  display: block;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 60;
+  padding: 1rem;
+}
+
+.modal-box {
+  width: min(640px, 100%);
+  background: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  padding: 1.25rem;
+  box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.45);
+}
+
+.modal-box h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.modal-box p {
+  margin-top: 0.5rem;
+  color: #334155;
+}
+
+.modal-box button {
+  margin-top: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.75rem;
+  background: #f8fafc;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.modal-box button:hover {
+  background: #f1f5f9;
+}

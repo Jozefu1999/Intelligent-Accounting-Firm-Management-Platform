@@ -1,9 +1,9 @@
 <div class="min-h-screen bg-[radial-gradient(120%_120%_at_0%_0%,#dff7ff_0%,#eff5ff_35%,#f7fafc_70%,#f8fafc_100%)]">
-  @if (authService.isLoggedIn()) {
+  @if (authService.isLoggedIn() && !useAssistantLayout) {
     <div class="flex min-h-screen flex-col">
       <app-navbar></app-navbar>
       <div class="flex flex-1 flex-col overflow-hidden lg:flex-row">
-      <app-role-sidebar [role]="currentRole"></app-role-sidebar>
+        <app-role-sidebar [role]="currentRole"></app-role-sidebar>
         <main class="flex-1 overflow-y-auto px-4 pb-6 pt-4 sm:px-6 sm:pb-8 sm:pt-6 lg:px-10">
           <div class="mx-auto w-full max-w-[1400px]">
             <router-outlet></router-outlet>

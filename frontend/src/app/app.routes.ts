@@ -21,9 +21,33 @@ export const routes: Routes = [
     canActivate: [authGuard, ExpertGuard],
   },
   {
-    path: 'assistant-dashboard',
-    loadComponent: () => import('./pages/assistant-dashboard/assistant-dashboard.component').then(m => m.AssistantDashboardComponent),
+    path: 'assistant',
     canActivate: [authGuard, AssistantGuard],
+    loadComponent: () => import('./layouts/assistant-layout/assistant-layout.component').then(m => m.AssistantLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/assistant/dashboard/assistant-dashboard.component').then(m => m.AssistantDashboardComponent),
+      },
+      {
+        path: 'projets',
+        loadComponent: () => import('./pages/assistant/projets/assistant-projets.component').then(m => m.AssistantProjetsComponent),
+      },
+      {
+        path: 'documents',
+        loadComponent: () => import('./pages/assistant/documents/assistant-documents.component').then(m => m.AssistantDocumentsComponent),
+      },
+    ],
+  },
+  {
+    path: 'assistant-dashboard',
+    redirectTo: 'assistant/dashboard',
+    pathMatch: 'full',
   },
   {
     path: 'admin-dashboard',
