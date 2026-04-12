@@ -72,7 +72,10 @@ export class ClientDashboardComponent implements OnInit {
     this.isSendingMessage = true;
 
     this.contactService.sendMessage({
+      nom: this.displayNom,
+      email: this.displayEmail,
       sujet: this.sujet,
+      project_id: null,
       message: this.message,
       user_id: userId,
     }).subscribe({
