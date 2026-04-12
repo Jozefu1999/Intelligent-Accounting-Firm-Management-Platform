@@ -4,7 +4,7 @@ const ROLE_HOME_MAP: Record<UserRole, string> = {
   expert_comptable: '/dashboard',
   assistant: '/assistant/dashboard',
   administrateur: '/admin-dashboard',
-  visiteur: '/client-dashboard',
+  visiteur: '/client/dashboard',
 };
 
 const ROLE_LABEL_MAP: Record<UserRole, string> = {
