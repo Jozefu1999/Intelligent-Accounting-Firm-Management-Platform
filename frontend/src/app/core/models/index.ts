@@ -67,8 +67,6 @@ export interface Project {
   client?: Client;
   created_at?: string;
   updated_at?: string;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export interface Document {
@@ -82,24 +80,6 @@ export interface Document {
   category?: 'financial' | 'legal' | 'administrative' | 'report' | 'other';
   uploaded_by?: number;
   created_at?: string;
-  createdAt?: string;
-}
-
-export interface ContactMessage {
-  id: number;
-  user_id: number;
-  nom: string;
-  email: string;
-  sujet: string;
-  project_id?: number | null;
-  message: string;
-  statut: 'envoye' | 'lu' | 'repondu';
-  created_at?: string;
-  createdAt?: string;
-  project?: {
-    id: number;
-    name: string;
-  };
 }
 
 export interface AuthResponse {

@@ -46,10 +46,9 @@ export class SidebarComponent {
       { label: 'Modele ML', subtitle: 'Retrain et suivi', icon: 'model_training', path: '/admin-dashboard', fragment: 'ml-model' },
     ],
     visiteur: [
-      { label: 'Tableau de bord', subtitle: 'Mon espace client', icon: 'dashboard', path: '/client/dashboard', exact: true },
-      { label: 'Mes Projets', subtitle: 'Suivi des dossiers', icon: 'work', path: '/client/projects', exact: true },
-      { label: 'Mon Profil', subtitle: 'Informations personnelles', icon: 'person', path: '/client/profile', exact: true },
-      { label: 'Contacter', subtitle: 'Messages au cabinet', icon: 'mail', path: '/client/contact', exact: true },
+      { label: 'Accueil', subtitle: 'Mon espace', icon: 'home', path: '/client-dashboard', exact: true },
+      { label: 'Mon Profil', subtitle: 'Informations personnelles', icon: 'person', path: '/client-dashboard', fragment: 'profil' },
+      { label: 'Contacter le cabinet', subtitle: 'Messagerie', icon: 'mail', path: '/client-dashboard', fragment: 'contact' },
     ],
   };
 

@@ -16,10 +16,6 @@ export class DocumentService {
     return this.http.get<Document[]>(this.apiUrl);
   }
 
-  getByProjectId(projectId: number): Observable<Document[]> {
-    return this.http.get<Document[]>(`${this.apiUrl}?project_id=${projectId}`);
-  }
-
   upload(file: File, data: { client_id?: number; project_id?: number; category?: string }): Observable<Document> {
     const formData = new FormData();
     formData.append('file', file);

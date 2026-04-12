@@ -21,8 +21,8 @@ export class App {
     return this.authService.getCurrentUser()?.role ?? 'visiteur';
   }
 
-  get useStandaloneLayout(): boolean {
+  get useAssistantLayout(): boolean {
     const currentUrl = this.router.url ?? '';
-    return currentUrl.startsWith('/assistant') || currentUrl.startsWith('/client');
+    return currentUrl.startsWith('/assistant');
   }
 }

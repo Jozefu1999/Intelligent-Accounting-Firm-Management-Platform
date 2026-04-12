@@ -6,7 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth';
 import { UserRole } from '../../../core/models';
 
@@ -58,12 +57,8 @@ export class Register {
         const destination = returnUrl || this.authService.getHomeForCurrentUser();
         this.router.navigateByUrl(destination);
       },
-      error: (err: HttpErrorResponse) => {
-        if (err.status === 0) {
-          this.errorMessage = 'Impossible de joindre le serveur. Verifiez que le backend fonctionne sur le port 3000.';
-        } else {
-          this.errorMessage = err.error?.message || 'Registration failed.';
-        }
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Registration failed.';
         this.loading = false;
       },
     });

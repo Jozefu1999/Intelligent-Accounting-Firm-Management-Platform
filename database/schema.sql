@@ -86,18 +86,3 @@ CREATE TABLE IF NOT EXISTS ai_business_plans (
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
     FOREIGN KEY (generated_by) REFERENCES users(id) ON DELETE SET NULL
 );
-
--- CONTACT MESSAGES
-CREATE TABLE IF NOT EXISTS contact_messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    nom VARCHAR(200) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    sujet VARCHAR(255) NOT NULL,
-    project_id INT NULL,
-    message TEXT NOT NULL,
-    statut ENUM('envoye', 'lu', 'repondu') DEFAULT 'envoye',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL
-);
