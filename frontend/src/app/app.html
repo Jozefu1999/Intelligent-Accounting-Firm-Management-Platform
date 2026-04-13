@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-[radial-gradient(120%_120%_at_0%_0%,#dff7ff_0%,#eff5ff_35%,#f7fafc_70%,#f8fafc_100%)]">
-  @if (authService.isLoggedIn() && !useAssistantLayout) {
+  @if (authService.isLoggedIn() && !useStandaloneLayout) {
     <div class="flex min-h-screen flex-col">
       <app-navbar></app-navbar>
       <div class="flex flex-1 flex-col overflow-hidden lg:flex-row">
