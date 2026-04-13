@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewRef } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { catchError, finalize, forkJoin, of, timeout } from 'rxjs';
 import { Document, Project, User } from '../../../core/models';
 import { AuthService } from '../../../core/services/auth';
 import { DocumentService } from '../../../core/services/document';
@@ -22,6 +22,7 @@ export class AssistantDashboardComponent implements OnInit {
 
   isLoading = false;
   errorMessage = '';
+  warningMessage = '';
 
   private readonly today = new Date();
 
@@ -29,6 +30,7 @@ export class AssistantDashboardComponent implements OnInit {
     private authService: AuthService,
     private projectService: ProjectService,
     private documentService: DocumentService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -63,19 +65,37 @@ export class AssistantDashboardComponent implements OnInit {
   loadDashboard(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.warningMessage = '';
 
     forkJoin({
-      projects: this.projectService.getAll(),
-      documents: this.documentService.getAll(),
-    }).subscribe({
+      projects: this.projectService.getAll().pipe(
+        timeout(12000),
+        catchError(() => {
+          this.errorMessage = 'Impossible de charger les projets assignes.';
+          return of([] as Project[]);
+        }),
+      ),
+      documents: this.documentService.getAll().pipe(
+        timeout(12000),
+        catchError(() => {
+          this.warningMessage = 'Les documents n ont pas pu etre charges. Les statistiques affichent uniquement les donnees disponibles.';
+          return of([] as Document[]);
+        }),
+      ),
+    }).pipe(
+      finalize(() => {
+        this.isLoading = false;
+        this.triggerUiUpdate();
+      }),
+    ).subscribe({
       next: ({ projects, documents }) => {
         this.projects = projects ?? [];
         this.documents = documents ?? [];
-        this.isLoading = false;
+        this.triggerUiUpdate();
       },
       error: () => {
         this.errorMessage = 'Impossible de charger le tableau de bord assistant.';
-        this.isLoading = false;
+        this.triggerUiUpdate();
       },
     });
   }
@@ -128,5 +148,12 @@ export class AssistantDashboardComponent implements OnInit {
     }
 
     return date.getTime();
+  }
+
+  private triggerUiUpdate(): void {
+    const view = this.cdr as ViewRef;
+    if (!view.destroyed) {
+      this.cdr.detectChanges();
+    }
   }
 }
