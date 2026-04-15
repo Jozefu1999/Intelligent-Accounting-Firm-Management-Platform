@@ -35,6 +35,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/assistant/dashboard/assistant-dashboard.component').then(m => m.AssistantDashboardComponent),
       },
       {
+        path: 'projets/new',
+        loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
+      },
+      {
         path: 'projets',
         loadComponent: () => import('./pages/assistant/projets/assistant-projets.component').then(m => m.AssistantProjetsComponent),
       },

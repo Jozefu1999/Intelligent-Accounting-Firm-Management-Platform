@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="projects-workspace">
   @if (errorMessage) {
     <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
       {{ errorMessage }}
@@ -11,14 +11,52 @@
     </div>
   }
 
-  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-    <h1 class="text-2xl font-semibold text-slate-900">Mes Projets assignes</h1>
-    <p class="mt-2 text-sm text-slate-500">Suivez vos missions, mettez a jour leur statut et consultez les details.</p>
+  <section class="hero-panel">
+    <div>
+      <p class="hero-eyebrow">Suivi collaboratif</p>
+      <h1 class="hero-title">Mes projets assignes</h1>
+      <p class="hero-subtitle">Pilotez vos missions en temps reel, mettez a jour le statut et ajoutez rapidement de nouveaux projets.</p>
+    </div>
+
+    <div class="hero-actions">
+      <a routerLink="/assistant/projets/new" class="action-button action-button--primary">
+        <mat-icon>add_circle</mat-icon>
+        <span>Ajouter un projet</span>
+      </a>
+
+      <button type="button" class="action-button action-button--secondary" (click)="loadProjects()">
+        <mat-icon>refresh</mat-icon>
+        <span>Actualiser</span>
+      </button>
+    </div>
   </section>
 
-  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+  <section class="metrics-grid">
+    <article class="metric-card">
+      <p class="metric-label">Total projets</p>
+      <p class="metric-value">{{ totalProjectsCount }}</p>
+    </article>
+
+    <article class="metric-card">
+      <p class="metric-label">En cours</p>
+      <p class="metric-value">{{ inProgressProjectsCount }}</p>
+    </article>
+
+    <article class="metric-card">
+      <p class="metric-label">Termines</p>
+      <p class="metric-value">{{ completedProjectsCount }}</p>
+    </article>
+
+    <article class="metric-card metric-card--accent">
+      <p class="metric-label">Progression</p>
+      <p class="metric-value">{{ completionRate }}%</p>
+      <p class="metric-hint">{{ suspendedProjectsCount }} suspendu(s)</p>
+    </article>
+  </section>
+
+  <section class="table-panel">
     @if (isLoading) {
-      <div class="flex items-center justify-center py-8">
+      <div class="table-loader">
         <div class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-600"></div>
       </div>
     } @else {
@@ -52,8 +90,16 @@
                       <option [value]="option.value">{{ option.label }}</option>
                     }
                   </select>
+
+                  <span [class]="getStatusBadgeClass(project.status)">
+                    {{ getStatusLabel(project.status) }}
+                  </span>
                 </td>
-                <td class="px-3 py-3 text-sm text-slate-700">{{ getPriorityLabel(project.priority) }}</td>
+                <td class="px-3 py-3 text-sm text-slate-700">
+                  <span [class]="getPriorityBadgeClass(project.priority)">
+                    {{ getPriorityLabel(project.priority) }}
+                  </span>
+                </td>
                 <td class="px-3 py-3 text-sm text-slate-600">{{ formatDate(project.created_at || project.updated_at) }}</td>
                 <td class="px-3 py-3">
                   <button
@@ -100,6 +146,6 @@
       <p class="mt-4 text-sm text-slate-500">Aucun document lie a ce projet.</p>
     }
 
-    <button type="button" (click)="closeModal()">Fermer</button>
+    <button type="button" class="modal-close" (click)="closeModal()">Fermer</button>
   </div>
 </div>

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { Document, Project } from '../../../core/models';
@@ -12,7 +13,7 @@ type UiStatus = 'en_cours' | 'termine' | 'suspendu';
 @Component({
   selector: 'app-assistant-projets-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './assistant-projets.component.html',
   styleUrl: './assistant-projets.component.css',
 })
@@ -41,6 +42,30 @@ export class AssistantProjetsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProjects();
+  }
+
+  get totalProjectsCount(): number {
+    return this.projects.length;
+  }
+
+  get inProgressProjectsCount(): number {
+    return this.projects.filter((project) => project.status === 'in_progress' || project.status === 'draft').length;
+  }
+
+  get completedProjectsCount(): number {
+    return this.projects.filter((project) => project.status === 'completed').length;
+  }
+
+  get suspendedProjectsCount(): number {
+    return this.projects.filter((project) => project.status === 'cancelled').length;
+  }
+
+  get completionRate(): number {
+    if (this.totalProjectsCount === 0) {
+      return 0;
+    }
+
+    return Math.round((this.completedProjectsCount / this.totalProjectsCount) * 100);
   }
 
   loadProjects(): void {
@@ -164,6 +189,28 @@ export class AssistantProjetsComponent implements OnInit {
     }
 
     return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+  }
+
+  getStatusBadgeClass(status: Project['status'] | undefined): string {
+    switch (status) {
+      case 'completed':
+        return 'badge badge--completed';
+      case 'cancelled':
+        return 'badge badge--suspended';
+      default:
+        return 'badge badge--in-progress';
+    }
+  }
+
+  getPriorityBadgeClass(priority: Project['priority'] | undefined): string {
+    switch (priority) {
+      case 'high':
+        return 'badge badge--priority-high';
+      case 'low':
+        return 'badge badge--priority-low';
+      default:
+        return 'badge badge--priority-medium';
+    }
   }
 
   private toUiStatus(rawValue: string): UiStatus | null {

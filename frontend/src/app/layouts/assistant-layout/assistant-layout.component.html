@@ -1,9 +1,29 @@
-<div class="layout-wrapper">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <p class="sidebar-eyebrow">Espace Assistant</p>
-      <h2 class="sidebar-title">Navigation</h2>
+<div class="assistant-shell">
+  <div class="ambient-shape ambient-shape--one" aria-hidden="true"></div>
+  <div class="ambient-shape ambient-shape--two" aria-hidden="true"></div>
+
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    [class.visible]="isSidebarOpen"
+    aria-label="Fermer le menu"
+    (click)="closeSidebar()"
+  ></button>
+
+  <aside class="assistant-sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-brand">
+      <div class="brand-mark">AF</div>
+      <div>
+        <p class="brand-eyebrow">Workspace</p>
+        <h2 class="brand-title">Assistant Hub</h2>
+      </div>
     </div>
+
+    <section class="identity-card">
+      <p class="identity-label">Connecte en tant que</p>
+      <p class="identity-name">{{ userDisplayName }}</p>
+      <p class="identity-date">{{ todayLabel }}</p>
+    </section>
 
     <nav class="nav-menu">
       <a
@@ -11,6 +31,7 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav-item"
+        (click)="closeSidebar()"
       >
         <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
         <span class="nav-label">Tableau de bord</span>
@@ -19,11 +40,12 @@
       <a
         routerLink="/assistant/projets"
         routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
+        [routerLinkActiveOptions]="{ exact: false }"
         class="nav-item"
+        (click)="closeSidebar()"
       >
-        <span class="nav-icon"><mat-icon>work</mat-icon></span>
-        <span class="nav-label">Mes Projets assignes</span>
+        <span class="nav-icon"><mat-icon>assignment</mat-icon></span>
+        <span class="nav-label">Mes projets assignes</span>
       </a>
 
       <a
@@ -31,19 +53,40 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav-item"
+        (click)="closeSidebar()"
       >
         <span class="nav-icon"><mat-icon>description</mat-icon></span>
         <span class="nav-label">Documents</span>
       </a>
-
-      <a class="nav-item logout" role="button" tabindex="0" (click)="logout()" (keydown.enter)="logout()">
-        <span class="nav-icon"><mat-icon>logout</mat-icon></span>
-        <span class="nav-label">Deconnexion</span>
-      </a>
     </nav>
+
+    <button type="button" class="sidebar-logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Deconnexion</span>
+    </button>
   </aside>
 
-  <main class="main-content">
-    <router-outlet></router-outlet>
-  </main>
+  <section class="assistant-workspace">
+    <header class="workspace-header">
+      <div class="header-left">
+        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Ouvrir le menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <div>
+          <p class="workspace-eyebrow">Assistant Interface</p>
+          <h1 class="workspace-title">Gestion quotidienne</h1>
+        </div>
+      </div>
+
+      <button type="button" class="header-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Se deconnecter</span>
+      </button>
+    </header>
+
+    <main class="workspace-content">
+      <router-outlet></router-outlet>
+    </main>
+  </section>
 </div>

@@ -8,9 +8,9 @@
 			<p class="mt-1 text-sm text-slate-500">Create projects from this page. Client creation no longer creates projects.</p>
 		</div>
 
-		<a routerLink="/projects" mat-stroked-button class="border-slate-300 text-slate-700">
+		<a [routerLink]="listRoute" mat-stroked-button class="border-slate-300 text-slate-700">
 			<mat-icon>arrow_back</mat-icon>
-			Back to list
+			{{ isAssistantContext ? 'Back to assistant projects' : 'Back to list' }}
 		</a>
 	</div>
 
@@ -129,7 +129,7 @@
 				</div>
 
 				<div class="flex flex-wrap items-center justify-end gap-3 border-t border-slate-100 pt-4">
-					<button type="button" routerLink="/projects" mat-button class="text-slate-600">Cancel</button>
+					<button type="button" [routerLink]="listRoute" mat-button class="text-slate-600">Cancel</button>
 
 					<button type="submit" [disabled]="isSubmitting" mat-flat-button class="bg-blue-600 text-white">
 						@if (isSubmitting) {

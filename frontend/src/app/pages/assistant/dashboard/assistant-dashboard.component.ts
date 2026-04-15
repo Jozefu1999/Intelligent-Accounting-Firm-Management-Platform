@@ -54,6 +54,22 @@ export class AssistantDashboardComponent implements OnInit {
     return this.documents.length;
   }
 
+  get inProgressProjectsCount(): number {
+    return this.projects.filter((project) => project.status === 'in_progress' || project.status === 'draft').length;
+  }
+
+  get completedProjectsCount(): number {
+    return this.projects.filter((project) => project.status === 'completed').length;
+  }
+
+  get completionRate(): number {
+    if (this.assignedProjectsCount === 0) {
+      return 0;
+    }
+
+    return Math.round((this.completedProjectsCount / this.assignedProjectsCount) * 100);
+  }
+
   get recentProjects(): Project[] {
     return [...this.projects]
       .sort((left, right) => this.toTimestamp(right.created_at || right.updated_at) - this.toTimestamp(left.created_at || left.updated_at))
@@ -115,6 +131,28 @@ export class AssistantDashboardComponent implements OnInit {
     }
 
     return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+  }
+
+  getStatusBadgeClass(status: Project['status']): string {
+    switch (status) {
+      case 'completed':
+        return 'badge badge--completed';
+      case 'cancelled':
+        return 'badge badge--suspended';
+      default:
+        return 'badge badge--in-progress';
+    }
+  }
+
+  getPriorityBadgeClass(priority: Project['priority']): string {
+    switch (priority) {
+      case 'high':
+        return 'badge badge--priority-high';
+      case 'medium':
+        return 'badge badge--priority-medium';
+      default:
+        return 'badge badge--priority-low';
+    }
   }
 
   private toTimestamp(value?: string): number {
