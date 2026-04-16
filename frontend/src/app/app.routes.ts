@@ -50,9 +50,37 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'admin-dashboard',
-    loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    path: 'admin',
     canActivate: [authGuard, AdminGuard],
+    loadComponent: () => import('./layouts/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./pages/admin/users/admin-users.component').then(m => m.AdminUsersComponent),
+      },
+      {
+        path: 'statistics',
+        loadComponent: () => import('./pages/admin/statistics/admin-statistics.component').then(m => m.AdminStatisticsComponent),
+      },
+      {
+        path: 'ml',
+        loadComponent: () => import('./pages/admin/ml/admin-ml.component').then(m => m.AdminMlComponent),
+      },
+    ],
+  },
+  {
+    path: 'admin-dashboard',
+    redirectTo: 'admin/dashboard',
+    pathMatch: 'full',
   },
   {
     path: 'client',
@@ -130,6 +158,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
       },
     ],
+  },
+  {
+    path: 'expert/projects',
+    redirectTo: 'projects',
+    pathMatch: 'full',
   },
   {
     path: 'ai-tools',

@@ -1,0 +1,367 @@
+:host {
+  display: block;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --text: #1e293b;
+  --muted: #64748b;
+}
+
+.admin-alert {
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.86rem;
+}
+
+.admin-alert-danger {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.admin-card {
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+}
+
+.welcome-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.welcome-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.welcome-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.role-chip {
+  margin-top: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.welcome-date {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.kpi-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.kpi-card {
+  padding: 1rem;
+}
+
+.kpi-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.kpi-icon {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon mat-icon {
+  width: 1.12rem;
+  height: 1.12rem;
+  font-size: 1.12rem;
+}
+
+.kpi-label {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.kpi-value {
+  margin: 0.65rem 0 0;
+  color: #0f172a;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.kpi-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.kpi-blue .kpi-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.kpi-teal .kpi-icon {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.kpi-purple .kpi-icon {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.kpi-red .kpi-icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.dashboard-grid-two {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 0.9rem;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.card-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.7rem;
+  padding: 0.55rem 0.6rem;
+}
+
+.user-core {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.user-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #1e293b;
+  font-size: 0.74rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-name {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.user-email {
+  margin: 0.1rem 0 0;
+  color: #64748b;
+  font-size: 0.73rem;
+}
+
+.user-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.role-badge {
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.role-expert {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.role-assistant {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.role-admin {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.role-visitor {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.user-date {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.card-link {
+  margin-top: 0.8rem;
+  display: inline-block;
+  color: #2563eb;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.progress-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #475569;
+  font-size: 0.82rem;
+  margin-bottom: 0.3rem;
+}
+
+.progress-track {
+  width: 100%;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.progress-blue {
+  background: #2563eb;
+}
+
+.progress-green {
+  background: #22c55e;
+}
+
+.progress-orange {
+  background: #f59e0b;
+}
+
+.progress-red {
+  background: #ef4444;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1rem 0;
+}
+
+.empty-state {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.skeleton {
+  min-height: 140px;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.skeleton-row {
+  height: 2.5rem;
+  border-radius: 0.7rem;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1180px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-card {
+    flex-direction: column;
+  }
+
+  .user-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,192 @@
+@if (errorMessage) {
+  <div class="admin-alert admin-alert-danger">{{ errorMessage }}</div>
+}
+
+<section class="stats-header admin-card">
+  <div>
+    <h2>Statistiques de la plateforme</h2>
+    <p>Vue detaillee de l'activite du cabinet</p>
+  </div>
+
+  <div class="range-filter">
+    <button type="button" [class.active]="selectedRange === 'week'" (click)="selectRange('week')">Cette semaine</button>
+    <button type="button" [class.active]="selectedRange === 'month'" (click)="selectRange('month')">Ce mois</button>
+    <button type="button" [class.active]="selectedRange === 'year'" (click)="selectRange('year')">Cette annee</button>
+  </div>
+</section>
+
+<section class="summary-grid">
+  @if (isLoading) {
+    @for (row of [1, 2, 3, 4]; track row) {
+      <article class="admin-card summary-card skeleton"></article>
+    }
+  } @else {
+    @for (card of summaryCards; track card.label) {
+      <article class="admin-card summary-card" [class]="'admin-card summary-card ' + card.accentClass">
+        <div class="summary-top">
+          <span>{{ card.label }}</span>
+          <mat-icon>{{ card.icon }}</mat-icon>
+        </div>
+        <strong>{{ card.value }}</strong>
+        <small>{{ card.subtitle }}</small>
+      </article>
+    }
+  }
+</section>
+
+<section class="chart-grid">
+  <article class="admin-card">
+    <h3>Projets par statut</h3>
+
+    @if (isLoading) {
+      <div class="skeleton-list">
+        @for (row of [1, 2, 3]; track row) {
+          <div class="skeleton-line"></div>
+        }
+      </div>
+    } @else {
+      <div class="distribution-list">
+        @for (item of statusDistribution; track item.label) {
+          <div class="distribution-row">
+            <div class="distribution-head">
+              <span>{{ item.label }}</span>
+              <span>{{ item.count }} projets ({{ item.percent }}%)</span>
+            </div>
+            <div class="track">
+              <div class="fill" [class]="item.colorClass" [style.width.%]="item.percent"></div>
+            </div>
+          </div>
+        }
+      </div>
+      <p class="card-total">Total: {{ stats.projects_count }} projets</p>
+    }
+  </article>
+
+  <article class="admin-card">
+    <h3>Projets par niveau de risque</h3>
+
+    @if (isLoading) {
+      <div class="skeleton-list">
+        @for (row of [1, 2, 3]; track row) {
+          <div class="skeleton-line"></div>
+        }
+      </div>
+    } @else {
+      <div class="distribution-list">
+        @for (item of riskDistribution; track item.label) {
+          <div class="distribution-row">
+            <div class="distribution-head">
+              <span>{{ item.label }}</span>
+              <span>{{ item.count }} projets ({{ item.percent }}%)</span>
+            </div>
+            <div class="track">
+              <div class="fill" [class]="item.colorClass" [style.width.%]="item.percent"></div>
+            </div>
+          </div>
+        }
+      </div>
+      <p class="card-total">Total: {{ stats.projects_count }} projets</p>
+    }
+  </article>
+</section>
+
+<section class="chart-grid">
+  <article class="admin-card">
+    <h3>Utilisateurs par role</h3>
+
+    @if (isLoading) {
+      <div class="skeleton-list">
+        @for (row of [1, 2, 3, 4]; track row) {
+          <div class="skeleton-line"></div>
+        }
+      </div>
+    } @else {
+      <div class="distribution-list">
+        @for (item of usersByRoleDistribution; track item.label) {
+          <div class="distribution-row">
+            <div class="distribution-head">
+              <span>{{ item.label }}</span>
+              <span>{{ item.count }} ({{ item.percent }}%)</span>
+            </div>
+            <div class="track">
+              <div class="fill" [class]="item.colorClass" [style.width.%]="item.percent"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </article>
+
+  <article class="admin-card">
+    <h3>Dernieres actions</h3>
+
+    @if (isLoading) {
+      <div class="skeleton-list">
+        @for (row of [1, 2, 3, 4, 5]; track row) {
+          <div class="skeleton-line"></div>
+        }
+      </div>
+    } @else {
+      <div class="timeline">
+        @for (item of displayActivities; track item.created_at + item.action) {
+          <div class="timeline-row">
+            <span class="dot"></span>
+            <div>
+              <p class="timeline-text">{{ item.action }} par {{ item.user_name }}</p>
+              <p class="timeline-time">{{ formatTimeAgo(item.created_at) }}</p>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-state">Aucune activite recente.</p>
+        }
+      </div>
+    }
+  </article>
+</section>
+
+<section class="admin-card risk-projects-card">
+  <div class="table-title-row">
+    <h3>Projets recents a risque eleve</h3>
+    <a routerLink="/expert/projects" class="table-link">Voir tous les projets -></a>
+  </div>
+
+  @if (isLoading) {
+    <div class="skeleton-list">
+      @for (row of [1, 2, 3, 4, 5]; track row) {
+        <div class="skeleton-line"></div>
+      }
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>TITRE</th>
+            <th>CLIENT</th>
+            <th>STATUT</th>
+            <th>RISQUE</th>
+            <th>DATE</th>
+            <th>EXPERT ASSIGNE</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (project of highRiskProjects; track project.id) {
+            <tr>
+              <td>{{ project.titre }}</td>
+              <td>{{ project.client }}</td>
+              <td>{{ project.statut }}</td>
+              <td><span class="risk-badge">{{ project.niveau_risque }}</span></td>
+              <td>{{ formatDate(project.created_at) }}</td>
+              <td>{{ project.expert_assigne || 'Non assigne' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-cell">Aucun projet a risque eleve.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

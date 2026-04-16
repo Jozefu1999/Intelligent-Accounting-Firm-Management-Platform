@@ -23,6 +23,8 @@ export class App {
 
   get useStandaloneLayout(): boolean {
     const currentUrl = this.router.url ?? '';
-    return currentUrl.startsWith('/assistant') || currentUrl.startsWith('/client');
+    return currentUrl.startsWith('/assistant')
+      || currentUrl.startsWith('/client')
+      || currentUrl.startsWith('/admin');
   }
 }
