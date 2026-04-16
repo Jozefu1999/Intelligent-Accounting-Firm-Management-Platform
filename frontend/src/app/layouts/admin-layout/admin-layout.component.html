@@ -1,0 +1,89 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <div class="admin-logo">PC</div>
+      <div>
+        <p class="admin-brand-title">Plateforme Comptable</p>
+        <p class="admin-brand-subtitle">ADMIN CONSOLE</p>
+      </div>
+    </div>
+
+    <nav class="admin-nav">
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="admin-nav-item"
+      >
+        <mat-icon>space_dashboard</mat-icon>
+        <span>Tableau de bord</span>
+      </a>
+
+      <a
+        routerLink="/admin/users"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="admin-nav-item"
+      >
+        <mat-icon>manage_accounts</mat-icon>
+        <span>Utilisateurs</span>
+      </a>
+
+      <a
+        routerLink="/admin/statistics"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="admin-nav-item"
+      >
+        <mat-icon>bar_chart</mat-icon>
+        <span>Statistiques</span>
+      </a>
+
+      <a
+        routerLink="/admin/ml"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="admin-nav-item"
+      >
+        <mat-icon>model_training</mat-icon>
+        <span>Modele ML</span>
+      </a>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+      <div class="admin-user-chip">
+        <div class="admin-user-avatar">{{ initials }}</div>
+        <div>
+          <p class="admin-user-name">{{ fullName || 'Administrateur' }}</p>
+          <span class="admin-user-role">Administrateur</span>
+        </div>
+      </div>
+
+      <a routerLink="/login" class="admin-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Deconnexion</span>
+      </a>
+    </div>
+  </aside>
+
+  <section class="admin-content-wrap">
+    <header class="admin-topbar">
+      <h1 class="admin-topbar-title">{{ pageTitle }}</h1>
+
+      <div class="admin-topbar-right">
+        <button type="button" class="admin-bell" aria-label="Notifications">
+          <mat-icon>notifications</mat-icon>
+        </button>
+
+        <div class="admin-topbar-user">
+          <p class="admin-topbar-name">{{ fullName || 'Administrateur' }}</p>
+          <div class="admin-topbar-avatar">{{ initials }}</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-page-content">
+      <router-outlet></router-outlet>
+    </main>
+  </section>
+</div>

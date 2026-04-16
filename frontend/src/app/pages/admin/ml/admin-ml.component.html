@@ -1,0 +1,36 @@
+<section class="admin-card ml-hero">
+  <div>
+    <h2>Modele ML</h2>
+    <p>Console de supervision et d'entrainement du modele de prediction de risque.</p>
+  </div>
+
+  <button type="button" class="run-btn" [disabled]="isRunning" (click)="runRetrain()">
+    {{ isRunning ? 'Execution...' : 'Lancer un retrain' }}
+  </button>
+</section>
+
+<section class="metrics-grid">
+  <article class="admin-card metric-card">
+    <p>Etat</p>
+    <strong>{{ statusMessage }}</strong>
+  </article>
+
+  <article class="admin-card metric-card">
+    <p>Derniere execution</p>
+    <strong>{{ lastRun }}</strong>
+  </article>
+
+  <article class="admin-card metric-card">
+    <p>Precision estimee</p>
+    <strong>{{ accuracy }}</strong>
+  </article>
+</section>
+
+<section class="admin-card notes-card">
+  <h3>Notes operationnelles</h3>
+  <ul>
+    <li>Verifier que les donnees projet sont a jour avant un retrain.</li>
+    <li>Lancer un retrain pendant les plages de faible activite.</li>
+    <li>Controler les variations de precision apres execution.</li>
+  </ul>
+</section>

@@ -1,0 +1,167 @@
+@if (errorMessage) {
+  <div class="admin-alert admin-alert-danger">{{ errorMessage }}</div>
+}
+
+@if (successMessage) {
+  <div class="admin-alert admin-alert-success">{{ successMessage }}</div>
+}
+
+<section class="page-header-row">
+  <div>
+    <h2 class="page-title">Utilisateurs</h2>
+  </div>
+
+  <div class="header-actions">
+    <input
+      type="search"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Rechercher par nom ou email"
+      class="search-input"
+    />
+
+    <select [(ngModel)]="selectedRole" (ngModelChange)="onRoleFilterChange()" class="role-filter">
+      @for (option of roleOptions; track option.value + option.label) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  </div>
+</section>
+
+<section class="pills-row">
+  <span class="stat-pill">Total: {{ totalUsersCount }}</span>
+  <span class="stat-pill">Experts: {{ expertsCount }}</span>
+  <span class="stat-pill">Assistants: {{ assistantsCount }}</span>
+  <span class="stat-pill">Admins: {{ adminsCount }}</span>
+  <span class="stat-pill">Clients: {{ visitorsCount }}</span>
+</section>
+
+<section class="admin-card table-card">
+  @if (isLoading) {
+    <div class="skeleton-table">
+      @for (row of [1, 2, 3, 4, 5, 6]; track row) {
+        <div class="skeleton-line"></div>
+      }
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>UTILISATEUR</th>
+            <th>ROLE</th>
+            <th>DATE INSCRIPTION</th>
+            <th>STATUT</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of pagedUsers; track user.id) {
+            <tr [class.row-removing]="deletingUserIds.has(user.id)">
+              <td>
+                <div class="user-cell">
+                  <div class="avatar">{{ getInitials(user) }}</div>
+                  <div>
+                    <p class="name">{{ getDisplayName(user) }}</p>
+                    <p class="mail">{{ user.email }}</p>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span [class]="getRoleBadgeClass(user.role)">{{ getRoleLabel(user.role) }}</span>
+              </td>
+
+              <td>{{ formatDate(user.created_at) }}</td>
+
+              <td>
+                <span class="badge badge-active">Actif</span>
+              </td>
+
+              <td>
+                <div class="actions">
+                  <button type="button" class="icon-btn" (click)="openRoleEditor(user)" aria-label="Modifier role">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button type="button" class="icon-btn" (click)="openDetailsModal(user)" aria-label="Voir details">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+
+                  <button type="button" class="icon-btn danger" (click)="openDeleteModal(user)" aria-label="Supprimer utilisateur">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+
+                @if (editingUserId === user.id) {
+                  <div class="inline-role-editor">
+                    <select [(ngModel)]="pendingRoleByUserId[user.id]">
+                      @for (role of roles; track role) {
+                        <option [value]="role">{{ role }}</option>
+                      }
+                    </select>
+                    <button type="button" class="confirm-btn" (click)="confirmRoleChange(user)">Confirmer</button>
+                    <button type="button" class="cancel-btn" (click)="cancelRoleEditor()">Annuler</button>
+                  </div>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">
+                <div class="empty-state">
+                  <mat-icon>group_off</mat-icon>
+                  <p>Aucun utilisateur trouve.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button type="button" (click)="previousPage()" [disabled]="page === 1">Precedent</button>
+      <span>Page {{ page }} sur {{ totalPages }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page === totalPages">Suivant</button>
+    </div>
+  }
+</section>
+
+@if (detailsModalOpen) {
+  <div class="modal-overlay" (click)="closeDetailsModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Details utilisateur</h3>
+
+      @if (detailsLoading) {
+        <p>Chargement...</p>
+      } @else if (detailsModalUser) {
+        <div class="modal-grid">
+          <p><span>Nom complet:</span> {{ getDisplayName(detailsModalUser) }}</p>
+          <p><span>Email:</span> {{ detailsModalUser.email }}</p>
+          <p><span>Role:</span> {{ getRoleLabel(detailsModalUser.role) }}</p>
+          <p><span>Date creation:</span> {{ formatDate(detailsModalUser.created_at) }}</p>
+          <p><span>Projets lies:</span> {{ detailsModalUser.projects_linked_count }}</p>
+        </div>
+      }
+
+      <div class="modal-actions">
+        <button type="button" (click)="closeDetailsModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (deleteModalOpen) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Supprimer {{ deleteModalUser ? getDisplayName(deleteModalUser) : '' }} ?</h3>
+      <p>Cette action est irreversible.</p>
+
+      <div class="modal-actions">
+        <button type="button" (click)="closeDeleteModal()">Annuler</button>
+        <button type="button" class="danger-btn" (click)="confirmDelete()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+}

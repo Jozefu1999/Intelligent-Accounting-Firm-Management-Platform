@@ -40,10 +40,10 @@ export class SidebarComponent {
       { label: 'Documents', subtitle: 'Upload et suivi', icon: 'description', path: '/assistant/documents', exact: true },
     ],
     administrateur: [
-      { label: 'Tableau de bord', subtitle: 'Pilotage global', icon: 'insights', path: '/admin-dashboard', exact: true },
-      { label: 'Utilisateurs', subtitle: 'Gestion des comptes', icon: 'manage_accounts', path: '/admin-dashboard', fragment: 'users' },
-      { label: 'Statistiques', subtitle: 'Activite systeme', icon: 'bar_chart', path: '/admin-dashboard', fragment: 'stats' },
-      { label: 'Modele ML', subtitle: 'Retrain et suivi', icon: 'model_training', path: '/admin-dashboard', fragment: 'ml-model' },
+      { label: 'Tableau de bord', subtitle: 'Pilotage global', icon: 'insights', path: '/admin/dashboard', exact: true },
+      { label: 'Utilisateurs', subtitle: 'Gestion des comptes', icon: 'manage_accounts', path: '/admin/users', exact: true },
+      { label: 'Statistiques', subtitle: 'Activite systeme', icon: 'bar_chart', path: '/admin/statistics', exact: true },
+      { label: 'Modele ML', subtitle: 'Retrain et suivi', icon: 'model_training', path: '/admin/ml', exact: true },
     ],
     visiteur: [
       { label: 'Tableau de bord', subtitle: 'Mon espace client', icon: 'dashboard', path: '/client/dashboard', exact: true },

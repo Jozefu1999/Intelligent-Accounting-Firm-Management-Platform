@@ -1,0 +1,388 @@
+:host {
+  display: block;
+}
+
+.admin-card {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+}
+
+.admin-alert {
+  margin-bottom: 0.9rem;
+  border-radius: 0.75rem;
+  padding: 0.68rem 0.82rem;
+  border: 1px solid;
+  font-size: 0.86rem;
+}
+
+.admin-alert-danger {
+  border-color: #fecaca;
+  color: #be123c;
+  background: #fff1f2;
+}
+
+.admin-alert-success {
+  border-color: #bbf7d0;
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.page-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.search-input,
+.role-filter {
+  border-radius: 0.7rem;
+  border: 1px solid #cbd5e1;
+  padding: 0.48rem 0.65rem;
+  font-size: 0.83rem;
+  color: #334155;
+  background: #ffffff;
+}
+
+.search-input {
+  min-width: 220px;
+}
+
+.pills-row {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.stat-pill {
+  border-radius: 999px;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+.table-card {
+  margin-top: 0.9rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f8fafc;
+}
+
+th {
+  padding: 0.66rem;
+  text-align: left;
+  color: #64748b;
+  font-size: 0.71rem;
+  letter-spacing: 0.06em;
+}
+
+td {
+  border-top: 1px solid #f1f5f9;
+  padding: 0.68rem;
+  color: #334155;
+  font-size: 0.82rem;
+  vertical-align: top;
+}
+
+tbody tr {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.row-removing {
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.name {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.mail {
+  margin: 0.1rem 0 0;
+  color: #64748b;
+  font-size: 0.73rem;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  font-size: 0.69rem;
+  font-weight: 700;
+}
+
+.role-expert {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.role-assistant {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.role-admin {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.role-visitor {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.badge-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.icon-btn {
+  width: 1.95rem;
+  height: 1.95rem;
+  border-radius: 0.55rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-btn mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.icon-btn:hover {
+  background: #f8fafc;
+}
+
+.icon-btn.danger {
+  border-color: #fecaca;
+  color: #dc2626;
+  background: #fff1f2;
+}
+
+.inline-role-editor {
+  margin-top: 0.42rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.inline-role-editor select {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.45rem;
+  padding: 0.25rem 0.35rem;
+  font-size: 0.73rem;
+}
+
+.confirm-btn,
+.cancel-btn {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.45rem;
+  font-size: 0.71rem;
+  padding: 0.24rem 0.45rem;
+  background: #ffffff;
+}
+
+.confirm-btn {
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  color: #64748b;
+  padding: 1.2rem 0;
+}
+
+.pagination {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.pagination button {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.55rem;
+  background: #ffffff;
+  color: #334155;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  padding: 1rem;
+}
+
+.modal {
+  width: min(520px, 100%);
+  border-radius: 0.9rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 24px 60px -30px rgba(15, 23, 42, 0.7);
+}
+
+.modal h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.modal p {
+  color: #334155;
+  font-size: 0.84rem;
+}
+
+.modal-grid {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+
+.modal-grid span {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.modal-actions button {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.55rem;
+  background: #ffffff;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.danger-btn {
+  border-color: #fecaca !important;
+  color: #dc2626;
+  background: #fff1f2 !important;
+}
+
+.skeleton-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.skeleton-line {
+  height: 2.35rem;
+  border-radius: 0.6rem;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .page-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .search-input,
+  .role-filter {
+    width: 100%;
+  }
+}
