@@ -1,7 +1,7 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { UserRole } from '../core/models';
-import { getHomeForRole, normalizeRole } from '../core/utils/role-home';
+import { getHomeForRole } from '../core/utils/role-home';
 import { AuthService } from '../core/services/auth';
 
 const createRoleGuard = (expectedRole: UserRole): CanActivateFn => {
@@ -14,40 +14,13 @@ const createRoleGuard = (expectedRole: UserRole): CanActivateFn => {
       return false;
     }
 
-    const authUser = authService.getCurrentUser();
-    const currentRole = authUser?.role;
-
-    if (currentRole) {
-      const normalizedRole = normalizeRole(currentRole);
-      if (normalizedRole !== expectedRole) {
-        void router.navigate([getHomeForRole(normalizedRole)]);
-        return false;
-      }
-
-      return true;
-    }
-
-    const rawUser = localStorage.getItem('user');
-
-    if (!rawUser) {
-      void router.navigate(['/login']);
+    const currentRole = authService.getCurrentRole();
+    if (currentRole !== expectedRole) {
+      void router.navigate([getHomeForRole(currentRole)]);
       return false;
     }
 
-    try {
-      const user = JSON.parse(rawUser) as { role?: string };
-      const userRole = normalizeRole(user.role);
-
-      if (userRole !== expectedRole) {
-        void router.navigate([getHomeForRole(userRole)]);
-        return false;
-      }
-
-      return true;
-    } catch {
-      void router.navigate(['/login']);
-      return false;
-    }
+    return true;
   };
 };
 
