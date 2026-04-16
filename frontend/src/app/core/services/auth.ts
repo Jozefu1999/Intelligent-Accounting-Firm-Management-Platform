@@ -19,9 +19,17 @@ export class AuthService {
   constructor(private http: HttpClient) {
     const token = this.getToken();
     const user = this.readStoredUser();
+    const tokenRole = this.getRoleFromToken(token);
 
     if (token && user) {
-      this.currentUserSubject.next(this.normalizeUser(user));
+      this.currentUserSubject.next(this.normalizeUser(user, tokenRole));
+    }
+
+    if (token && !user) {
+      const tokenUser = this.buildUserFromToken(token);
+      if (tokenUser) {
+        this.currentUserSubject.next(tokenUser);
+      }
     }
 
     if (!token && user) {
@@ -29,14 +37,71 @@ export class AuthService {
     }
   }
 
-  private normalizeUser(user: User): User {
+  private decodeTokenPayload(token: string | null): Record<string, unknown> | null {
+    if (!token) {
+      return null;
+    }
+
+    const tokenParts = token.split('.');
+    if (tokenParts.length < 2) {
+      return null;
+    }
+
+    try {
+      const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const paddedBase64 = `${base64}${'='.repeat((4 - (base64.length % 4)) % 4)}`;
+      const decoded = atob(paddedBase64);
+      return JSON.parse(decoded) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  }
+
+  private getRoleFromToken(token: string | null): UserRole | null {
+    const payload = this.decodeTokenPayload(token);
+    if (!payload) {
+      return null;
+    }
+
+    const roleCandidate = payload['role'];
+    if (typeof roleCandidate !== 'string' || roleCandidate.trim().length === 0) {
+      return null;
+    }
+
+    return normalizeRole(roleCandidate);
+  }
+
+  private buildUserFromToken(token: string): User | null {
+    const payload = this.decodeTokenPayload(token);
+    if (!payload) {
+      return null;
+    }
+
+    const role = this.getRoleFromToken(token) ?? 'visiteur';
+    const idCandidate = payload['id'];
+    const emailCandidate = payload['email'];
+
+    return {
+      id: typeof idCandidate === 'number' ? idCandidate : 0,
+      email: typeof emailCandidate === 'string' ? emailCandidate : '',
+      first_name: '',
+      last_name: '',
+      prenom: '',
+      nom: '',
+      role,
+    };
+  }
+
+  private normalizeUser(user: User, tokenRole?: UserRole | null): User {
+    const resolvedRole = tokenRole ?? normalizeRole(user.role);
+
     return {
       ...user,
       first_name: user.first_name ?? user.prenom ?? '',
       last_name: user.last_name ?? user.nom ?? '',
       prenom: user.prenom ?? user.first_name ?? '',
       nom: user.nom ?? user.last_name ?? '',
-      role: normalizeRole(user.role),
+      role: resolvedRole,
     };
   }
 
@@ -56,7 +121,7 @@ export class AuthService {
   }
 
   private setSession(token: string, user: User): void {
-    const normalizedUser = this.normalizeUser(user);
+    const normalizedUser = this.normalizeUser(user, this.getRoleFromToken(token));
 
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.userKey, JSON.stringify(normalizedUser));
@@ -95,7 +160,8 @@ export class AuthService {
   }): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/profile`, data).pipe(
       tap((user) => {
-        const normalizedUser = this.normalizeUser(user);
+        const tokenRole = this.getRoleFromToken(this.getToken());
+        const normalizedUser = this.normalizeUser(user, tokenRole);
         localStorage.setItem(this.userKey, JSON.stringify(normalizedUser));
         this.currentUserSubject.next(normalizedUser);
       })
@@ -109,7 +175,8 @@ export class AuthService {
   fetchCurrentUser(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/me`).pipe(
       tap((user) => {
-        const normalizedUser = this.normalizeUser(user);
+        const tokenRole = this.getRoleFromToken(this.getToken());
+        const normalizedUser = this.normalizeUser(user, tokenRole);
         localStorage.setItem(this.userKey, JSON.stringify(normalizedUser));
         this.currentUserSubject.next(normalizedUser);
       })
@@ -147,8 +214,23 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  getCurrentRole(): UserRole {
+    const currentUserRole = this.currentUserSubject.value?.role;
+    if (currentUserRole) {
+      return normalizeRole(currentUserRole);
+    }
+
+    const tokenRole = this.getRoleFromToken(this.getToken());
+    if (tokenRole) {
+      return tokenRole;
+    }
+
+    const storedUserRole = this.readStoredUser()?.role;
+    return normalizeRole(storedUserRole);
+  }
+
   getHomeForCurrentUser(): string {
-    return getHomeForRole(this.currentUserSubject.value?.role);
+    return getHomeForRole(this.getCurrentRole());
   }
 
   getHomeForRole(role: string | undefined | null): string {
