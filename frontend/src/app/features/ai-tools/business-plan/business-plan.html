@@ -1,1 +1,100 @@
-<p>business-plan works!</p>
+<section class="ai-page">
+	<header class="ai-header">
+		<p class="ai-eyebrow">AI TOOLS</p>
+		<h1>Business Plan Generator</h1>
+		<p>Generate a structured business plan from project data and AI analysis.</p>
+	</header>
+
+	<div class="ai-grid">
+		<article class="ai-card ai-form-card">
+			<h2>Generate Plan</h2>
+			<p>Select a project, then run AI generation.</p>
+
+			<form [formGroup]="form" (ngSubmit)="generateBusinessPlan()" class="ai-form-stack">
+				<label for="projectId">Project</label>
+				<select
+					id="projectId"
+					formControlName="projectId"
+					[disabled]="isProjectsLoading || isGenerating"
+				>
+					<option [ngValue]="0">Select a project</option>
+					@for (project of projects; track project.id) {
+						<option [ngValue]="project.id">
+							{{ project.name }}
+							@if (project.client?.company_name) {
+								- {{ project.client?.company_name }}
+							}
+						</option>
+					}
+				</select>
+
+				@if (selectedProject) {
+					<div class="project-preview">
+						<p class="project-preview-title">Selected project</p>
+						<p class="project-preview-name">{{ selectedProject.name }}</p>
+						<p class="project-preview-meta">
+							Status: {{ selectedProject.status || 'draft' }}
+							| Priority: {{ selectedProject.priority || 'medium' }}
+						</p>
+					</div>
+				}
+
+				<button
+					type="submit"
+					class="primary-btn"
+					[disabled]="isGenerating || isProjectsLoading || projects.length === 0"
+				>
+					@if (isGenerating) {
+						<mat-icon class="spin">autorenew</mat-icon>
+						<span>Generating...</span>
+					} @else {
+						<mat-icon>auto_awesome</mat-icon>
+						<span>Generate Business Plan</span>
+					}
+				</button>
+			</form>
+
+			@if (errorMessage) {
+				<div class="alert alert-error">
+					<mat-icon>error</mat-icon>
+					<span>{{ errorMessage }}</span>
+				</div>
+			}
+
+			@if (successMessage) {
+				<div class="alert alert-success">
+					<mat-icon>check_circle</mat-icon>
+					<span>{{ successMessage }}</span>
+				</div>
+			}
+		</article>
+
+		<article class="ai-card ai-result-card">
+			@if (generatedPlan; as plan) {
+				<header class="result-header">
+					<h2>Generated Plan</h2>
+					<p>
+						Project #{{ plan.project_id }}
+						@if (plan.created_at || plan.createdAt) {
+							| Generated {{ (plan.created_at || plan.createdAt) | date:'dd/MM/yyyy HH:mm' }}
+						}
+					</p>
+				</header>
+
+				@for (section of sections; track section.key) {
+					<section class="plan-section">
+						<h3>{{ section.title }}</h3>
+						<p class="section-hint">{{ section.hint }}</p>
+						<pre>{{ formatSectionValue(section.key) }}</pre>
+					</section>
+				}
+			} @else {
+				<div class="result-placeholder">
+					<mat-icon>description</mat-icon>
+					<h2>No plan generated yet</h2>
+					<p>Run a generation to see the AI business plan content here.</p>
+				</div>
+			}
+		</article>
+	</div>
+</section>
