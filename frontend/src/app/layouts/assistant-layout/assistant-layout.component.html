@@ -1,10 +1,29 @@
 <div class="assistant-shell">
-  <aside class="assistant-sidebar">
-    <div class="brand-card">
-      <p class="brand-eyebrow">Assistant workspace</p>
-      <h1 class="brand-title">Operations Hub</h1>
-      <p class="brand-meta">{{ todayLabel }}</p>
+  <div class="ambient-shape ambient-shape--one" aria-hidden="true"></div>
+  <div class="ambient-shape ambient-shape--two" aria-hidden="true"></div>
+
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    [class.visible]="isSidebarOpen"
+    aria-label="Fermer le menu"
+    (click)="closeSidebar()"
+  ></button>
+
+  <aside class="assistant-sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-brand">
+      <div class="brand-mark">AF</div>
+      <div>
+        <p class="brand-eyebrow">Workspace</p>
+        <h2 class="brand-title">Assistant Hub</h2>
+      </div>
     </div>
+
+    <section class="identity-card">
+      <p class="identity-label">Connecte en tant que</p>
+      <p class="identity-name">{{ userDisplayName }}</p>
+      <p class="identity-date">{{ todayLabel }}</p>
+    </section>
 
     <nav class="nav-menu">
       <a
@@ -12,6 +31,7 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav-item"
+        (click)="closeSidebar()"
       >
         <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
         <span class="nav-label">Tableau de bord</span>
@@ -20,11 +40,12 @@
       <a
         routerLink="/assistant/projets"
         routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
+        [routerLinkActiveOptions]="{ exact: false }"
         class="nav-item"
+        (click)="closeSidebar()"
       >
-        <span class="nav-icon"><mat-icon>work</mat-icon></span>
-        <span class="nav-label">Mes projets</span>
+        <span class="nav-icon"><mat-icon>assignment</mat-icon></span>
+        <span class="nav-label">Mes projets assignes</span>
       </a>
 
       <a
@@ -32,25 +53,40 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav-item"
+        (click)="closeSidebar()"
       >
         <span class="nav-icon"><mat-icon>description</mat-icon></span>
         <span class="nav-label">Documents</span>
       </a>
     </nav>
 
-    <div class="user-card">
-      <p class="user-name">{{ fullName || 'Assistant' }}</p>
-      <p class="user-role">Assistant</p>
-      <button type="button" class="logout-btn" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Deconnexion</span>
-      </button>
-    </div>
+    <button type="button" class="sidebar-logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Deconnexion</span>
+    </button>
   </aside>
 
-  <main class="assistant-main">
-    <div class="content-surface">
+  <section class="assistant-workspace">
+    <header class="workspace-header">
+      <div class="header-left">
+        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Ouvrir le menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <div>
+          <p class="workspace-eyebrow">Assistant Interface</p>
+          <h1 class="workspace-title">Gestion quotidienne</h1>
+        </div>
+      </div>
+
+      <button type="button" class="header-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Se deconnecter</span>
+      </button>
+    </header>
+
+    <main class="workspace-content">
       <router-outlet></router-outlet>
-    </div>
-  </main>
+    </main>
+  </section>
 </div>

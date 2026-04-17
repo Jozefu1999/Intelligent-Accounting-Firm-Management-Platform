@@ -19,6 +19,9 @@ import { ProjectService } from '../../../core/services/project';
 export class ProjectForm implements OnInit {
   clients: Client[] = [];
 
+  listRoute = '/projects';
+  isAssistantContext = false;
+
   selectedClientId = '';
   name = '';
   description = '';
@@ -45,6 +48,9 @@ export class ProjectForm implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isAssistantContext = this.router.url.startsWith('/assistant/');
+    this.listRoute = this.isAssistantContext ? '/assistant/projets' : '/projects';
+
     this.loadClients();
 
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -101,7 +107,7 @@ export class ProjectForm implements OnInit {
         )
         .subscribe({
           next: () => {
-            this.router.navigateByUrl('/projects');
+            this.router.navigateByUrl(this.listRoute);
             this.cdr.detectChanges();
           },
           error: (error) => {
@@ -124,7 +130,7 @@ export class ProjectForm implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.router.navigateByUrl('/projects');
+          this.router.navigateByUrl(this.listRoute);
           this.cdr.detectChanges();
         },
         error: (error) => {

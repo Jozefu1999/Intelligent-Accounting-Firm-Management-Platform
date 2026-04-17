@@ -1,39 +1,50 @@
-<div class="space-y-6">
+<div class="dashboard-shell">
   @if (errorMessage) {
     <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
       {{ errorMessage }}
     </div>
   }
 
-  @if (warningMessage) {
-    <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-      {{ warningMessage }}
+  <section class="hero-card">
+    <div>
+      <p class="hero-eyebrow">Assistant workspace</p>
+      <h1 class="hero-title">
+        Bonjour {{ fullName || 'Assistant' }}
+        <span class="role-pill">Assistant</span>
+      </h1>
+      <p class="hero-date">{{ todayLabel }}</p>
     </div>
-  }
 
-  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-    <h1 class="text-2xl font-semibold text-slate-900">
-      Bonjour {{ fullName || 'Assistant' }}
-      <span class="ml-2 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">Assistant</span>
-    </h1>
-    <p class="mt-2 text-sm text-slate-500">{{ todayLabel }}</p>
+    <div class="hero-actions">
+      <a routerLink="/assistant/projets/new" class="quick-action quick-action--primary">Ajouter projet</a>
+      <a routerLink="/assistant/documents" class="quick-action quick-action--ghost">Voir documents</a>
+    </div>
   </section>
 
-  <section class="grid gap-4 md:grid-cols-2">
-    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p class="text-sm text-slate-500">Projets assignes</p>
-      <p class="mt-2 text-3xl font-semibold text-slate-900">{{ assignedProjectsCount }}</p>
+  <section class="kpi-grid">
+    <article class="kpi-card">
+      <p class="kpi-label">Projets assignes</p>
+      <p class="kpi-value">{{ assignedProjectsCount }}</p>
+      <p class="kpi-sub">{{ inProgressProjectsCount }} en cours</p>
     </article>
 
-    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p class="text-sm text-slate-500">Documents uploades</p>
-      <p class="mt-2 text-3xl font-semibold text-slate-900">{{ uploadedDocumentsCount }}</p>
+    <article class="kpi-card">
+      <p class="kpi-label">Documents uploades</p>
+      <p class="kpi-value">{{ uploadedDocumentsCount }}</p>
+      <p class="kpi-sub">Pieces disponibles</p>
+    </article>
+
+    <article class="kpi-card kpi-card--accent">
+      <p class="kpi-label">Taux d'avancement</p>
+      <p class="kpi-value">{{ completionRate }}%</p>
+      <p class="kpi-sub">{{ completedProjectsCount }} projet(s) termine(s)</p>
     </article>
   </section>
 
-  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+  <section class="projects-card">
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-lg font-semibold text-slate-900">Derniers projets assignes</h2>
+      <a routerLink="/assistant/projets" class="text-sm font-semibold text-cyan-700 hover:text-cyan-800">Voir tout</a>
     </div>
 
     @if (isLoading) {
@@ -57,8 +68,12 @@
               <tr>
                 <td class="px-3 py-3 text-sm font-medium text-slate-900">{{ project.name }}</td>
                 <td class="px-3 py-3 text-sm text-slate-600">{{ project.client?.company_name || 'N/A' }}</td>
-                <td class="px-3 py-3 text-sm text-slate-700">{{ getStatusLabel(project.status) }}</td>
-                <td class="px-3 py-3 text-sm text-slate-700">{{ getPriorityLabel(project.priority) }}</td>
+                <td class="px-3 py-3 text-sm text-slate-700">
+                  <span [class]="getStatusBadgeClass(project.status)">{{ getStatusLabel(project.status) }}</span>
+                </td>
+                <td class="px-3 py-3 text-sm text-slate-700">
+                  <span [class]="getPriorityBadgeClass(project.priority)">{{ getPriorityLabel(project.priority) }}</span>
+                </td>
                 <td class="px-3 py-3 text-sm text-slate-600">{{ formatDate(project.created_at || project.updated_at) }}</td>
               </tr>
             } @empty {

@@ -3,8 +3,6 @@ import { Component } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
-import { User } from '../../core/models';
-import { AuthService } from '../../core/services/auth';
 
 @Component({
   selector: 'app-assistant-layout',
@@ -14,30 +12,47 @@ import { AuthService } from '../../core/services/auth';
   styleUrl: './assistant-layout.component.css',
 })
 export class AssistantLayoutComponent {
-  currentUser: User | null = null;
+  isSidebarOpen = false;
+  readonly todayLabel = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date());
 
-  private readonly today = new Date();
+  constructor(private router: Router) {}
 
-  constructor(
-    private router: Router,
-    private authService: AuthService,
-  ) {
-    this.currentUser = this.authService.getCurrentUser();
+  get userDisplayName(): string {
+    const rawUser = localStorage.getItem('user');
+    if (!rawUser) {
+      return 'Assistant';
+    }
+
+    try {
+      const user = JSON.parse(rawUser) as {
+        first_name?: string;
+        last_name?: string;
+        prenom?: string;
+        nom?: string;
+      };
+
+      const firstName = user.prenom || user.first_name || '';
+      const lastName = user.nom || user.last_name || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      return fullName || 'Assistant';
+    } catch {
+      return 'Assistant';
+    }
   }
 
-  get fullName(): string {
-    const firstName = this.currentUser?.prenom || this.currentUser?.first_name || '';
-    const lastName = this.currentUser?.nom || this.currentUser?.last_name || '';
-    return `${firstName} ${lastName}`.trim();
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
-  get todayLabel(): string {
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' }).format(this.today);
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
   }
 
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    this.closeSidebar();
     void this.router.navigate(['/login']);
   }
 }
