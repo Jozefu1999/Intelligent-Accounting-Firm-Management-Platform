@@ -54,14 +54,70 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'admin-dashboard',
-    loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    path: 'admin',
     canActivate: [authGuard, AdminGuard],
+    loadComponent: () => import('./layouts/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./pages/admin/users/admin-users.component').then(m => m.AdminUsersComponent),
+      },
+      {
+        path: 'statistics',
+        loadComponent: () => import('./pages/admin/statistics/admin-statistics.component').then(m => m.AdminStatisticsComponent),
+      },
+      {
+        path: 'ml',
+        loadComponent: () => import('./pages/admin/ml/admin-ml.component').then(m => m.AdminMlComponent),
+      },
+    ],
+  },
+  {
+    path: 'admin-dashboard',
+    redirectTo: 'admin/dashboard',
+    pathMatch: 'full',
+  },
+  {
+    path: 'client',
+    canActivate: [authGuard, ClientGuard],
+    loadComponent: () => import('./layouts/client-layout/client-layout.component').then(m => m.ClientLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/client/dashboard/client-dashboard.component').then(m => m.ClientDashboardComponent),
+      },
+      {
+        path: 'projects',
+        loadComponent: () => import('./pages/client/projects/client-projects.component').then(m => m.ClientProjectsComponent),
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./pages/client/profile/client-profile.component').then(m => m.ClientProfileComponent),
+      },
+      {
+        path: 'contact',
+        loadComponent: () => import('./pages/client/contact/client-contact.component').then(m => m.ClientContactComponent),
+      },
+    ],
   },
   {
     path: 'client-dashboard',
-    loadComponent: () => import('./pages/client-dashboard/client-dashboard.component').then(m => m.ClientDashboardComponent),
-    canActivate: [authGuard, ClientGuard],
+    redirectTo: 'client/dashboard',
+    pathMatch: 'full',
   },
   {
     path: 'clients',
@@ -106,6 +162,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
       },
     ],
+  },
+  {
+    path: 'expert/projects',
+    redirectTo: 'projects',
+    pathMatch: 'full',
   },
   {
     path: 'ai-tools',

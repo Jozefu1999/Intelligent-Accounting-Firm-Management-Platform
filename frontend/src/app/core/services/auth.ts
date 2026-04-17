@@ -102,6 +102,10 @@ export class AuthService {
     );
   }
 
+  changePassword(data: { currentPassword: string; newPassword: string }): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/change-password`, data);
+  }
+
   fetchCurrentUser(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/me`).pipe(
       tap((user) => {

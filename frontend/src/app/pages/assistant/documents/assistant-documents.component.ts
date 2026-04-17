@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewRef } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { catchError, finalize, of, timeout } from 'rxjs';
 import { Document, Project } from '../../../core/models';
 import { DocumentService } from '../../../core/services/document';
 import { ProjectService } from '../../../core/services/project';
@@ -26,10 +27,12 @@ export class AssistantDocumentsComponent implements OnInit {
 
   errorMessage = '';
   successMessage = '';
+  projectWarningMessage = '';
 
   constructor(
     private documentService: DocumentService,
     private projectService: ProjectService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -41,25 +44,45 @@ export class AssistantDocumentsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.documentService.getAll().subscribe({
+    this.documentService.getAll().pipe(
+      timeout(12000),
+      catchError(() => {
+        this.errorMessage = 'Impossible de charger les documents.';
+        return of([] as Document[]);
+      }),
+      finalize(() => {
+        this.isLoading = false;
+        this.triggerUiUpdate();
+      }),
+    ).subscribe({
       next: (documents) => {
         this.documents = documents ?? [];
-        this.isLoading = false;
+        this.triggerUiUpdate();
       },
       error: () => {
         this.errorMessage = 'Impossible de charger les documents.';
-        this.isLoading = false;
+        this.triggerUiUpdate();
       },
     });
   }
 
   loadProjects(): void {
-    this.projectService.getAll().subscribe({
+    this.projectWarningMessage = '';
+
+    this.projectService.getAll().pipe(
+      timeout(12000),
+      catchError(() => {
+        this.projectWarningMessage = 'La liste des projets n a pas pu etre chargee. L upload peut etre limite.';
+        return of([] as Project[]);
+      }),
+    ).subscribe({
       next: (projects) => {
         this.projects = projects ?? [];
+        this.triggerUiUpdate();
       },
       error: () => {
         this.projects = [];
+        this.triggerUiUpdate();
       },
     });
   }
@@ -102,10 +125,12 @@ export class AssistantDocumentsComponent implements OnInit {
         this.successMessage = 'Document uploade avec succes.';
         this.closeModal();
         this.loadDocuments();
+        this.triggerUiUpdate();
       },
       error: () => {
         this.errorMessage = 'Echec de l upload du document.';
         this.isUploading = false;
+        this.triggerUiUpdate();
       },
     });
   }
@@ -122,6 +147,7 @@ export class AssistantDocumentsComponent implements OnInit {
       },
       error: () => {
         this.errorMessage = 'Impossible de telecharger le document.';
+        this.triggerUiUpdate();
       },
     });
   }
@@ -160,5 +186,12 @@ export class AssistantDocumentsComponent implements OnInit {
     }
 
     return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+  }
+
+  private triggerUiUpdate(): void {
+    const view = this.cdr as ViewRef;
+    if (!view.destroyed) {
+      this.cdr.detectChanges();
+    }
   }
 }

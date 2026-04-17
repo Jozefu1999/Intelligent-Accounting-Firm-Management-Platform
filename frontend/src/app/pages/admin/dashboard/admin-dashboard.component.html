@@ -1,0 +1,116 @@
+@if (errorMessage) {
+  <div class="admin-alert admin-alert-danger">
+    {{ errorMessage }}
+  </div>
+}
+
+<section class="admin-card welcome-card">
+  <div class="welcome-left">
+    <p class="welcome-title">Bonjour, {{ fullName || 'Administrateur' }}</p>
+    <p class="welcome-subtitle">Vue d'ensemble de l'activite de la plateforme</p>
+    <span class="role-chip">Administrateur</span>
+  </div>
+  <div class="welcome-date">{{ todayLabel }}</div>
+</section>
+
+<section class="kpi-grid">
+  @if (isLoading) {
+    @for (card of [1, 2, 3, 4]; track card) {
+      <article class="admin-card kpi-card skeleton"></article>
+    }
+  } @else {
+    @for (kpi of kpis; track kpi.label) {
+      <article class="admin-card kpi-card" [class]="'admin-card kpi-card ' + kpi.accentClass">
+        <div class="kpi-head">
+          <div class="kpi-icon"><mat-icon>{{ kpi.icon }}</mat-icon></div>
+          <p class="kpi-label">{{ kpi.label }}</p>
+        </div>
+        <p class="kpi-value">{{ kpi.value }}</p>
+        <p class="kpi-subtitle">{{ kpi.subtitle }}</p>
+      </article>
+    }
+  }
+</section>
+
+<section class="dashboard-grid-two">
+  <article class="admin-card">
+    <div class="card-title-row">
+      <h2 class="card-title">Nouveaux utilisateurs</h2>
+    </div>
+
+    @if (isLoading) {
+      <div class="skeleton-list">
+        @for (row of [1, 2, 3, 4, 5]; track row) {
+          <div class="skeleton-row"></div>
+        }
+      </div>
+    } @else {
+      <div class="user-list">
+        @for (user of recentUsers; track user.id) {
+          <div class="user-row">
+            <div class="user-core">
+              <div class="user-avatar">{{ getUserInitials(user) }}</div>
+              <div>
+                <p class="user-name">{{ getDisplayName(user) }}</p>
+                <p class="user-email">{{ user.email }}</p>
+              </div>
+            </div>
+
+            <div class="user-meta">
+              <span [class]="getRoleClass(user.role)">{{ getRoleLabel(user.role) }}</span>
+              <span class="user-date">{{ formatDate(user.created_at) }}</span>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-state">Aucun utilisateur recent.</p>
+        }
+      </div>
+
+      <a routerLink="/admin/users" class="card-link">Voir tous les utilisateurs -></a>
+    }
+  </article>
+
+  <article class="admin-card">
+    <div class="card-title-row">
+      <h2 class="card-title">Activite de la plateforme</h2>
+    </div>
+
+    @if (isLoading) {
+      <div class="skeleton-list">
+        @for (row of [1, 2, 3, 4, 5, 6]; track row) {
+          <div class="skeleton-row"></div>
+        }
+      </div>
+    } @else {
+      <div class="progress-list">
+        @for (row of statusBlocks; track row.label) {
+          <div class="progress-row">
+            <div class="progress-row-head">
+              <span>{{ row.label }}</span>
+              <strong>{{ row.count }}</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [class]="row.barClass" [style.width.%]="row.pct"></div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <hr class="divider" />
+
+      <div class="progress-list">
+        @for (row of riskBlocks; track row.label) {
+          <div class="progress-row">
+            <div class="progress-row-head">
+              <span>{{ row.label }}</span>
+              <strong>{{ row.count }}</strong>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [class]="row.barClass" [style.width.%]="row.pct"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </article>
+</section>

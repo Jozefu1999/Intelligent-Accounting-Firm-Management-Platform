@@ -1,0 +1,126 @@
+<div class="projects-page">
+  <section class="projects-hero client-fade-up">
+    <div>
+      <p class="hero-eyebrow">Suivi des dossiers</p>
+      <h1>Mes Projets</h1>
+      <p>Consultez l avancement de vos missions et accedez aux details de chaque dossier.</p>
+    </div>
+
+    <div class="hero-filters">
+      <input
+        [formControl]="searchControl"
+        type="text"
+        placeholder="Rechercher par titre"
+        class="field"
+      />
+
+      <select [formControl]="statusControl" class="field">
+        <option value="all">Tous</option>
+        <option value="en_cours">En cours</option>
+        <option value="termine">Termine</option>
+        <option value="suspendu">Suspendu</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="projects-panel client-fade-up">
+    @if (isLoading) {
+      <p class="panel-info">Chargement des projets...</p>
+    } @else if (filteredProjects.length === 0) {
+      <div class="panel-empty">Aucun projet en cours pour le moment.</div>
+    } @else {
+      <div class="table-wrap">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>TITRE</th>
+              <th>TYPE</th>
+              <th>STATUT</th>
+              <th>NIVEAU DE RISQUE</th>
+              <th>DATE CREATION</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (project of filteredProjects; track project.id) {
+              <tr>
+                <td class="font-medium">{{ project.name }}</td>
+                <td>{{ getTypeLabel(project.type) }}</td>
+                <td>
+                  <span class="badge" [class]="getStatusClass(project.status)">{{ getStatusLabel(project.status) }}</span>
+                </td>
+                <td>
+                  <span class="badge" [class]="getRiskClass(project)">{{ getRiskLabel(project) }}</span>
+                </td>
+                <td>{{ formatDate(project.created_at || project.createdAt) }}</td>
+                <td>
+                  <button type="button" class="ghost-btn" (click)="openDetails(project)">
+                    Voir details
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>
+
+@if (selectedProject) {
+  <div class="modal-backdrop">
+    <div class="modal-card client-fade-up">
+      <div class="modal-head">
+        <h2>{{ selectedProject.name }}</h2>
+        <button type="button" class="ghost-btn" (click)="closeDetails()">Fermer</button>
+      </div>
+
+      <div class="detail-grid">
+        <p><span class="font-semibold">Titre:</span> {{ selectedProject.name }}</p>
+        <p><span class="font-semibold">Type:</span> {{ getTypeLabel(selectedProject.type) }}</p>
+        <p><span class="font-semibold">Description:</span> {{ selectedProject.description || '-' }}</p>
+        <p><span class="font-semibold">Statut:</span> {{ getStatusLabel(selectedProject.status) }}</p>
+        <p><span class="font-semibold">Niveau de risque:</span> {{ getRiskLabel(selectedProject) }}</p>
+        <p><span class="font-semibold">Date de creation:</span> {{ formatDate(selectedProject.created_at || selectedProject.createdAt) }}</p>
+        <p class="detail-wide"><span class="font-semibold">Nom du client:</span> {{ currentUserName }}</p>
+      </div>
+
+      <div class="document-block">
+        <h3>Documents</h3>
+
+        @if (isLoadingDetails) {
+          <p class="panel-info">Chargement des documents...</p>
+        } @else if (selectedProjectDocuments.length === 0) {
+          <div class="panel-empty">
+            Aucun document disponible.
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>NOM FICHIER</th>
+                  <th>DATE</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (document of selectedProjectDocuments; track document.id) {
+                  <tr>
+                    <td>{{ document.name }}</td>
+                    <td>{{ formatDate(document.created_at || document.createdAt) }}</td>
+                    <td>
+                      <button type="button" class="primary-btn" (click)="downloadDocument(document)">
+                        Download
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

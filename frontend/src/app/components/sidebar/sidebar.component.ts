@@ -40,15 +40,16 @@ export class SidebarComponent {
       { label: 'Documents', subtitle: 'Upload et suivi', icon: 'description', path: '/assistant/documents', exact: true },
     ],
     administrateur: [
-      { label: 'Tableau de bord', subtitle: 'Pilotage global', icon: 'insights', path: '/admin-dashboard', exact: true },
-      { label: 'Utilisateurs', subtitle: 'Gestion des comptes', icon: 'manage_accounts', path: '/admin-dashboard', fragment: 'users' },
-      { label: 'Statistiques', subtitle: 'Activite systeme', icon: 'bar_chart', path: '/admin-dashboard', fragment: 'stats' },
-      { label: 'Modele ML', subtitle: 'Retrain et suivi', icon: 'model_training', path: '/admin-dashboard', fragment: 'ml-model' },
+      { label: 'Tableau de bord', subtitle: 'Pilotage global', icon: 'insights', path: '/admin/dashboard', exact: true },
+      { label: 'Utilisateurs', subtitle: 'Gestion des comptes', icon: 'manage_accounts', path: '/admin/users', exact: true },
+      { label: 'Statistiques', subtitle: 'Activite systeme', icon: 'bar_chart', path: '/admin/statistics', exact: true },
+      { label: 'Modele ML', subtitle: 'Retrain et suivi', icon: 'model_training', path: '/admin/ml', exact: true },
     ],
     visiteur: [
-      { label: 'Accueil', subtitle: 'Mon espace', icon: 'home', path: '/client-dashboard', exact: true },
-      { label: 'Mon Profil', subtitle: 'Informations personnelles', icon: 'person', path: '/client-dashboard', fragment: 'profil' },
-      { label: 'Contacter le cabinet', subtitle: 'Messagerie', icon: 'mail', path: '/client-dashboard', fragment: 'contact' },
+      { label: 'Tableau de bord', subtitle: 'Mon espace client', icon: 'dashboard', path: '/client/dashboard', exact: true },
+      { label: 'Mes Projets', subtitle: 'Suivi des dossiers', icon: 'work', path: '/client/projects', exact: true },
+      { label: 'Mon Profil', subtitle: 'Informations personnelles', icon: 'person', path: '/client/profile', exact: true },
+      { label: 'Contacter', subtitle: 'Messages au cabinet', icon: 'mail', path: '/client/contact', exact: true },
     ],
   };
 
