@@ -108,38 +108,6 @@ export class SidebarComponent {
     return 'CLIENT SPACE';
   }
 
-  get fullName(): string {
-    const user = this.authService.getCurrentUser();
-    const firstName = user?.prenom || user?.first_name || '';
-    const lastName = user?.nom || user?.last_name || '';
-    return `${firstName} ${lastName}`.trim();
-  }
-
-  get initials(): string {
-    const user = this.authService.getCurrentUser();
-    const firstNameInitial = (user?.prenom || user?.first_name || '').charAt(0);
-    const lastNameInitial = (user?.nom || user?.last_name || '').charAt(0);
-    const combined = `${firstNameInitial}${lastNameInitial}`.trim();
-
-    if (combined.length > 0) {
-      return combined.toUpperCase();
-    }
-
-    if (this.normalizedRole === 'expert_comptable') {
-      return 'EX';
-    }
-
-    if (this.normalizedRole === 'administrateur') {
-      return 'AD';
-    }
-
-    if (this.normalizedRole === 'assistant') {
-      return 'AS';
-    }
-
-    return 'CL';
-  }
-
   trackByPath(_index: number, item: SidebarItem): string {
     return `${item.path}::${item.fragment ?? ''}`;
   }

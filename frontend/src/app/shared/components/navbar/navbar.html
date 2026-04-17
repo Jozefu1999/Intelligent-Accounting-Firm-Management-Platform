@@ -9,27 +9,5 @@
         <p class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Firm Console</p>
       </div>
     </div>
-
-    @if (currentUser$ | async; as user) {
-      <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/85 px-3 py-2">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-700 text-sm font-bold text-white">
-          {{ getInitials(getUserFirstName(user), getUserLastName(user)) }}
-        </div>
-
-        <div class="hidden text-right sm:block">
-          <p class="text-sm font-semibold text-slate-800">{{ getUserFirstName(user) }} {{ getUserLastName(user) }}</p>
-          <p class="text-xs text-slate-500">{{ getRoleLabel(user.role) }}</p>
-        </div>
-
-        <button
-          mat-icon-button
-          (click)="logout()"
-          class="!h-9 !w-9 rounded-xl !text-slate-600 hover:!bg-slate-200"
-          aria-label="Se déconnecter"
-        >
-          <mat-icon>logout</mat-icon>
-        </button>
-      </div>
-    }
   </div>
 </nav>
