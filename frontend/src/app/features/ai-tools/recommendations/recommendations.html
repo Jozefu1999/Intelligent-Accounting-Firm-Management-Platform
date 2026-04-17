@@ -1,1 +1,98 @@
-<p>recommendations works!</p>
+<section class="ai-page">
+	<header class="ai-header">
+		<p class="ai-eyebrow">AI TOOLS</p>
+		<h1>Smart Recommendations</h1>
+		<p>Generate actionable recommendations tailored to each client profile.</p>
+	</header>
+
+	<div class="ai-grid">
+		<article class="ai-card ai-form-card">
+			<h2>Generate Recommendations</h2>
+			<p>Choose a client and request 3 to 5 prioritized actions.</p>
+
+			<form [formGroup]="form" (ngSubmit)="generateRecommendations()" class="ai-form-stack">
+				<label for="clientId">Client</label>
+				<select
+					id="clientId"
+					formControlName="clientId"
+					[disabled]="isClientsLoading || isGenerating"
+				>
+					<option [ngValue]="0">Select a client</option>
+					@for (client of clients; track client.id) {
+						<option [ngValue]="client.id">
+							{{ client.company_name }}
+						</option>
+					}
+				</select>
+
+				@if (selectedClient) {
+					<div class="client-preview">
+						<p class="client-preview-title">Selected client</p>
+						<p class="client-preview-name">{{ selectedClient.company_name }}</p>
+						<p class="client-preview-meta">
+							Revenue: {{ selectedClient.annual_revenue || 0 | number }} EUR
+							| Current risk: {{ selectedClient.risk_level || 'n/a' }}
+						</p>
+					</div>
+				}
+
+				<button
+					type="submit"
+					class="primary-btn"
+					[disabled]="isGenerating || isClientsLoading || clients.length === 0"
+				>
+					@if (isGenerating) {
+						<mat-icon class="spin">autorenew</mat-icon>
+						<span>Generating...</span>
+					} @else {
+						<mat-icon>lightbulb</mat-icon>
+						<span>Generate Recommendations</span>
+					}
+				</button>
+			</form>
+
+			@if (errorMessage) {
+				<div class="alert alert-error">
+					<mat-icon>error</mat-icon>
+					<span>{{ errorMessage }}</span>
+				</div>
+			}
+
+			@if (successMessage) {
+				<div class="alert alert-success">
+					<mat-icon>check_circle</mat-icon>
+					<span>{{ successMessage }}</span>
+				</div>
+			}
+		</article>
+
+		<article class="ai-card ai-result-card">
+			@if (recommendations.length > 0) {
+				<header class="result-header">
+					<h2>Recommended Actions</h2>
+					<p>{{ recommendations.length }} recommendation(s) generated.</p>
+				</header>
+
+				<div class="recommendation-list">
+					@for (recommendation of recommendations; track recommendation.title + recommendation.description) {
+						<article class="recommendation-card">
+							<div class="recommendation-head">
+								<h3>{{ recommendation.title }}</h3>
+								<span class="priority-chip" [class]="'priority-chip ' + getPriorityClass(recommendation.priority)">
+									{{ getPriorityLabel(recommendation.priority) }}
+								</span>
+							</div>
+							<p>{{ recommendation.description }}</p>
+						</article>
+					}
+				</div>
+			} @else {
+				<div class="result-placeholder">
+					<mat-icon>tips_and_updates</mat-icon>
+					<h2>No recommendations yet</h2>
+					<p>Run generation to receive strategic suggestions for the selected client.</p>
+				</div>
+			}
+		</article>
+	</div>
+</section>
