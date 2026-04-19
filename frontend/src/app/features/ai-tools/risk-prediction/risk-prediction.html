@@ -1,1 +1,107 @@
-<p>risk-prediction works!</p>
+<section class="ai-page">
+	<header class="ai-header">
+		<p class="ai-eyebrow">AI TOOLS</p>
+		<h1>Risk Prediction</h1>
+		<p>Estimate project risk level using the ML model and input financial indicators.</p>
+	</header>
+
+	<div class="ai-grid">
+		<article class="ai-card ai-form-card">
+			<h2>Model Inputs</h2>
+			<p>Provide normalized values to evaluate predicted risk probability.</p>
+
+			<form [formGroup]="form" (ngSubmit)="predictRisk()" class="ai-form-stack">
+				<label for="annualRevenue">Annual revenue (EUR)</label>
+				<input
+					id="annualRevenue"
+					type="number"
+					min="0"
+					formControlName="annualRevenue"
+					[disabled]="isPredicting"
+				/>
+
+				<label for="estimatedBudget">Estimated project budget (EUR)</label>
+				<input
+					id="estimatedBudget"
+					type="number"
+					min="0"
+					formControlName="estimatedBudget"
+					[disabled]="isPredicting"
+				/>
+
+				<label for="sectorCode">Sector code</label>
+				<input
+					id="sectorCode"
+					type="number"
+					min="0"
+					formControlName="sectorCode"
+					[disabled]="isPredicting"
+				/>
+
+				<button type="submit" class="primary-btn" [disabled]="isPredicting">
+					@if (isPredicting) {
+						<mat-icon class="spin">autorenew</mat-icon>
+						<span>Predicting...</span>
+					} @else {
+						<mat-icon>analytics</mat-icon>
+						<span>Run Prediction</span>
+					}
+				</button>
+			</form>
+
+			@if (errorMessage) {
+				<div class="alert alert-error">
+					<mat-icon>error</mat-icon>
+					<span>{{ errorMessage }}</span>
+				</div>
+			}
+
+			@if (successMessage) {
+				<div class="alert alert-success">
+					<mat-icon>check_circle</mat-icon>
+					<span>{{ successMessage }}</span>
+				</div>
+			}
+		</article>
+
+		<article class="ai-card ai-result-card">
+			@if (prediction; as result) {
+				<header class="result-header">
+					<h2>Prediction Result</h2>
+					<p>Confidence score: {{ toPercent(result.score) }}%</p>
+				</header>
+
+				<div class="risk-summary">
+					<p class="risk-summary-label">Predicted level</p>
+					<div class="risk-badge" [class]="'risk-badge ' + getRiskClass(result.risk_level)">
+						{{ getRiskLabel(result.risk_level) }}
+					</div>
+				</div>
+
+				<div class="probability-grid">
+					@for (level of probabilityLevels; track level) {
+						<div class="probability-row">
+							<div class="probability-meta">
+								<span>{{ getProbabilityLabel(level) }}</span>
+								<span>{{ toPercent(getProbability(level)) }}%</span>
+							</div>
+							<div class="probability-track">
+								<div
+									class="probability-bar"
+									[class]="'probability-bar ' + getProbabilityBarClass(level)"
+									[style.width]="getProbabilityWidth(level)"
+								></div>
+							</div>
+						</div>
+					}
+				</div>
+			} @else {
+				<div class="result-placeholder">
+					<mat-icon>shield</mat-icon>
+					<h2>No prediction yet</h2>
+					<p>Submit model inputs to receive risk probability and confidence score.</p>
+				</div>
+			}
+		</article>
+	</div>
+</section>

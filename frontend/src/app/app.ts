@@ -23,8 +23,9 @@ export class App {
 
   get useStandaloneLayout(): boolean {
     const currentUrl = this.router.url ?? '';
-    return currentUrl.startsWith('/assistant')
-      || currentUrl.startsWith('/client')
-      || currentUrl.startsWith('/admin');
+    const currentPath = currentUrl.split('?')[0].split('#')[0];
+
+    return ['/assistant', '/client', '/admin']
+      .some((prefix) => currentPath === prefix || currentPath.startsWith(`${prefix}/`));
   }
 }

@@ -1,71 +1,124 @@
-<div>
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Projects</h1>
-    <a routerLink="/projects/new" mat-flat-button class="bg-blue-600 text-white">
-      <mat-icon>add</mat-icon> New Project
-    </a>
-  </div>
-
+<div class="projects-workspace">
   @if (errorMessage) {
-    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <div class="alert alert-error">
       {{ errorMessage }}
     </div>
   }
 
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+  <section class="hero-panel">
+    <div>
+      <p class="hero-eyebrow">Expert workspace</p>
+      <h1 class="hero-title">Gestion des projets</h1>
+      <p class="hero-subtitle">Pilotez l'ensemble des missions, suivez leur progression et accedez rapidement aux actions principales.</p>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="action-button action-button--secondary" (click)="loadProjects()">
+        <mat-icon>refresh</mat-icon>
+        <span>Actualiser</span>
+      </button>
+
+      <a routerLink="/projects/new" class="action-button action-button--primary">
+        <mat-icon>add_circle</mat-icon>
+        <span>Nouveau projet</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="metrics-grid">
+    <article class="metric-card">
+      <p class="metric-label">Total projets</p>
+      <p class="metric-value">{{ totalProjectsCount }}</p>
+      <p class="metric-hint">Portefeuille global</p>
+    </article>
+
+    <article class="metric-card">
+      <p class="metric-label">En cours</p>
+      <p class="metric-value">{{ inProgressProjectsCount }}</p>
+      <p class="metric-hint">Execution active</p>
+    </article>
+
+    <article class="metric-card">
+      <p class="metric-label">Termines</p>
+      <p class="metric-value">{{ completedProjectsCount }}</p>
+      <p class="metric-hint">Missions finalisees</p>
+    </article>
+
+    <article class="metric-card metric-card--accent">
+      <p class="metric-label">Progression</p>
+      <p class="metric-value">{{ completionRate }}%</p>
+      <p class="metric-hint">{{ cancelledProjectsCount }} annule(s)</p>
+    </article>
+  </section>
+
+  <section class="table-panel">
     @if (isLoading) {
-      <div class="px-5 py-10 text-center text-sm text-gray-500">
-        Loading projects...
+      <div class="table-loader">
+        <div class="spinner"></div>
       </div>
     } @else {
-      <table class="w-full text-left">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Project</th>
-            <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Client</th>
-            <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
-            <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Priority</th>
-            <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          @for (project of projects; track project.id) {
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-5 py-4 text-sm font-medium text-gray-800">{{ project.name }}</td>
-              <td class="px-5 py-4 text-sm text-gray-600">{{ project.client?.company_name }}</td>
-              <td class="px-5 py-4 text-sm text-gray-600 capitalize">{{ project.type }}</td>
-              <td class="px-5 py-4">
-                <span class="text-xs px-2 py-1 rounded-full font-medium"
-                  [class]="project.status === 'completed' ? 'bg-green-100 text-green-700' : project.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : project.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'">
-                  {{ project.status }}
-                </span>
-              </td>
-              <td class="px-5 py-4">
-                <span class="text-xs px-2 py-1 rounded-full font-medium"
-                  [class]="project.priority === 'high' ? 'bg-red-100 text-red-700' : project.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'">
-                  {{ project.priority }}
-                </span>
-              </td>
-              <td class="px-5 py-4 text-right">
-                <a [routerLink]="['/projects', project.id]" class="text-blue-600 hover:text-blue-800 mr-2">
-                  <mat-icon class="text-lg">visibility</mat-icon>
-                </a>
-                <a [routerLink]="['/projects', project.id, 'edit']" class="text-gray-500 hover:text-gray-700 mr-2">
-                  <mat-icon class="text-lg">edit</mat-icon>
-                </a>
-                <button (click)="deleteProject(project.id)" class="text-red-500 hover:text-red-700">
-                  <mat-icon class="text-lg">delete</mat-icon>
-                </button>
-              </td>
-            </tr>
-          } @empty {
+      <div class="table-wrap">
+        <table>
+          <thead>
             <tr>
-              <td colspan="6" class="px-5 py-8 text-center text-gray-400">No projects found.</td>
+              <th>Projet</th>
+              <th>Client</th>
+              <th>Type</th>
+              <th>Statut</th>
+              <th>Priorite</th>
+              <th>Mise a jour</th>
+              <th>Actions</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            @for (project of projects; track trackByProjectId($index, project)) {
+              <tr>
+                <td>
+                  <p class="project-name">{{ project.name }}</p>
+                </td>
+
+                <td class="project-client">{{ project.client?.company_name || 'N/A' }}</td>
+                <td>{{ getTypeLabel(project.type) }}</td>
+
+                <td>
+                  <span [class]="getStatusPillClass(project.status)">
+                    {{ getStatusLabel(project.status) }}
+                  </span>
+                </td>
+
+                <td>
+                  <span [class]="getPriorityPillClass(project.priority)">
+                    {{ getPriorityLabel(project.priority) }}
+                  </span>
+                </td>
+
+                <td>{{ getMostRecentDate(project) }}</td>
+
+                <td>
+                  <div class="actions-cell">
+                    <a [routerLink]="['/projects', project.id]" class="row-action row-action--view" aria-label="Voir le projet">
+                      <mat-icon>visibility</mat-icon>
+                    </a>
+
+                    <a [routerLink]="['/projects', project.id, 'edit']" class="row-action row-action--edit" aria-label="Modifier le projet">
+                      <mat-icon>edit</mat-icon>
+                    </a>
+
+                    <button type="button" class="row-action row-action--delete" (click)="deleteProject(project.id)" aria-label="Supprimer le projet">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-state">Aucun projet disponible pour le moment.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     }
-  </div>
+  </section>
 </div>

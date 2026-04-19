@@ -116,3 +116,47 @@ export interface DashboardStats {
   projectsByStatus: { status: string; count: number }[];
   clientsByRisk: { risk_level: string; count: number }[];
 }
+
+export interface BusinessPlanContent {
+  executive_summary?: string;
+  market_analysis?: string;
+  financial_projections?: string;
+  risks?: string;
+  recommendations?: string;
+  [key: string]: unknown;
+}
+
+export interface AiBusinessPlan {
+  id: number;
+  project_id: number;
+  generated_by?: number;
+  content: BusinessPlanContent;
+  created_at?: string;
+  createdAt?: string;
+}
+
+export interface AiRecommendation {
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low' | string;
+}
+
+export interface AiRecommendationsResponse {
+  recommendations: AiRecommendation[];
+}
+
+export interface RiskPredictionRequest {
+  annual_revenue: number;
+  estimated_budget: number;
+  sector_code: number;
+}
+
+export interface RiskPredictionResponse {
+  risk_level: string;
+  score: number;
+  probabilities: {
+    low: number;
+    medium: number;
+    high: number;
+  };
+}
