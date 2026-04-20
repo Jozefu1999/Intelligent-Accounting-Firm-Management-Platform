@@ -291,8 +291,17 @@ DB_PASSWORD=your_password
 JWT_SECRET=your_jwt_secret_key
 JWT_EXPIRES_IN=24h
 
-# OpenAI
-OPENAI_API_KEY=your_openai_api_key
+# AI provider selection (auto|gemini|xai|grok)
+AI_PROVIDER=xai
+
+# Gemini (optional, preferred if provided)
+GEMINI_API_KEY=your_gemini_api_key
+
+# xAI / Grok (optional)
+XAI_API_KEY=your_xai_api_key
+# Optional aliases accepted by backend:
+GROK_API_KEY=
+GROQ_API_KEY=
 ```
 
 ## License

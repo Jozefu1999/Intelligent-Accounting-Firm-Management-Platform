@@ -27,8 +27,36 @@ const parseInteger = (value, fallbackValue) => {
   return parsed;
 };
 
-const getAiProvider = () => (readEnv('GEMINI_API_KEY') ? 'gemini' : 'xai');
-const getAiApiKey = () => readEnv('GEMINI_API_KEY') || readEnv('XAI_API_KEY') || readEnv('GROK_API_KEY') || readEnv('OPENAI_API_KEY');
+const getGeminiApiKey = () => readEnv('GEMINI_API_KEY');
+const getXaiApiKey = () => readEnv('XAI_API_KEY')
+  || readEnv('GROK_API_KEY')
+  || readEnv('GROQ_API_KEY')
+  || readEnv('OPENAI_API_KEY');
+
+const normalizeProvider = (value) => {
+  const normalized = value.toLowerCase();
+
+  if (normalized === 'grok') {
+    return 'xai';
+  }
+
+  if (normalized === 'gemini' || normalized === 'xai') {
+    return normalized;
+  }
+
+  return '';
+};
+
+const getAiProvider = () => {
+  const forcedProvider = normalizeProvider(readEnv('AI_PROVIDER'));
+  if (forcedProvider) {
+    return forcedProvider;
+  }
+
+  return getGeminiApiKey() ? 'gemini' : 'xai';
+};
+
+const getAiApiKey = () => (getAiProvider() === 'gemini' ? getGeminiApiKey() : getXaiApiKey());
 const getAiBaseUrl = () => {
   if (getAiProvider() === 'gemini') {
     return readEnv('GEMINI_BASE_URL') || DEFAULT_GEMINI_BASE_URL;
@@ -282,7 +310,11 @@ const createAiCompletion = async ({ prompt, temperature = 0.2 }) => {
   }
 
   if (provider === 'xai' && isUnauthorizedError(lastError)) {
-    throw toHttpError(401, 'xAI API key is invalid or unauthorized. Check XAI_API_KEY in backend/.env.');
+    throw toHttpError(401, 'xAI API key is invalid or unauthorized. Check XAI_API_KEY (or GROK_API_KEY/GROQ_API_KEY) in backend/.env.');
+  }
+
+  if (provider === 'xai' && (status === 429 || isQuotaError(lastError))) {
+    throw toHttpError(429, 'xAI quota/rate limit reached. Check xAI billing/limits, then retry.');
   }
 
   if (isModelNotFoundError(lastError)) {
@@ -303,7 +335,7 @@ function getAIClient() {
   if (!aiClient) {
     const apiKey = getAiApiKey();
     if (!apiKey) {
-      throw new Error('No AI API key configured. Set GEMINI_API_KEY or XAI_API_KEY in backend/.env.');
+      throw new Error('No AI API key configured for selected provider. Set GEMINI_API_KEY, or set AI_PROVIDER=xai with XAI_API_KEY (or GROK_API_KEY/GROQ_API_KEY) in backend/.env.');
     }
 
     aiClient = new OpenAI({

@@ -213,19 +213,31 @@ export class Recommendations implements OnInit {
           return 'Le modele xAI configure est indisponible. Verifiez XAI_MODEL dans backend/.env (exemple: grok-4).';
         }
 
-        if (normalizedBackendMessage.includes('invalid api key')
-          || normalizedBackendMessage.includes('unauthorized')) {
+        if (normalizedBackendMessage.includes('gemini api key is invalid')) {
+          return 'La cle API Gemini est invalide ou non autorisee. Verifiez GEMINI_API_KEY dans backend/.env.';
+        }
+
+        if (normalizedBackendMessage.includes('xai api key is invalid')) {
           return 'La cle API xAI est invalide ou non autorisee. Verifiez XAI_API_KEY dans backend/.env.';
         }
 
-        if (normalizedBackendMessage.includes('gemini api key is invalid')) {
-          return 'La cle API Gemini est invalide ou non autorisee. Verifiez GEMINI_API_KEY dans backend/.env.';
+        if (normalizedBackendMessage.includes('invalid api key')
+          || normalizedBackendMessage.includes('unauthorized')) {
+          return 'La cle API IA est invalide ou non autorisee. Verifiez la configuration du provider dans backend/.env.';
         }
 
         if (normalizedBackendMessage.includes('quota')
           || normalizedBackendMessage.includes('resource_exhausted')
           || normalizedBackendMessage.includes('rate limit')) {
-          return 'Le quota Gemini est atteint. Reessayez plus tard ou reduisez le volume des requetes.';
+          if (normalizedBackendMessage.includes('xai') || normalizedBackendMessage.includes('grok')) {
+            return 'La limite xAI est atteinte. Verifiez la facturation/limites xAI puis reessayez.';
+          }
+
+          if (normalizedBackendMessage.includes('gemini')) {
+            return 'Le quota Gemini est atteint. Reessayez plus tard ou reduisez le volume des requetes.';
+          }
+
+          return 'La limite du provider IA est atteinte. Reessayez plus tard ou reduisez le volume des requetes.';
         }
 
         return backendMessage;
