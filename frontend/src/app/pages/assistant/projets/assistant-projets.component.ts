@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -30,9 +30,9 @@ export class AssistantProjetsComponent implements OnInit {
   successMessage = '';
 
   readonly statusOptions: ReadonlyArray<{ label: string; value: UiStatus }> = [
-    { label: 'en_cours', value: 'en_cours' },
-    { label: 'termine', value: 'termine' },
-    { label: 'suspendu', value: 'suspendu' },
+    { label: 'In progress', value: 'en_cours' },
+    { label: 'Completed', value: 'termine' },
+    { label: 'Suspended', value: 'suspendu' },
   ];
 
   constructor(
@@ -82,7 +82,7 @@ export class AssistantProjetsComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger les projets assignes.';
+        this.errorMessage = 'Unable to load assigned projects.';
         this.isLoading = false;
       },
     });
@@ -124,7 +124,7 @@ export class AssistantProjetsComponent implements OnInit {
     this.projectService.update(project.id, payload).subscribe({
       next: (updatedProject) => {
         project.status = updatedProject?.status ?? nextApiStatus;
-        this.successMessage = 'Statut mis a jour avec succes.';
+        this.successMessage = 'Status updated successfully.';
 
         if (this.selectedProject?.id === project.id) {
           this.selectedProject = { ...project };
@@ -132,7 +132,7 @@ export class AssistantProjetsComponent implements OnInit {
       },
       error: () => {
         project.status = previousStatus;
-        this.errorMessage = 'Echec de mise a jour du statut du projet.';
+        this.errorMessage = 'Failed to update project status.';
       },
     });
   }
@@ -153,18 +153,24 @@ export class AssistantProjetsComponent implements OnInit {
       return '-';
     }
 
-    const uiStatus = this.getStatusAlias(status);
-    return uiStatus;
+    switch (this.getStatusAlias(status)) {
+      case 'termine':
+        return 'Completed';
+      case 'suspendu':
+        return 'Suspended';
+      default:
+        return 'In progress';
+    }
   }
 
   getPriorityLabel(priority: Project['priority'] | undefined): string {
     switch (priority) {
       case 'high':
-        return 'Haute';
+        return 'High';
       case 'medium':
-        return 'Moyenne';
+        return 'Medium';
       case 'low':
-        return 'Basse';
+        return 'Low';
       default:
         return '-';
     }
@@ -188,7 +194,7 @@ export class AssistantProjetsComponent implements OnInit {
       return '-';
     }
 
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
   }
 
   getStatusBadgeClass(status: Project['status'] | undefined): string {
@@ -230,3 +236,4 @@ export class AssistantProjetsComponent implements OnInit {
     }
   }
 }
+

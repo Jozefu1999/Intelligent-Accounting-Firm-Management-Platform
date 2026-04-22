@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -69,7 +69,7 @@ export class ClientProfileComponent implements OnInit {
       return '-';
     }
 
-    return new Date(createdAt).toLocaleDateString('fr-FR');
+    return new Date(createdAt).toLocaleDateString('en-US');
   }
 
   get passwordMinLengthMet(): boolean {
@@ -104,7 +104,7 @@ export class ClientProfileComponent implements OnInit {
     }).subscribe({
       next: (user) => {
         this.currentUser = user;
-        this.profileSuccessMessage = 'Profil mis a jour avec succes.';
+        this.profileSuccessMessage = 'Profile updated successfully.';
         this.profileErrorMessage = '';
         this.isSavingProfile = false;
       },
@@ -112,9 +112,9 @@ export class ClientProfileComponent implements OnInit {
         this.isSavingProfile = false;
 
         if (error.error?.message === 'Email already in use.') {
-          this.profileErrorMessage = 'Cet email est deja utilise.';
+          this.profileErrorMessage = 'This email is already in use.';
         } else {
-          this.profileErrorMessage = error.error?.message || 'Erreur lors de la mise a jour du profil.';
+          this.profileErrorMessage = error.error?.message || 'Error while updating profile.';
         }
       },
     });
@@ -125,7 +125,7 @@ export class ClientProfileComponent implements OnInit {
       this.passwordForm.markAllAsTouched();
 
       if (!this.passwordsMatch) {
-        this.passwordErrorMessage = 'Les mots de passe ne correspondent pas.';
+        this.passwordErrorMessage = 'Passwords do not match.';
       }
 
       return;
@@ -140,7 +140,7 @@ export class ClientProfileComponent implements OnInit {
       newPassword: this.passwordForm.controls.newPassword.value,
     }).subscribe({
       next: () => {
-        this.passwordSuccessMessage = 'Mot de passe modifie avec succes.';
+        this.passwordSuccessMessage = 'Password changed successfully.';
         this.passwordErrorMessage = '';
         this.isChangingPassword = false;
         this.passwordForm.reset({
@@ -151,8 +151,9 @@ export class ClientProfileComponent implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.isChangingPassword = false;
-        this.passwordErrorMessage = error.error?.message || 'Erreur lors du changement du mot de passe.';
+        this.passwordErrorMessage = error.error?.message || 'Error while changing password.';
       },
     });
   }
 }
+

@@ -1,17 +1,17 @@
-<div class="dashboard-wrapper">
-  <div *ngIf="isLoading" class="loading-state">Chargement...</div>
+﻿<div class="dashboard-wrapper">
+  <div *ngIf="isLoading" class="loading-state">Loading...</div>
 
   <ng-container *ngIf="!isLoading">
     <div class="dashboard-header">
       <div>
-        <h1>Tableau de bord</h1>
+        <h1>Dashboard</h1>
         <p>
-          Bienvenue, {{ currentUser?.prenom }} {{ currentUser?.nom }} -
+          Welcome, {{ currentUser?.prenom }} {{ currentUser?.nom }} -
           <span class="role-badge">{{ currentUser?.role }}</span>
         </p>
       </div>
       <div class="header-date">
-        {{ today | date:'EEEE d MMMM yyyy' : '' : 'fr' }}
+        {{ today | date:'EEEE, MMMM d, yyyy' : '' : 'en-US' }}
       </div>
     </div>
 
@@ -26,7 +26,7 @@
           </svg>
         </div>
         <div class="stat-number">{{ stats.totalClients }}</div>
-        <div class="stat-label">Clients actifs</div>
+        <div class="stat-label">Active clients</div>
       </a>
 
       <a class="stat-card" routerLink="/projects">
@@ -36,7 +36,7 @@
           </svg>
         </div>
         <div class="stat-number">{{ stats.totalProjects }}</div>
-        <div class="stat-label">Projets au total</div>
+        <div class="stat-label">Total projects</div>
       </a>
 
       <div class="stat-card">
@@ -47,7 +47,7 @@
           </svg>
         </div>
         <div class="stat-number">{{ stats.activeProjects }}</div>
-        <div class="stat-label">Projets en cours</div>
+        <div class="stat-label">Projects in progress</div>
       </div>
 
       <div class="stat-card">
@@ -59,24 +59,24 @@
           </svg>
         </div>
         <div class="stat-number">{{ stats.highRiskProjects }}</div>
-        <div class="stat-label">Projets a risque eleve</div>
+        <div class="stat-label">High-risk projects</div>
       </div>
     </div>
 
     <div class="two-col-grid">
       <div class="section-card">
         <div class="section-card-header">
-          <h3>Projets recents</h3>
-          <a class="see-all" routerLink="/projects">Voir tout -&gt;</a>
+          <h3>Recent projects</h3>
+          <a class="see-all" routerLink="/projects">View all -&gt;</a>
         </div>
 
         <table class="mini-table" *ngIf="recentProjects.length > 0; else emptyProjectsTpl">
           <thead>
             <tr>
-              <th>PROJET</th>
+              <th>PROJECT</th>
               <th>CLIENT</th>
-              <th>STATUT</th>
-              <th>RISQUE</th>
+              <th>STATUS</th>
+              <th>RISK</th>
               <th>DATE</th>
             </tr>
           </thead>
@@ -86,27 +86,27 @@
               <td>{{ project.client_nom }}</td>
               <td>
                 <span [class]="getStatusClass(project.statut)">
-                  {{ project.statut }}
+                  {{ getStatusLabel(project.statut) }}
                 </span>
               </td>
               <td>
                 <span [class]="getRiskClass(project.niveau_risque)">
-                  {{ project.niveau_risque }}
+                  {{ getRiskLabel(project.niveau_risque) }}
                 </span>
               </td>
-              <td>{{ project.created_at | date:'dd/MM/yyyy' }}</td>
+              <td>{{ project.created_at | date:'mediumDate' }}</td>
             </tr>
           </tbody>
         </table>
         <ng-template #emptyProjectsTpl>
-          <div class="empty-state">Aucun projet recent</div>
+          <div class="empty-state">No recent project</div>
         </ng-template>
       </div>
 
       <div class="section-card">
         <div class="section-card-header">
-          <h3>Clients recents</h3>
-          <a class="see-all" routerLink="/clients">Voir tout -&gt;</a>
+          <h3>Recent clients</h3>
+          <a class="see-all" routerLink="/clients">View all -&gt;</a>
         </div>
 
         <ng-container *ngIf="recentClients.length > 0; else emptyClientsTpl">
@@ -116,15 +116,15 @@
             </div>
             <div class="client-info">
               <span class="client-name">{{ client.nom }}</span>
-              <span class="client-sector">{{ client.secteur || 'Non renseigne' }}</span>
+              <span class="client-sector">{{ client.secteur || 'Not specified' }}</span>
             </div>
             <span [class]="'status-dot ' + client.statut">
-              {{ client.statut }}
+              {{ getClientStatusLabel(client.statut) }}
             </span>
           </div>
         </ng-container>
         <ng-template #emptyClientsTpl>
-          <div class="empty-state">Aucun client recent</div>
+          <div class="empty-state">No recent client</div>
         </ng-template>
       </div>
     </div>
@@ -132,12 +132,12 @@
     <div class="two-col-grid">
       <div class="section-card">
         <div class="section-card-header">
-          <h3>Repartition par statut</h3>
+          <h3>Distribution by status</h3>
         </div>
 
         <div class="progress-row" *ngFor="let item of projectsByStatus">
           <div class="progress-label">
-            <span>{{ item.statut }}</span>
+            <span>{{ getStatusLabel(item.statut) }}</span>
             <span>{{ item.count }}</span>
           </div>
           <div class="progress-bar-bg">
@@ -152,12 +152,12 @@
 
       <div class="section-card">
         <div class="section-card-header">
-          <h3>Repartition par niveau de risque</h3>
+          <h3>Distribution by risk level</h3>
         </div>
 
         <div class="progress-row" *ngFor="let item of projectsByRisk">
           <div class="progress-label">
-            <span>{{ item.niveau_risque }}</span>
+            <span>{{ getRiskLabel(item.niveau_risque) }}</span>
             <span>{{ item.count }}</span>
           </div>
           <div class="progress-bar-bg">
@@ -172,3 +172,4 @@
     </div>
   </ng-container>
 </div>
+

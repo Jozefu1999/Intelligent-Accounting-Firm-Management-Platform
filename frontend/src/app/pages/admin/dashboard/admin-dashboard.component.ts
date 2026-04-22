@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
@@ -62,36 +62,36 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   get todayLabel(): string {
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' }).format(new Date());
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date());
   }
 
   get kpis(): DashboardKpi[] {
     return [
       {
-        label: 'Total utilisateurs',
+        label: 'Total users',
         value: this.stats.users_count,
-        subtitle: 'comptes enregistres',
+        subtitle: 'registered accounts',
         icon: 'groups',
         accentClass: 'kpi-blue',
       },
       {
         label: 'Total clients',
         value: this.stats.clients_count,
-        subtitle: 'dossiers clients',
+        subtitle: 'client files',
         icon: 'business_center',
         accentClass: 'kpi-teal',
       },
       {
-        label: 'Total projets',
+        label: 'Total projects',
         value: this.stats.projects_count,
-        subtitle: 'missions en cours et terminees',
+        subtitle: 'active and completed missions',
         icon: 'folder_open',
         accentClass: 'kpi-purple',
       },
       {
-        label: 'Projets a risque eleve',
+        label: 'High-risk projects',
         value: this.stats.high_risk_count,
-        subtitle: 'necessitent une attention',
+        subtitle: 'require attention',
         icon: 'warning',
         accentClass: 'kpi-red',
       },
@@ -107,19 +107,19 @@ export class AdminDashboardComponent implements OnInit {
 
     return [
       {
-        label: 'Projets en cours',
+        label: 'Projects in progress',
         count: this.getStatusCount('en_cours'),
         pct: this.getPercent(this.getStatusCount('en_cours'), total),
         barClass: 'progress-blue',
       },
       {
-        label: 'Projets termines',
+        label: 'Completed projects',
         count: this.getStatusCount('termine'),
         pct: this.getPercent(this.getStatusCount('termine'), total),
         barClass: 'progress-green',
       },
       {
-        label: 'Projets suspendus',
+        label: 'Suspended projects',
         count: this.getStatusCount('suspendu'),
         pct: this.getPercent(this.getStatusCount('suspendu'), total),
         barClass: 'progress-orange',
@@ -132,19 +132,19 @@ export class AdminDashboardComponent implements OnInit {
 
     return [
       {
-        label: 'Risque faible',
+        label: 'Low risk',
         count: this.getRiskCount('faible'),
         pct: this.getPercent(this.getRiskCount('faible'), total),
         barClass: 'progress-green',
       },
       {
-        label: 'Risque moyen',
+        label: 'Medium risk',
         count: this.getRiskCount('moyen'),
         pct: this.getPercent(this.getRiskCount('moyen'), total),
         barClass: 'progress-orange',
       },
       {
-        label: 'Risque eleve',
+        label: 'High risk',
         count: this.getRiskCount('eleve'),
         pct: this.getPercent(this.getRiskCount('eleve'), total),
         barClass: 'progress-red',
@@ -162,7 +162,7 @@ export class AdminDashboardComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger les statistiques administrateur.';
+        this.errorMessage = 'Unable to load administrator statistics.';
         this.isLoading = false;
       },
     });
@@ -198,13 +198,13 @@ export class AdminDashboardComponent implements OnInit {
   getRoleLabel(role: string): string {
     switch (role) {
       case 'expert_comptable':
-        return 'Expert comptable';
+        return 'Accounting expert';
       case 'assistant':
         return 'Assistant';
       case 'administrateur':
-        return 'Administrateur';
+        return 'Administrator';
       default:
-        return 'Visiteur';
+        return 'Visitor';
     }
   }
 
@@ -218,7 +218,7 @@ export class AdminDashboardComponent implements OnInit {
       return '-';
     }
 
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
   }
 
   private getStatusCount(status: string): number {
@@ -245,3 +245,4 @@ export class AdminDashboardComponent implements OnInit {
     return Math.round((value / total) * 100);
   }
 }
+

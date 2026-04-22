@@ -44,7 +44,7 @@ export class AdminUsersComponent implements OnInit {
 
   readonly roles: UserRole[] = ['visiteur', 'expert_comptable', 'assistant', 'administrateur'];
   readonly roleOptions: RoleOption[] = [
-    { value: '', label: 'Tous' },
+    { value: '', label: 'All' },
     { value: 'expert_comptable', label: 'expert_comptable' },
     { value: 'assistant', label: 'assistant' },
     { value: 'administrateur', label: 'administrateur' },
@@ -98,7 +98,7 @@ export class AdminUsersComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger les utilisateurs.';
+        this.errorMessage = 'Unable to load users.';
         this.users = [];
         this.filteredUsers = [];
         this.isLoading = false;
@@ -145,11 +145,11 @@ export class AdminUsersComponent implements OnInit {
 
         this.applyFilters();
         this.editingUserId = null;
-        this.successMessage = 'Role mis a jour avec succes.';
+        this.successMessage = 'Role updated successfully.';
         this.loadUsers();
       },
       error: () => {
-        this.errorMessage = 'Echec de la mise a jour du role.';
+        this.errorMessage = 'Failed to update role.';
       },
     });
   }
@@ -203,7 +203,7 @@ export class AdminUsersComponent implements OnInit {
       next: () => {
         this.deletingUserIds.add(userToDelete.id);
         this.closeDeleteModal();
-        this.successMessage = 'Utilisateur supprime avec succes.';
+        this.successMessage = 'User deleted successfully.';
 
         setTimeout(() => {
           this.users = this.users.filter((user) => user.id !== userToDelete.id);
@@ -213,7 +213,7 @@ export class AdminUsersComponent implements OnInit {
         }, 220);
       },
       error: () => {
-        this.errorMessage = 'Echec de suppression utilisateur.';
+        this.errorMessage = 'Failed to delete user.';
       },
     });
   }
@@ -260,13 +260,13 @@ export class AdminUsersComponent implements OnInit {
   getRoleLabel(role: string): string {
     switch (role) {
       case 'expert_comptable':
-        return 'Expert comptable';
+        return 'Accounting expert';
       case 'assistant':
         return 'Assistant';
       case 'administrateur':
-        return 'Administrateur';
+        return 'Administrator';
       default:
-        return 'Visiteur';
+        return 'Visitor';
     }
   }
 
@@ -280,7 +280,7 @@ export class AdminUsersComponent implements OnInit {
       return '-';
     }
 
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
   }
 
   private applyFilters(): void {

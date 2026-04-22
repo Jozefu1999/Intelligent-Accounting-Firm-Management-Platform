@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -64,7 +64,7 @@ export class ClientDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
-    this.todayLabel = new Date().toLocaleDateString('fr-FR', {
+    this.todayLabel = new Date().toLocaleDateString('en-US', {
       day: '2-digit',
       month: 'long',
       year: 'numeric',
@@ -120,13 +120,13 @@ export class ClientDashboardComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.isSubmittingContact = false;
-        this.contactSuccessMessage = 'Message envoye avec succes !';
-        this.lastContactDate = new Date().toLocaleDateString('fr-FR');
+        this.contactSuccessMessage = 'Message sent successfully!';
+        this.lastContactDate = new Date().toLocaleDateString('en-US');
         this.contactForm.patchValue({ sujet: '', project_id: '', message: '' });
       },
       error: () => {
         this.isSubmittingContact = false;
-        this.contactErrorMessage = 'Erreur lors de l envoi. Veuillez reessayer.';
+        this.contactErrorMessage = 'Error sending message. Please try again.';
       },
     });
   }
@@ -141,7 +141,7 @@ export class ClientDashboardComponent implements OnInit {
     }).subscribe(({ projects, documents, messages }) => {
       this.allProjects = projects;
       this.recentProjects = projects.slice(0, 5).map((project) => this.mapProjectRow(project));
-      this.activeProjectsCount = projects.filter((project) => this.getStatusBucket(project.status) === 'en_cours').length;
+      this.activeProjectsCount = projects.filter((project) => this.getStatusBucket(project.status) === 'in_progress').length;
       this.documentsCount = documents.length;
       this.lastContactDate = this.extractLastContactDate(messages);
       this.isLoading = false;
@@ -158,7 +158,7 @@ export class ClientDashboardComponent implements OnInit {
       return '-';
     }
 
-    return new Date(rawDate).toLocaleDateString('fr-FR');
+    return new Date(rawDate).toLocaleDateString('en-US');
   }
 
   private mapProjectRow(project: Project): RecentProjectRow {
@@ -182,56 +182,56 @@ export class ClientDashboardComponent implements OnInit {
       case 'creation':
         return 'Creation';
       case 'development':
-        return 'Developpement';
+        return 'Development';
       case 'audit':
         return 'Audit';
       case 'consulting':
-        return 'Conseil';
+        return 'Consulting';
       default:
-        return 'Autre';
+        return 'Other';
     }
   }
 
-  private getStatusBucket(status: Project['status']): 'en_cours' | 'termine' | 'suspendu' {
+  private getStatusBucket(status: Project['status']): 'in_progress' | 'completed' | 'suspended' {
     if (status === 'completed') {
-      return 'termine';
+      return 'completed';
     }
 
     if (status === 'cancelled') {
-      return 'suspendu';
+      return 'suspended';
     }
 
-    return 'en_cours';
+    return 'in_progress';
   }
 
-  private getRiskBucket(project: Project): 'faible' | 'moyen' | 'eleve' {
+  private getRiskBucket(project: Project): 'low' | 'medium' | 'high' {
     if (project.priority === 'high') {
-      return 'eleve';
+      return 'high';
     }
 
     if (project.priority === 'medium') {
-      return 'moyen';
+      return 'medium';
     }
 
-    return 'faible';
+    return 'low';
   }
 
-  private getStatusClass(status: 'en_cours' | 'termine' | 'suspendu'): string {
+  private getStatusClass(status: 'in_progress' | 'completed' | 'suspended'): string {
     switch (status) {
-      case 'termine':
+      case 'completed':
         return 'bg-emerald-100 text-emerald-700';
-      case 'suspendu':
+      case 'suspended':
         return 'bg-orange-100 text-orange-700';
       default:
         return 'bg-sky-100 text-sky-700';
     }
   }
 
-  private getRiskClass(risk: 'faible' | 'moyen' | 'eleve'): string {
+  private getRiskClass(risk: 'low' | 'medium' | 'high'): string {
     switch (risk) {
-      case 'moyen':
+      case 'medium':
         return 'bg-orange-100 text-orange-700';
-      case 'eleve':
+      case 'high':
         return 'bg-rose-100 text-rose-700';
       default:
         return 'bg-emerald-100 text-emerald-700';
@@ -243,6 +243,7 @@ export class ClientDashboardComponent implements OnInit {
       return '-';
     }
 
-    return new Date(rawDate).toLocaleDateString('fr-FR');
+    return new Date(rawDate).toLocaleDateString('en-US');
   }
 }
+

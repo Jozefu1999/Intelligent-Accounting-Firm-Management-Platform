@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
@@ -62,30 +62,30 @@ export class AdminStatisticsComponent implements OnInit {
   get summaryCards(): SummaryCard[] {
     return [
       {
-        label: 'Total utilisateurs',
+        label: 'Total users',
         value: this.stats.users_count,
-        subtitle: 'comptes enregistres',
+        subtitle: 'registered accounts',
         icon: 'groups',
         accentClass: 'card-blue',
       },
       {
         label: 'Total clients',
         value: this.stats.clients_count,
-        subtitle: 'dossiers clients',
+        subtitle: 'client files',
         icon: 'business_center',
         accentClass: 'card-teal',
       },
       {
-        label: 'Total projets',
+        label: 'Total projects',
         value: this.stats.projects_count,
-        subtitle: 'missions globales',
+        subtitle: 'overall missions',
         icon: 'folder_open',
         accentClass: 'card-purple',
       },
       {
-        label: 'Projets a risque eleve',
+        label: 'High-risk projects',
         value: this.stats.high_risk_count,
-        subtitle: 'necessitent une attention',
+        subtitle: 'require attention',
         icon: 'warning',
         accentClass: 'card-red',
       },
@@ -104,9 +104,9 @@ export class AdminStatisticsComponent implements OnInit {
     const suspended = this.findStatusCount('suspendu');
 
     return [
-      { label: 'En cours', count: inProgress, percent: this.percent(inProgress, total), colorClass: 'bar-blue' },
-      { label: 'Termines', count: completed, percent: this.percent(completed, total), colorClass: 'bar-green' },
-      { label: 'Suspendus', count: suspended, percent: this.percent(suspended, total), colorClass: 'bar-orange' },
+      { label: 'In progress', count: inProgress, percent: this.percent(inProgress, total), colorClass: 'bar-blue' },
+      { label: 'Completed', count: completed, percent: this.percent(completed, total), colorClass: 'bar-green' },
+      { label: 'Suspended', count: suspended, percent: this.percent(suspended, total), colorClass: 'bar-orange' },
     ];
   }
 
@@ -118,9 +118,9 @@ export class AdminStatisticsComponent implements OnInit {
     const high = this.findRiskCount('eleve');
 
     return [
-      { label: 'Faible', count: low, percent: this.percent(low, total), colorClass: 'bar-green' },
-      { label: 'Moyen', count: medium, percent: this.percent(medium, total), colorClass: 'bar-orange' },
-      { label: 'Eleve', count: high, percent: this.percent(high, total), colorClass: 'bar-red' },
+      { label: 'Low', count: low, percent: this.percent(low, total), colorClass: 'bar-green' },
+      { label: 'Medium', count: medium, percent: this.percent(medium, total), colorClass: 'bar-orange' },
+      { label: 'High', count: high, percent: this.percent(high, total), colorClass: 'bar-red' },
     ];
   }
 
@@ -133,10 +133,10 @@ export class AdminStatisticsComponent implements OnInit {
     const visitor = this.findRoleCount('visiteur');
 
     return [
-      { label: 'Expert comptable', count: expert, percent: this.percent(expert, totalUsers), colorClass: 'bar-blue' },
+      { label: 'Accounting expert', count: expert, percent: this.percent(expert, totalUsers), colorClass: 'bar-blue' },
       { label: 'Assistant', count: assistant, percent: this.percent(assistant, totalUsers), colorClass: 'bar-purple' },
-      { label: 'Administrateur', count: admin, percent: this.percent(admin, totalUsers), colorClass: 'bar-red' },
-      { label: 'Visiteur / Client', count: visitor, percent: this.percent(visitor, totalUsers), colorClass: 'bar-gray' },
+      { label: 'Administrator', count: admin, percent: this.percent(admin, totalUsers), colorClass: 'bar-red' },
+      { label: 'Visitor / Client', count: visitor, percent: this.percent(visitor, totalUsers), colorClass: 'bar-gray' },
     ];
   }
 
@@ -162,7 +162,7 @@ export class AdminStatisticsComponent implements OnInit {
         this.loadActivity();
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger les statistiques globales.';
+        this.errorMessage = 'Unable to load global statistics.';
         this.isLoading = false;
       },
     });
@@ -191,7 +191,7 @@ export class AdminStatisticsComponent implements OnInit {
       return '-';
     }
 
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
   }
 
   formatTimeAgo(value?: string): string {
@@ -212,20 +212,20 @@ export class AdminStatisticsComponent implements OnInit {
 
     if (diffMs < hour) {
       const minutes = Math.max(1, Math.floor(diffMs / (60 * 1000)));
-      return `il y a ${minutes} min`;
+      return `${minutes} min ago`;
     }
 
     if (diffMs < day) {
       const hours = Math.floor(diffMs / hour);
-      return `il y a ${hours}h`;
+      return `${hours}h ago`;
     }
 
     const days = Math.floor(diffMs / day);
     if (days === 1) {
-      return 'hier';
+      return 'yesterday';
     }
 
-    return `il y a ${days} jours`;
+    return `${days} days ago`;
   }
 
   private findStatusCount(status: string): number {
@@ -248,3 +248,4 @@ export class AdminStatisticsComponent implements OnInit {
     return Math.round((value / total) * 100);
   }
 }
+

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -47,7 +47,7 @@ export class RiskPrediction {
     const sectorCode = Number(this.form.controls.sectorCode.value);
 
     if (!Number.isFinite(annualRevenue) || !Number.isFinite(estimatedBudget) || !Number.isFinite(sectorCode)) {
-      this.errorMessage = 'Tous les champs doivent contenir des nombres valides.';
+      this.errorMessage = 'All fields must contain valid numbers.';
       this.cdr.detectChanges();
       return;
     }
@@ -72,15 +72,15 @@ export class RiskPrediction {
       .subscribe({
         next: (response) => {
           this.prediction = this.normalizePrediction(response);
-          this.successMessage = 'Prediction terminee avec succes.';
+          this.successMessage = 'Prediction completed successfully.';
           this.cdr.detectChanges();
         },
         error: (error: unknown) => {
           this.prediction = null;
           this.errorMessage = this.getErrorMessage(
             error,
-            'La prediction ML a pris trop de temps. Reessayez dans un instant.',
-            'La prediction du risque a echoue. Verifiez la configuration ML.',
+            'ML prediction timed out. Please try again shortly.',
+            'Risk prediction failed. Check ML configuration.',
           );
           this.cdr.detectChanges();
         },
@@ -208,10 +208,11 @@ export class RiskPrediction {
       }
 
       if (error.status === 0) {
-        return 'Le serveur API est inaccessible. Verifiez que le backend est lance.';
+        return 'API server is unreachable. Verify that the backend is running.';
       }
     }
 
     return defaultMessage;
   }
 }
+

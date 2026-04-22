@@ -10,7 +10,7 @@ import { Component } from '@angular/core';
 })
 export class AdminMlComponent {
   isRunning = false;
-  statusMessage = 'Pret a lancer un entrainement du modele.';
+  statusMessage = 'Ready to start model retraining.';
   lastRun = '-';
   accuracy = '-';
 
@@ -20,12 +20,12 @@ export class AdminMlComponent {
     }
 
     this.isRunning = true;
-    this.statusMessage = 'Execution en cours...';
+    this.statusMessage = 'Execution in progress...';
 
     setTimeout(() => {
       this.isRunning = false;
-      this.statusMessage = 'Dernier retrain termine avec succes.';
-      this.lastRun = new Intl.DateTimeFormat('fr-FR', {
+      this.statusMessage = 'Last retrain completed successfully.';
+      this.lastRun = new Intl.DateTimeFormat('en-US', {
         dateStyle: 'medium',
         timeStyle: 'short',
       }).format(new Date());

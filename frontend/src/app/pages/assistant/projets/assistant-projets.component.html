@@ -1,4 +1,4 @@
-<div class="projects-workspace">
+﻿<div class="projects-workspace">
   @if (errorMessage) {
     <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
       {{ errorMessage }}
@@ -13,44 +13,44 @@
 
   <section class="hero-panel">
     <div>
-      <p class="hero-eyebrow">Suivi collaboratif</p>
-      <h1 class="hero-title">Mes projets assignes</h1>
-      <p class="hero-subtitle">Pilotez vos missions en temps reel, mettez a jour le statut et ajoutez rapidement de nouveaux projets.</p>
+      <p class="hero-eyebrow">Collaborative tracking</p>
+      <h1 class="hero-title">My assigned projects</h1>
+      <p class="hero-subtitle">Manage your missions in real time, update status, and quickly add new projects.</p>
     </div>
 
     <div class="hero-actions">
       <a routerLink="/assistant/projets/new" class="action-button action-button--primary">
         <mat-icon>add_circle</mat-icon>
-        <span>Ajouter un projet</span>
+        <span>Add project</span>
       </a>
 
       <button type="button" class="action-button action-button--secondary" (click)="loadProjects()">
         <mat-icon>refresh</mat-icon>
-        <span>Actualiser</span>
+        <span>Refresh</span>
       </button>
     </div>
   </section>
 
   <section class="metrics-grid">
     <article class="metric-card">
-      <p class="metric-label">Total projets</p>
+      <p class="metric-label">Total projects</p>
       <p class="metric-value">{{ totalProjectsCount }}</p>
     </article>
 
     <article class="metric-card">
-      <p class="metric-label">En cours</p>
+      <p class="metric-label">In progress</p>
       <p class="metric-value">{{ inProgressProjectsCount }}</p>
     </article>
 
     <article class="metric-card">
-      <p class="metric-label">Termines</p>
+      <p class="metric-label">Completed</p>
       <p class="metric-value">{{ completedProjectsCount }}</p>
     </article>
 
     <article class="metric-card metric-card--accent">
-      <p class="metric-label">Progression</p>
+      <p class="metric-label">Progress</p>
       <p class="metric-value">{{ completionRate }}%</p>
-      <p class="metric-hint">{{ suspendedProjectsCount }} suspendu(s)</p>
+      <p class="metric-hint">{{ suspendedProjectsCount }} suspended</p>
     </article>
   </section>
 
@@ -64,11 +64,11 @@
         <table class="w-full min-w-[920px] text-left">
           <thead class="border-b border-slate-200 bg-slate-50">
             <tr>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Titre</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Title</th>
               <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Client</th>
               <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Type</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Priorite</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Priority</th>
               <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th>
               <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
             </tr>
@@ -107,14 +107,14 @@
                     (click)="openModal(project)"
                     class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                   >
-                    Voir details
+                    View details
                   </button>
                 </td>
               </tr>
             } @empty {
               <tr>
                 <td colspan="7" class="px-3 py-6 text-center text-sm text-slate-500">
-                  Aucun projet assigne pour le moment.
+                  No assigned projects at the moment.
                 </td>
               </tr>
             }
@@ -129,13 +129,13 @@
   <div class="modal-box" (click)="$event.stopPropagation()">
     <h2>{{ selectedProject?.name }}</h2>
     <p>Client : {{ selectedProject?.client?.company_name || 'N/A' }}</p>
-    <p>Statut : {{ getStatusLabel(selectedProject?.status) }}</p>
-    <p>Risque : {{ selectedProject ? getRiskLabel(selectedProject) : 'N/A' }}</p>
-    <p>Description : {{ selectedProject?.description || 'Aucune description' }}</p>
+    <p>Status: {{ getStatusLabel(selectedProject?.status) }}</p>
+    <p>Risk: {{ selectedProject ? getRiskLabel(selectedProject) : 'N/A' }}</p>
+    <p>Description: {{ selectedProject?.description || 'No description' }}</p>
 
     @if (selectedProjectDocuments.length > 0) {
       <div class="mt-4">
-        <p class="mb-2 text-sm font-semibold text-slate-700">Documents lies</p>
+        <p class="mb-2 text-sm font-semibold text-slate-700">Linked documents</p>
         <ul class="space-y-1 text-sm text-slate-600">
           @for (document of selectedProjectDocuments; track document.id) {
             <li>{{ document.name }}</li>
@@ -143,9 +143,10 @@
         </ul>
       </div>
     } @else {
-      <p class="mt-4 text-sm text-slate-500">Aucun document lie a ce projet.</p>
+      <p class="mt-4 text-sm text-slate-500">No document linked to this project.</p>
     }
 
-    <button type="button" class="modal-close" (click)="closeModal()">Fermer</button>
+    <button type="button" class="modal-close" (click)="closeModal()">Close</button>
   </div>
 </div>
+

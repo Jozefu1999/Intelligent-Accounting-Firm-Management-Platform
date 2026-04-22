@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -70,14 +70,14 @@ export class ProjectList implements OnInit {
         },
         error: () => {
           this.projects = [];
-          this.errorMessage = 'Impossible de charger les projets. Veuillez reessayer.';
+          this.errorMessage = 'Unable to load projects. Please try again.';
           this.cdr.detectChanges();
         },
       });
   }
 
   deleteProject(id: number): void {
-    if (!confirm('Voulez-vous vraiment supprimer ce projet ?')) {
+    if (!confirm('Are you sure you want to delete this project?')) {
       return;
     }
 
@@ -89,7 +89,7 @@ export class ProjectList implements OnInit {
           this.cdr.detectChanges();
         },
         error: () => {
-          this.errorMessage = 'La suppression du projet a echoue.';
+          this.errorMessage = 'Project deletion failed.';
           this.cdr.detectChanges();
         },
       });
@@ -102,26 +102,26 @@ export class ProjectList implements OnInit {
   getStatusLabel(status: Project['status'] | undefined): string {
     switch (status) {
       case 'in_progress':
-        return 'En cours';
+        return 'In progress';
       case 'completed':
-        return 'Termine';
+        return 'Completed';
       case 'cancelled':
-        return 'Annule';
+        return 'Cancelled';
       case 'draft':
-        return 'Brouillon';
+        return 'Draft';
       default:
-        return 'Inconnu';
+        return 'Unknown';
     }
   }
 
   getPriorityLabel(priority: Project['priority'] | undefined): string {
     switch (priority) {
       case 'high':
-        return 'Haute';
+        return 'High';
       case 'medium':
-        return 'Moyenne';
+        return 'Medium';
       case 'low':
-        return 'Basse';
+        return 'Low';
       default:
         return 'N/A';
     }
@@ -132,13 +132,13 @@ export class ProjectList implements OnInit {
       case 'creation':
         return 'Creation';
       case 'development':
-        return 'Developpement';
+        return 'Development';
       case 'audit':
         return 'Audit';
       case 'consulting':
-        return 'Conseil';
+        return 'Consulting';
       case 'other':
-        return 'Autre';
+        return 'Other';
       default:
         return 'N/A';
     }
@@ -180,10 +180,11 @@ export class ProjectList implements OnInit {
       return '-';
     }
 
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
   }
 
   getMostRecentDate(project: Project): string {
     return this.formatDate(project.updated_at || project.updatedAt || project.created_at || project.createdAt);
   }
 }
+

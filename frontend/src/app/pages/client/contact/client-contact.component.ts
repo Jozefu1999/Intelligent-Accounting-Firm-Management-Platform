@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -85,7 +85,7 @@ export class ClientContactComponent implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
-        this.errorMessage = error.error?.message || 'Erreur lors de l envoi. Veuillez reessayer.';
+        this.errorMessage = error.error?.message || 'Error sending message. Please try again.';
       },
     });
   }
@@ -99,11 +99,11 @@ export class ClientContactComponent implements OnInit {
   getStatusLabel(status: ContactMessage['statut']): string {
     switch (status) {
       case 'lu':
-        return 'Lu';
+        return 'Read';
       case 'repondu':
-        return 'Repondu';
+        return 'Replied';
       default:
-        return 'Envoye';
+        return 'Sent';
     }
   }
 
@@ -127,7 +127,7 @@ export class ClientContactComponent implements OnInit {
       return '-';
     }
 
-    return new Date(rawDate).toLocaleDateString('fr-FR');
+    return new Date(rawDate).toLocaleDateString('en-US');
   }
 
   private loadPageData(): void {
@@ -151,3 +151,4 @@ export class ClientContactComponent implements OnInit {
     });
   }
 }
+

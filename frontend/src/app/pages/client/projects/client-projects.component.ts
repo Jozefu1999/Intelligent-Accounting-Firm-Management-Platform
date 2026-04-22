@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -133,13 +133,13 @@ export class ClientProjectsComponent implements OnInit {
       case 'creation':
         return 'Creation';
       case 'development':
-        return 'Developpement';
+        return 'Development';
       case 'audit':
         return 'Audit';
       case 'consulting':
-        return 'Conseil';
+        return 'Consulting';
       default:
-        return 'Autre';
+        return 'Other';
     }
   }
 
@@ -148,7 +148,7 @@ export class ClientProjectsComponent implements OnInit {
       return '-';
     }
 
-    return new Date(rawDate).toLocaleDateString('fr-FR');
+    return new Date(rawDate).toLocaleDateString('en-US');
   }
 
   private loadProjects(): void {
@@ -190,3 +190,4 @@ export class ClientProjectsComponent implements OnInit {
     return 'faible';
   }
 }
+

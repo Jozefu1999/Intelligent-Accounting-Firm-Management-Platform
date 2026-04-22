@@ -1,4 +1,4 @@
-<div class="assistant-shell">
+﻿<div class="assistant-shell">
   <div class="ambient-shape ambient-shape--one" aria-hidden="true"></div>
   <div class="ambient-shape ambient-shape--two" aria-hidden="true"></div>
 
@@ -6,7 +6,7 @@
     type="button"
     class="sidebar-backdrop"
     [class.visible]="isSidebarOpen"
-    aria-label="Fermer le menu"
+    aria-label="Close menu"
     (click)="closeSidebar()"
   ></button>
 
@@ -20,7 +20,7 @@
     </div>
 
     <section class="identity-card">
-      <p class="identity-label">Connecte en tant que</p>
+      <p class="identity-label">Signed in as</p>
       <p class="identity-name">{{ userDisplayName }}</p>
       <p class="identity-date">{{ todayLabel }}</p>
     </section>
@@ -34,7 +34,7 @@
         (click)="closeSidebar()"
       >
         <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
-        <span class="nav-label">Tableau de bord</span>
+        <span class="nav-label">Dashboard</span>
       </a>
 
       <a
@@ -45,7 +45,7 @@
         (click)="closeSidebar()"
       >
         <span class="nav-icon"><mat-icon>assignment</mat-icon></span>
-        <span class="nav-label">Mes projets assignes</span>
+        <span class="nav-label">My assigned projects</span>
       </a>
 
       <a
@@ -62,26 +62,26 @@
 
     <button type="button" class="sidebar-logout" (click)="logout()">
       <mat-icon>logout</mat-icon>
-      <span>Deconnexion</span>
+      <span>Log out</span>
     </button>
   </aside>
 
   <section class="assistant-workspace">
     <header class="workspace-header">
       <div class="header-left">
-        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Ouvrir le menu">
+        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
           <mat-icon>menu</mat-icon>
         </button>
 
         <div>
           <p class="workspace-eyebrow">Assistant Interface</p>
-          <h1 class="workspace-title">Gestion quotidienne</h1>
+          <h1 class="workspace-title">Daily operations</h1>
         </div>
       </div>
 
       <button type="button" class="header-logout" (click)="logout()">
         <mat-icon>logout</mat-icon>
-        <span>Se deconnecter</span>
+        <span>Log out</span>
       </button>
     </header>
 
@@ -90,3 +90,4 @@
     </main>
   </section>
 </div>
+

@@ -1,9 +1,9 @@
-<div class="profile-page">
+﻿<div class="profile-page">
   <section class="profile-hero client-fade-up">
     <div class="hero-main">
       <div class="hero-avatar">{{ avatarInitials }}</div>
       <div>
-        <p class="hero-eyebrow">Compte client</p>
+        <p class="hero-eyebrow">Client account</p>
         <h1>{{ fullName }}</h1>
         <p>{{ currentUser?.email }}</p>
       </div>
@@ -11,13 +11,13 @@
 
     <div class="hero-meta">
       <span class="role-chip">Client</span>
-      <span>Membre depuis {{ memberSince }}</span>
+      <span>Member since {{ memberSince }}</span>
     </div>
   </section>
 
   <div class="profile-grid">
     <section class="panel client-fade-up">
-      <h2>Informations personnelles</h2>
+      <h2>Personal information</h2>
 
       @if (profileSuccessMessage) {
         <div class="alert-success">{{ profileSuccessMessage }}</div>
@@ -29,12 +29,12 @@
 
       <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="form-grid">
         <div class="field-group">
-          <label>Nom</label>
+          <label>Last name</label>
           <input formControlName="nom" type="text" class="field" />
         </div>
 
         <div class="field-group">
-          <label>Prenom</label>
+          <label>First name</label>
           <input formControlName="prenom" type="text" class="field" />
         </div>
 
@@ -45,14 +45,14 @@
 
         <div class="field-wide">
           <button type="submit" [disabled]="isSavingProfile" class="primary-btn">
-            {{ isSavingProfile ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+            {{ isSavingProfile ? 'Saving...' : 'Save changes' }}
           </button>
         </div>
       </form>
     </section>
 
     <section class="panel client-fade-up">
-      <h2>Changer le mot de passe</h2>
+      <h2>Change password</h2>
 
       @if (passwordSuccessMessage) {
         <div class="alert-success">{{ passwordSuccessMessage }}</div>
@@ -64,29 +64,30 @@
 
       <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
         <div class="field-group">
-          <label>Mot de passe actuel</label>
+          <label>Current password</label>
           <input formControlName="currentPassword" type="password" class="field" />
         </div>
 
         <div class="field-group">
-          <label>Nouveau mot de passe</label>
+          <label>New password</label>
           <input formControlName="newPassword" type="password" class="field" />
         </div>
 
         <div class="field-group">
-          <label>Confirmer le nouveau mot de passe</label>
+          <label>Confirm new password</label>
           <input formControlName="confirmPassword" type="password" class="field" />
         </div>
 
         <div class="rule-list">
-          <p [class]="passwordMinLengthMet ? 'rule-ok' : 'rule-pending'">✓ Minimum 6 caracteres</p>
-          <p [class]="passwordsMatch ? 'rule-ok' : 'rule-pending'">✓ Les mots de passe correspondent</p>
+          <p [class]="passwordMinLengthMet ? 'rule-ok' : 'rule-pending'">✓ Minimum 6 characters</p>
+          <p [class]="passwordsMatch ? 'rule-ok' : 'rule-pending'">✓ Passwords match</p>
         </div>
 
         <button type="submit" [disabled]="isChangingPassword" class="primary-btn dark-btn">
-          {{ isChangingPassword ? 'Mise a jour...' : 'Changer le mot de passe' }}
+          {{ isChangingPassword ? 'Updating...' : 'Change password' }}
         </button>
       </form>
     </section>
   </div>
 </div>
+

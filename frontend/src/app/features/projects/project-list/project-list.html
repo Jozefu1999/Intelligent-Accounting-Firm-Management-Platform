@@ -1,4 +1,4 @@
-<div class="projects-workspace">
+﻿<div class="projects-workspace">
   @if (errorMessage) {
     <div class="alert alert-error">
       {{ errorMessage }}
@@ -8,46 +8,46 @@
   <section class="hero-panel">
     <div>
       <p class="hero-eyebrow">Expert workspace</p>
-      <h1 class="hero-title">Gestion des projets</h1>
-      <p class="hero-subtitle">Pilotez l'ensemble des missions, suivez leur progression et accedez rapidement aux actions principales.</p>
+      <h1 class="hero-title">Project Management</h1>
+      <p class="hero-subtitle">Manage all missions, track progress, and quickly access key actions.</p>
     </div>
 
     <div class="hero-actions">
       <button type="button" class="action-button action-button--secondary" (click)="loadProjects()">
         <mat-icon>refresh</mat-icon>
-        <span>Actualiser</span>
+        <span>Refresh</span>
       </button>
 
       <a routerLink="/projects/new" class="action-button action-button--primary">
         <mat-icon>add_circle</mat-icon>
-        <span>Nouveau projet</span>
+        <span>New project</span>
       </a>
     </div>
   </section>
 
   <section class="metrics-grid">
     <article class="metric-card">
-      <p class="metric-label">Total projets</p>
+      <p class="metric-label">Total projects</p>
       <p class="metric-value">{{ totalProjectsCount }}</p>
-      <p class="metric-hint">Portefeuille global</p>
+      <p class="metric-hint">Overall portfolio</p>
     </article>
 
     <article class="metric-card">
-      <p class="metric-label">En cours</p>
+      <p class="metric-label">In progress</p>
       <p class="metric-value">{{ inProgressProjectsCount }}</p>
-      <p class="metric-hint">Execution active</p>
+      <p class="metric-hint">Active execution</p>
     </article>
 
     <article class="metric-card">
-      <p class="metric-label">Termines</p>
+      <p class="metric-label">Completed</p>
       <p class="metric-value">{{ completedProjectsCount }}</p>
-      <p class="metric-hint">Missions finalisees</p>
+      <p class="metric-hint">Completed missions</p>
     </article>
 
     <article class="metric-card metric-card--accent">
-      <p class="metric-label">Progression</p>
+      <p class="metric-label">Progress</p>
       <p class="metric-value">{{ completionRate }}%</p>
-      <p class="metric-hint">{{ cancelledProjectsCount }} annule(s)</p>
+      <p class="metric-hint">{{ cancelledProjectsCount }} cancelled</p>
     </article>
   </section>
 
@@ -61,12 +61,12 @@
         <table>
           <thead>
             <tr>
-              <th>Projet</th>
+              <th>Project</th>
               <th>Client</th>
               <th>Type</th>
-              <th>Statut</th>
-              <th>Priorite</th>
-              <th>Mise a jour</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Update</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -97,15 +97,15 @@
 
                 <td>
                   <div class="actions-cell">
-                    <a [routerLink]="['/projects', project.id]" class="row-action row-action--view" aria-label="Voir le projet">
+                    <a [routerLink]="['/projects', project.id]" class="row-action row-action--view" aria-label="View project">
                       <mat-icon>visibility</mat-icon>
                     </a>
 
-                    <a [routerLink]="['/projects', project.id, 'edit']" class="row-action row-action--edit" aria-label="Modifier le projet">
+                    <a [routerLink]="['/projects', project.id, 'edit']" class="row-action row-action--edit" aria-label="Edit project">
                       <mat-icon>edit</mat-icon>
                     </a>
 
-                    <button type="button" class="row-action row-action--delete" (click)="deleteProject(project.id)" aria-label="Supprimer le projet">
+                    <button type="button" class="row-action row-action--delete" (click)="deleteProject(project.id)" aria-label="Delete project">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>
@@ -113,7 +113,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">Aucun projet disponible pour le moment.</td>
+                <td colspan="7" class="empty-state">No project available at the moment.</td>
               </tr>
             }
           </tbody>
@@ -122,3 +122,4 @@
     }
   </section>
 </div>
+

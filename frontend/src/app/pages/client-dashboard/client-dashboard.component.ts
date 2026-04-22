@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../core/models';
@@ -63,7 +63,7 @@ export class ClientDashboardComponent implements OnInit {
   submitContact(): void {
     const userId = this.currentUser?.id;
     if (!userId || !this.sujet.trim() || !this.message.trim()) {
-      this.feedbackError = 'Sujet et message sont obligatoires.';
+      this.feedbackError = 'Subject et message sont obligatoires.';
       return;
     }
 
@@ -82,11 +82,11 @@ export class ClientDashboardComponent implements OnInit {
       next: () => {
         this.sujet = '';
         this.message = '';
-        this.feedbackSuccess = 'Message envoye au cabinet.';
+        this.feedbackSuccess = 'Message sent to the firm.';
         this.isSendingMessage = false;
       },
       error: () => {
-        this.feedbackError = 'Impossible d envoyer le message.';
+        this.feedbackError = 'Unable to send the message.';
         this.isSendingMessage = false;
       },
     });
@@ -106,7 +106,7 @@ export class ClientDashboardComponent implements OnInit {
 
   saveProfile(): void {
     if (!this.profileForm.nom.trim() || !this.profileForm.prenom.trim() || !this.profileForm.email.trim()) {
-      this.feedbackError = 'Nom, prenom et email sont obligatoires.';
+      this.feedbackError = 'Last name, first name, and email are required.';
       return;
     }
 
@@ -122,13 +122,13 @@ export class ClientDashboardComponent implements OnInit {
     }).subscribe({
       next: (updatedUser) => {
         this.currentUser = updatedUser;
-        this.feedbackSuccess = 'Profil mis a jour avec succes.';
+        this.feedbackSuccess = 'Profile updated successfully.';
         this.isSavingProfile = false;
         this.showEditProfile = false;
         this.profileForm.password = '';
       },
       error: () => {
-        this.feedbackError = 'Impossible de mettre a jour le profil.';
+        this.feedbackError = 'Unable to update the profile.';
         this.isSavingProfile = false;
       },
     });
@@ -146,3 +146,4 @@ export class ClientDashboardComponent implements OnInit {
     };
   }
 }
+

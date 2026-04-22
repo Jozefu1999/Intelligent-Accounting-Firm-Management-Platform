@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,29 +33,29 @@ export class SidebarComponent {
 
   private readonly navByRole: Record<UserRole, SidebarItem[]> = {
     expert_comptable: [
-      { label: 'Dashboard', subtitle: "Vue d'ensemble", icon: 'dashboard', path: '/dashboard', exact: true },
-      { label: 'Clients', subtitle: 'Portefeuille', icon: 'people', path: '/clients' },
-      { label: 'Projets', subtitle: 'Missions en cours', icon: 'folder', path: '/projects' },
-      { label: 'Business Plan', subtitle: 'Generation IA', icon: 'auto_awesome', path: '/ai-tools/business-plan' },
-      { label: 'Recommandations', subtitle: 'Conseils cibles', icon: 'lightbulb', path: '/ai-tools/recommendations' },
-      { label: 'Risk Prediction', subtitle: 'Anticipation', icon: 'warning', path: '/ai-tools/risk-prediction' },
+      { label: 'Dashboard', subtitle: "Overview", icon: 'dashboard', path: '/dashboard', exact: true },
+      { label: 'Clients', subtitle: 'Portfolio', icon: 'people', path: '/clients' },
+      { label: 'Projects', subtitle: 'Current missions', icon: 'folder', path: '/projects' },
+      { label: 'Business Plan', subtitle: 'AI generation', icon: 'auto_awesome', path: '/ai-tools/business-plan' },
+      { label: 'Recommendations', subtitle: 'Targeted advice', icon: 'lightbulb', path: '/ai-tools/recommendations' },
+      { label: 'Risk Prediction', subtitle: 'Risk anticipation', icon: 'warning', path: '/ai-tools/risk-prediction' },
     ],
     assistant: [
-      { label: 'Tableau de bord', subtitle: 'Vue operationnelle', icon: 'space_dashboard', path: '/assistant/dashboard', exact: true },
-      { label: 'Mes Projets assignes', subtitle: 'Missions assignees', icon: 'work', path: '/assistant/projets', exact: true },
-      { label: 'Documents', subtitle: 'Upload et suivi', icon: 'description', path: '/assistant/documents', exact: true },
+      { label: 'Dashboard', subtitle: 'Operational view', icon: 'space_dashboard', path: '/assistant/dashboard', exact: true },
+      { label: 'My assigned projects', subtitle: 'Assigned missions', icon: 'work', path: '/assistant/projets', exact: true },
+      { label: 'Documents', subtitle: 'Upload and tracking', icon: 'description', path: '/assistant/documents', exact: true },
     ],
     administrateur: [
-      { label: 'Tableau de bord', subtitle: 'Pilotage global', icon: 'insights', path: '/admin/dashboard', exact: true },
-      { label: 'Utilisateurs', subtitle: 'Gestion des comptes', icon: 'manage_accounts', path: '/admin/users', exact: true },
-      { label: 'Statistiques', subtitle: 'Activite systeme', icon: 'bar_chart', path: '/admin/statistics', exact: true },
-      { label: 'Modele ML', subtitle: 'Retrain et suivi', icon: 'model_training', path: '/admin/ml', exact: true },
+      { label: 'Dashboard', subtitle: 'Global oversight', icon: 'insights', path: '/admin/dashboard', exact: true },
+      { label: 'Users', subtitle: 'Account management', icon: 'manage_accounts', path: '/admin/users', exact: true },
+      { label: 'Statistics', subtitle: 'System activity', icon: 'bar_chart', path: '/admin/statistics', exact: true },
+      { label: 'ML Model', subtitle: 'Retrain and monitoring', icon: 'model_training', path: '/admin/ml', exact: true },
     ],
     visiteur: [
-      { label: 'Tableau de bord', subtitle: 'Mon espace client', icon: 'dashboard', path: '/client/dashboard', exact: true },
-      { label: 'Mes Projets', subtitle: 'Suivi des dossiers', icon: 'work', path: '/client/projects', exact: true },
-      { label: 'Mon Profil', subtitle: 'Informations personnelles', icon: 'person', path: '/client/profile', exact: true },
-      { label: 'Contacter', subtitle: 'Messages au cabinet', icon: 'mail', path: '/client/contact', exact: true },
+      { label: 'Dashboard', subtitle: 'My client space', icon: 'dashboard', path: '/client/dashboard', exact: true },
+      { label: 'My Projects', subtitle: 'Case tracking', icon: 'work', path: '/client/projects', exact: true },
+      { label: 'My Profile', subtitle: 'Personal information', icon: 'person', path: '/client/profile', exact: true },
+      { label: 'Contact', subtitle: 'Messages to the firm', icon: 'mail', path: '/client/contact', exact: true },
     ],
   };
 
@@ -117,3 +117,4 @@ export class SidebarComponent {
     void this.router.navigate(['/login']);
   }
 }
+

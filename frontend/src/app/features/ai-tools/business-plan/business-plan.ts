@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -104,8 +104,8 @@ export class BusinessPlan implements OnInit {
           this.projects = [];
           this.errorMessage = this.getErrorMessage(
             error,
-            'Le chargement des projets a depasse le delai autorise.',
-            'Impossible de charger les projets pour la generation du business plan.',
+            'Project loading exceeded the allowed timeout.',
+            'Unable to load projects for business plan generation.',
           );
           this.cdr.detectChanges();
         },
@@ -120,7 +120,7 @@ export class BusinessPlan implements OnInit {
 
     const projectId = this.form.controls.projectId.value;
     if (projectId <= 0) {
-      this.errorMessage = 'Selectionnez un projet avant de lancer la generation.';
+      this.errorMessage = 'Select a project before starting generation.';
       this.cdr.detectChanges();
       return;
     }
@@ -139,15 +139,15 @@ export class BusinessPlan implements OnInit {
       .subscribe({
         next: (response) => {
           this.generatedPlan = this.normalizePlan(response);
-          this.successMessage = 'Business plan genere avec succes.';
+          this.successMessage = 'Business plan generated successfully.';
           this.cdr.detectChanges();
         },
         error: (error: unknown) => {
           this.generatedPlan = null;
           this.errorMessage = this.getErrorMessage(
             error,
-            'La generation IA a pris trop de temps. Reessayez dans un instant.',
-            'La generation du business plan a echoue. Verifiez la configuration IA.',
+            'AI generation timed out. Please try again shortly.',
+            'Business plan generation failed. Check AI configuration.',
           );
           this.cdr.detectChanges();
         },
@@ -158,12 +158,12 @@ export class BusinessPlan implements OnInit {
     const rawValue = this.generatedPlan?.content?.[sectionKey];
 
     if (typeof rawValue === 'string') {
-      return rawValue.trim().length > 0 ? rawValue : 'Aucune information disponible.';
+      return rawValue.trim().length > 0 ? rawValue : 'No information available.';
     }
 
     if (Array.isArray(rawValue)) {
       if (rawValue.length === 0) {
-        return 'Aucune information disponible.';
+        return 'No information available.';
       }
 
       return rawValue
@@ -181,7 +181,7 @@ export class BusinessPlan implements OnInit {
       return JSON.stringify(rawValue, null, 2);
     }
 
-    return 'Aucune information disponible.';
+    return 'No information available.';
   }
 
   private normalizePlan(response: AiBusinessPlan | null | undefined): AiBusinessPlan {
@@ -250,49 +250,50 @@ export class BusinessPlan implements OnInit {
 
         if (normalizedBackendMessage.includes('no active credits/licenses')
           || normalizedBackendMessage.includes("doesn't have any credits or licenses")) {
-          return 'Le compte xAI n\'a pas de credits ou licence actifs. Activez la facturation dans la console xAI puis reessayez.';
+          return 'The xAI account has no active credits or licenses. Enable billing in the xAI console and retry.';
         }
 
         if (normalizedBackendMessage.includes('model not found')
           || normalizedBackendMessage.includes('model "') && normalizedBackendMessage.includes('is unavailable')) {
-          return 'Le modele xAI configure est indisponible. Verifiez XAI_MODEL dans backend/.env (exemple: grok-4).';
+          return 'The configured xAI model is unavailable. Check XAI_MODEL in backend/.env (example: grok-4).';
         }
 
         if (normalizedBackendMessage.includes('gemini api key is invalid')) {
-          return 'La cle API Gemini est invalide ou non autorisee. Verifiez GEMINI_API_KEY dans backend/.env.';
+          return 'The Gemini API key is invalid or unauthorized. Check GEMINI_API_KEY in backend/.env.';
         }
 
         if (normalizedBackendMessage.includes('xai api key is invalid')) {
-          return 'La cle API xAI est invalide ou non autorisee. Verifiez XAI_API_KEY dans backend/.env.';
+          return 'The xAI API key is invalid or unauthorized. Check XAI_API_KEY in backend/.env.';
         }
 
         if (normalizedBackendMessage.includes('invalid api key')
           || normalizedBackendMessage.includes('unauthorized')) {
-          return 'La cle API IA est invalide ou non autorisee. Verifiez la configuration du provider dans backend/.env.';
+          return 'The AI API key is invalid or unauthorized. Check provider configuration in backend/.env.';
         }
 
         if (normalizedBackendMessage.includes('quota')
           || normalizedBackendMessage.includes('resource_exhausted')
           || normalizedBackendMessage.includes('rate limit')) {
           if (normalizedBackendMessage.includes('xai') || normalizedBackendMessage.includes('grok')) {
-            return 'La limite xAI est atteinte. Verifiez la facturation/limites xAI puis reessayez.';
+            return 'The xAI limit is reached. Check xAI billing/limits and try again.';
           }
 
           if (normalizedBackendMessage.includes('gemini')) {
-            return 'Le quota Gemini est atteint. Reessayez plus tard ou reduisez le volume des requetes.';
+            return 'Gemini quota is reached. Try again later or reduce request volume.';
           }
 
-          return 'La limite du provider IA est atteinte. Reessayez plus tard ou reduisez le volume des requetes.';
+          return 'The AI provider limit is reached. Try again later or reduce request volume.';
         }
 
         return backendMessage;
       }
 
       if (error.status === 0) {
-        return 'Le serveur API est inaccessible. Verifiez que le backend est lance.';
+        return 'API server is unreachable. Verify that the backend is running.';
       }
     }
 
     return defaultMessage;
   }
 }
+
