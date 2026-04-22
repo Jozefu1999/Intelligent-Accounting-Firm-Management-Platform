@@ -4,7 +4,7 @@ import { guestGuard } from './core/guards/guest-guard';
 import { AdminGuard, AssistantGuard, ClientGuard, ExpertGuard } from './guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/expert/dashboard', pathMatch: 'full' },
   {
     path: 'login',
     canActivate: [guestGuard],
@@ -16,9 +16,74 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register').then(m => m.Register),
   },
   {
-    path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard),
+    path: 'expert',
     canActivate: [authGuard, ExpertGuard],
+    loadComponent: () => import('./layouts/expert-layout/expert-layout.component').then(m => m.ExpertLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard),
+      },
+      {
+        path: 'clients',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/clients/client-list/client-list').then(m => m.ClientList),
+          },
+          {
+            path: 'new',
+            loadComponent: () => import('./features/clients/client-form/client-form').then(m => m.ClientForm),
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('./features/clients/client-detail/client-detail').then(m => m.ClientDetail),
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () => import('./features/clients/client-form/client-form').then(m => m.ClientForm),
+          },
+        ],
+      },
+      {
+        path: 'projects',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/projects/project-list/project-list').then(m => m.ProjectList),
+          },
+          {
+            path: 'new',
+            loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('./features/projects/project-detail/project-detail').then(m => m.ProjectDetail),
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
+          },
+        ],
+      },
+      {
+        path: 'ai-tools/business-plan',
+        loadComponent: () => import('./features/ai-tools/business-plan/business-plan').then(m => m.BusinessPlan),
+      },
+      {
+        path: 'ai-tools/recommendations',
+        loadComponent: () => import('./features/ai-tools/recommendations/recommendations').then(m => m.Recommendations),
+      },
+      {
+        path: 'ai-tools/risk-prediction',
+        loadComponent: () => import('./features/ai-tools/risk-prediction/risk-prediction').then(m => m.RiskPrediction),
+      },
+    ],
   },
   {
     path: 'assistant',
@@ -120,71 +185,69 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'dashboard',
+    redirectTo: '/expert/dashboard',
+    pathMatch: 'full',
+  },
+  {
     path: 'clients',
-    canActivate: [authGuard, ExpertGuard],
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./features/clients/client-list/client-list').then(m => m.ClientList),
-      },
-      {
-        path: 'new',
-        loadComponent: () => import('./features/clients/client-form/client-form').then(m => m.ClientForm),
-      },
-      {
-        path: ':id',
-        loadComponent: () => import('./features/clients/client-detail/client-detail').then(m => m.ClientDetail),
-      },
-      {
-        path: ':id/edit',
-        loadComponent: () => import('./features/clients/client-form/client-form').then(m => m.ClientForm),
-      },
-    ],
+    redirectTo: '/expert/clients',
+    pathMatch: 'full',
+  },
+  {
+    path: 'clients/new',
+    redirectTo: '/expert/clients/new',
+    pathMatch: 'full',
+  },
+  {
+    path: 'clients/:id/edit',
+    redirectTo: '/expert/clients/:id/edit',
+    pathMatch: 'full',
+  },
+  {
+    path: 'clients/:id',
+    redirectTo: '/expert/clients/:id',
+    pathMatch: 'full',
   },
   {
     path: 'projects',
-    canActivate: [authGuard, ExpertGuard],
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./features/projects/project-list/project-list').then(m => m.ProjectList),
-      },
-      {
-        path: 'new',
-        loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
-      },
-      {
-        path: ':id',
-        loadComponent: () => import('./features/projects/project-detail/project-detail').then(m => m.ProjectDetail),
-      },
-      {
-        path: ':id/edit',
-        loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
-      },
-    ],
+    redirectTo: '/expert/projects',
+    pathMatch: 'full',
   },
   {
-    path: 'expert/projects',
-    redirectTo: 'projects',
+    path: 'projects/new',
+    redirectTo: '/expert/projects/new',
+    pathMatch: 'full',
+  },
+  {
+    path: 'projects/:id/edit',
+    redirectTo: '/expert/projects/:id/edit',
+    pathMatch: 'full',
+  },
+  {
+    path: 'projects/:id',
+    redirectTo: '/expert/projects/:id',
+    pathMatch: 'full',
+  },
+  {
+    path: 'ai-tools/business-plan',
+    redirectTo: '/expert/ai-tools/business-plan',
+    pathMatch: 'full',
+  },
+  {
+    path: 'ai-tools/recommendations',
+    redirectTo: '/expert/ai-tools/recommendations',
+    pathMatch: 'full',
+  },
+  {
+    path: 'ai-tools/risk-prediction',
+    redirectTo: '/expert/ai-tools/risk-prediction',
     pathMatch: 'full',
   },
   {
     path: 'ai-tools',
-    canActivate: [authGuard, ExpertGuard],
-    children: [
-      {
-        path: 'business-plan',
-        loadComponent: () => import('./features/ai-tools/business-plan/business-plan').then(m => m.BusinessPlan),
-      },
-      {
-        path: 'recommendations',
-        loadComponent: () => import('./features/ai-tools/recommendations/recommendations').then(m => m.Recommendations),
-      },
-      {
-        path: 'risk-prediction',
-        loadComponent: () => import('./features/ai-tools/risk-prediction/risk-prediction').then(m => m.RiskPrediction),
-      },
-    ],
+    redirectTo: '/expert/ai-tools/business-plan',
+    pathMatch: 'full',
   },
-  { path: '**', redirectTo: '/dashboard' },
+  { path: '**', redirectTo: '/expert/dashboard' },
 ];

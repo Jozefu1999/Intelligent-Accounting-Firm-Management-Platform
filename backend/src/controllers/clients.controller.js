@@ -1,4 +1,5 @@
 const { Client, User, Project } = require('../models');
+const { normalizeRole } = require('../utils/roles');
 
 const clientInclude = [
   { model: User, as: 'assignedExpert', attributes: ['id', 'first_name', 'last_name'] },
@@ -68,9 +69,17 @@ const normalizeCreatePayload = (body = {}) => {
   return clientData;
 };
 
+const isAssistantUser = (user) => normalizeRole(user?.role) === 'assistant';
+
+const isAssistantOwner = (client, userId) => Number(client?.assigned_expert_id) === Number(userId);
+
 const getAll = async (req, res, next) => {
   try {
-    const clients = await Client.findAll({ include: clientInclude });
+    const where = isAssistantUser(req.user)
+      ? { assigned_expert_id: req.user.id }
+      : undefined;
+
+    const clients = await Client.findAll({ where, include: clientInclude });
     res.json(clients);
   } catch (error) {
     next(error);
@@ -83,6 +92,11 @@ const getById = async (req, res, next) => {
     if (!client) {
       return res.status(404).json({ message: 'Client not found.' });
     }
+
+    if (isAssistantUser(req.user) && !isAssistantOwner(client, req.user.id)) {
+      return res.status(403).json({ message: 'Forbidden. You can only access clients linked to your account.' });
+    }
+
     res.json(client);
   } catch (error) {
     next(error);
@@ -92,6 +106,11 @@ const getById = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     const clientData = normalizeCreatePayload(req.body);
+
+    if (isAssistantUser(req.user)) {
+      clientData.assigned_expert_id = req.user.id;
+    }
+
     const client = await Client.create(clientData);
 
     const createdClient = await Client.findByPk(client.id, { include: clientInclude });
@@ -108,7 +127,16 @@ const update = async (req, res, next) => {
       return res.status(404).json({ message: 'Client not found.' });
     }
 
+    if (isAssistantUser(req.user) && !isAssistantOwner(client, req.user.id)) {
+      return res.status(403).json({ message: 'Forbidden. You can only update clients linked to your account.' });
+    }
+
     const clientData = normalizeCreatePayload(req.body);
+
+    if (isAssistantUser(req.user)) {
+      clientData.assigned_expert_id = req.user.id;
+    }
+
     await client.update(clientData);
     res.json(client);
   } catch (error) {
@@ -122,6 +150,11 @@ const remove = async (req, res, next) => {
     if (!client) {
       return res.status(404).json({ message: 'Client not found.' });
     }
+
+    if (isAssistantUser(req.user) && !isAssistantOwner(client, req.user.id)) {
+      return res.status(403).json({ message: 'Forbidden. You can only delete clients linked to your account.' });
+    }
+
     await client.destroy();
     res.json({ message: 'Client deleted successfully.' });
   } catch (error) {

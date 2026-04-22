@@ -1,0 +1,125 @@
+<div class="expert-shell">
+  <div class="ambient-shape ambient-shape--one" aria-hidden="true"></div>
+  <div class="ambient-shape ambient-shape--two" aria-hidden="true"></div>
+
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    [class.visible]="isSidebarOpen"
+    aria-label="Close menu"
+    (click)="closeSidebar()"
+  ></button>
+
+  <aside class="expert-sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-brand">
+      <div class="brand-mark">AF</div>
+      <div>
+        <p class="brand-eyebrow">Workspace</p>
+        <h2 class="brand-title">Expert Hub</h2>
+      </div>
+    </div>
+
+    <section class="identity-card">
+      <p class="identity-label">Connected as</p>
+      <p class="identity-name">{{ userDisplayName }}</p>
+      <p class="identity-date">{{ todayLabel }}</p>
+    </section>
+
+    <nav class="nav-menu">
+      <a
+        routerLink="/expert/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        (click)="closeSidebar()"
+      >
+        <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+
+      <a
+        routerLink="/expert/clients"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="nav-item"
+        (click)="closeSidebar()"
+      >
+        <span class="nav-icon"><mat-icon>people</mat-icon></span>
+        <span class="nav-label">Clients</span>
+      </a>
+
+      <a
+        routerLink="/expert/projects"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="nav-item"
+        (click)="closeSidebar()"
+      >
+        <span class="nav-icon"><mat-icon>assignment</mat-icon></span>
+        <span class="nav-label">Projects</span>
+      </a>
+
+      <a
+        routerLink="/expert/ai-tools/business-plan"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        (click)="closeSidebar()"
+      >
+        <span class="nav-icon"><mat-icon>auto_awesome</mat-icon></span>
+        <span class="nav-label">Business Plan</span>
+      </a>
+
+      <a
+        routerLink="/expert/ai-tools/recommendations"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        (click)="closeSidebar()"
+      >
+        <span class="nav-icon"><mat-icon>lightbulb</mat-icon></span>
+        <span class="nav-label">Recommendations</span>
+      </a>
+
+      <a
+        routerLink="/expert/ai-tools/risk-prediction"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        (click)="closeSidebar()"
+      >
+        <span class="nav-icon"><mat-icon>warning</mat-icon></span>
+        <span class="nav-label">Risk Prediction</span>
+      </a>
+    </nav>
+
+    <button type="button" class="sidebar-logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign out</span>
+    </button>
+  </aside>
+
+  <section class="expert-workspace">
+    <header class="workspace-header">
+      <div class="header-left">
+        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <div>
+          <p class="workspace-eyebrow">Expert Interface</p>
+          <h1 class="workspace-title">Portfolio management</h1>
+        </div>
+      </div>
+
+      <button type="button" class="header-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Sign out</span>
+      </button>
+    </header>
+
+    <main class="workspace-content">
+      <router-outlet></router-outlet>
+    </main>
+  </section>
+</div>
