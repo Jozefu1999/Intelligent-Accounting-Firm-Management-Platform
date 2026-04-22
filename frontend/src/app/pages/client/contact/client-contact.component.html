@@ -1,7 +1,7 @@
-<div class="contact-page">
+﻿<div class="contact-page">
   <section class="contact-hero client-fade-up">
-    <h1>Contacter le cabinet</h1>
-    <p>Envoyez un message a votre expert comptable</p>
+    <h1>Contact the firm</h1>
+    <p>Send a message to your accounting expert</p>
   </section>
 
   <section class="contact-form-panel client-fade-up">
@@ -12,17 +12,17 @@
     @if (isSuccessState) {
       <div class="success-card">
         <div class="success-icon">✓</div>
-        <p class="success-title">Message envoye avec succes !</p>
-        <p class="success-text">Notre equipe vous repondra dans les plus brefs delais.</p>
+        <p class="success-title">Message sent successfully!</p>
+        <p class="success-text">Our team will get back to you as soon as possible.</p>
         <button type="button" class="primary-btn success-btn" (click)="sendAnotherMessage()">
-          Envoyer un autre message
+          Send another message
         </button>
       </div>
     } @else {
       <form [formGroup]="contactForm" (ngSubmit)="submitContact()" class="contact-form">
         <div class="form-grid">
           <div class="field-group">
-            <label>Nom</label>
+            <label>Name</label>
             <input formControlName="nom" type="text" readonly class="field field-readonly" />
           </div>
 
@@ -33,14 +33,14 @@
         </div>
 
         <div class="field-group">
-          <label>Sujet</label>
-          <input formControlName="sujet" type="text" placeholder="Ex: Question sur mon dossier projet..." class="field" />
+          <label>Subject</label>
+          <input formControlName="sujet" type="text" placeholder="Ex: Question about my project case..." class="field" />
         </div>
 
         <div class="field-group">
-          <label>Selectionner un projet (optionnel)</label>
+          <label>Select a project (optional)</label>
           <select formControlName="project_id" class="field">
-            <option value="">Selectionner un projet (optionnel)</option>
+            <option value="">Select a project (optional)</option>
             @for (project of projects; track project.id) {
               <option [value]="project.id">{{ project.name }}</option>
             }
@@ -52,35 +52,35 @@
           <textarea
             formControlName="message"
             rows="5"
-            placeholder="Decrivez votre demande en detail..."
+            placeholder="Describe your request in detail..."
             class="field"
           ></textarea>
           @if (contactForm.controls.message.touched && contactForm.controls.message.invalid) {
-            <p class="field-error">Le message doit contenir au moins 20 caracteres.</p>
+            <p class="field-error">The message must contain at least 20 characters.</p>
           }
         </div>
 
         <button type="submit" [disabled]="isSubmitting" class="primary-btn">
-          {{ isSubmitting ? 'Envoi...' : 'Envoyer le message' }}
+          {{ isSubmitting ? 'Sending...' : 'Send message' }}
         </button>
       </form>
     }
   </section>
 
   <section class="history-panel client-fade-up">
-    <h2>Mes messages envoyes</h2>
+    <h2>My sent messages</h2>
 
     @if (messages.length === 0) {
-      <div class="panel-empty">Vous n'avez pas encore envoye de message.</div>
+      <div class="panel-empty">You have not sent a message yet.</div>
     } @else {
       <div class="table-wrap">
         <table class="modern-table">
           <thead>
             <tr>
-              <th>SUJET</th>
-              <th>PROJET</th>
+              <th>SUBJECT</th>
+              <th>PROJECT</th>
               <th>DATE</th>
-              <th>STATUT</th>
+              <th>STATUS</th>
             </tr>
           </thead>
           <tbody>
@@ -100,3 +100,4 @@
     }
   </section>
 </div>
+

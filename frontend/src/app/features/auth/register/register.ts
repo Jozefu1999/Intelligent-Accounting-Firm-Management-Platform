@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -40,7 +40,7 @@ export class Register {
 
   onSubmit(): void {
     if (!this.role) {
-      this.errorMessage = 'Veuillez selectionner un role.';
+      this.errorMessage = 'Please select a role.';
       return;
     }
 
@@ -60,7 +60,7 @@ export class Register {
       },
       error: (err: HttpErrorResponse) => {
         if (err.status === 0) {
-          this.errorMessage = 'Impossible de joindre le serveur. Verifiez que le backend fonctionne sur le port 3000.';
+          this.errorMessage = 'Unable to reach the server. Verify that the backend is running on port 3000.';
         } else {
           this.errorMessage = err.error?.message || 'Registration failed.';
         }
@@ -69,3 +69,4 @@ export class Register {
     });
   }
 }
+

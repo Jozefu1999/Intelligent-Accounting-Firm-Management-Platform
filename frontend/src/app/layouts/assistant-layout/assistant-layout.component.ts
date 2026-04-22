@@ -13,7 +13,7 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class AssistantLayoutComponent {
   isSidebarOpen = false;
-  readonly todayLabel = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date());
+  readonly todayLabel = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(new Date());
 
   constructor(private router: Router) {}
 

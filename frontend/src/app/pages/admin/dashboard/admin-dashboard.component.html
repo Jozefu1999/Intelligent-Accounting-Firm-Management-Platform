@@ -1,4 +1,4 @@
-@if (errorMessage) {
+﻿@if (errorMessage) {
   <div class="admin-alert admin-alert-danger">
     {{ errorMessage }}
   </div>
@@ -6,9 +6,9 @@
 
 <section class="admin-card welcome-card">
   <div class="welcome-left">
-    <p class="welcome-title">Bonjour, {{ fullName || 'Administrateur' }}</p>
-    <p class="welcome-subtitle">Vue d'ensemble de l'activite de la plateforme</p>
-    <span class="role-chip">Administrateur</span>
+    <p class="welcome-title">Hello, {{ fullName || 'Administrator' }}</p>
+    <p class="welcome-subtitle">Overview of platform activity</p>
+    <span class="role-chip">Administrator</span>
   </div>
   <div class="welcome-date">{{ todayLabel }}</div>
 </section>
@@ -35,7 +35,7 @@
 <section class="dashboard-grid-two">
   <article class="admin-card">
     <div class="card-title-row">
-      <h2 class="card-title">Nouveaux utilisateurs</h2>
+      <h2 class="card-title">New users</h2>
     </div>
 
     @if (isLoading) {
@@ -62,17 +62,17 @@
             </div>
           </div>
         } @empty {
-          <p class="empty-state">Aucun utilisateur recent.</p>
+          <p class="empty-state">No recent users.</p>
         }
       </div>
 
-      <a routerLink="/admin/users" class="card-link">Voir tous les utilisateurs -></a>
+      <a routerLink="/admin/users" class="card-link">View all users -></a>
     }
   </article>
 
   <article class="admin-card">
     <div class="card-title-row">
-      <h2 class="card-title">Activite de la plateforme</h2>
+      <h2 class="card-title">Platform activity</h2>
     </div>
 
     @if (isLoading) {
@@ -114,3 +114,4 @@
     }
   </article>
 </section>
+

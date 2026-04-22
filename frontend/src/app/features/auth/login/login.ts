@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -28,7 +28,7 @@ export class Login {
   ) {
     const reason = this.route.snapshot.queryParamMap.get('reason');
     if (reason === 'session-expired') {
-      this.errorMessage = 'Votre session a expiré. Veuillez vous reconnecter.';
+      this.errorMessage = 'Your session has expired. Please sign in again.';
     }
   }
 
@@ -43,7 +43,7 @@ export class Login {
       },
       error: (err: HttpErrorResponse) => {
         if (err.status === 0) {
-          this.errorMessage = 'Impossible de joindre le serveur. Verifiez que le backend fonctionne sur le port 3000.';
+          this.errorMessage = 'Unable to reach the server. Verify that the backend is running on port 3000.';
         } else {
           this.errorMessage = err.error?.message || 'Login failed.';
         }
@@ -52,3 +52,4 @@ export class Login {
     });
   }
 }
+

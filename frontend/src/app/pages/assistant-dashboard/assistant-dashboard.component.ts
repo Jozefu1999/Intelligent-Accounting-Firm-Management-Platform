@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -33,10 +33,10 @@ export class AssistantDashboardComponent implements OnInit {
   successMessage = '';
 
   readonly statusOptions: Array<{ label: string; value: ProjectStatus }> = [
-    { label: 'Brouillon', value: 'draft' },
-    { label: 'En cours', value: 'in_progress' },
-    { label: 'Termine', value: 'completed' },
-    { label: 'Annule', value: 'cancelled' },
+    { label: 'Draft', value: 'draft' },
+    { label: 'In progress', value: 'in_progress' },
+    { label: 'Completed', value: 'completed' },
+    { label: 'Cancelled', value: 'cancelled' },
   ];
 
   constructor(
@@ -83,7 +83,7 @@ export class AssistantDashboardComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger les donnees assistant.';
+        this.errorMessage = 'Unable to load assistant data.';
         this.isLoading = false;
       },
     });
@@ -111,7 +111,7 @@ export class AssistantDashboardComponent implements OnInit {
 
   submitUpload(): void {
     if (!this.selectedProjectId || !this.selectedFile) {
-      this.errorMessage = 'Veuillez selectionner un projet et un fichier.';
+      this.errorMessage = 'Please select a project and a file.';
       return;
     }
 
@@ -120,12 +120,12 @@ export class AssistantDashboardComponent implements OnInit {
 
     this.documentService.upload(this.selectedFile, { project_id: this.selectedProjectId }).subscribe({
       next: () => {
-        this.successMessage = 'Document uploade avec succes.';
+        this.successMessage = 'Document uploaded successfully.';
         this.closeUploadModal();
         this.loadDocumentsOnly();
       },
       error: () => {
-        this.errorMessage = 'Echec de l upload du document.';
+        this.errorMessage = 'Document upload failed.';
         this.isUploading = false;
       },
     });
@@ -141,10 +141,10 @@ export class AssistantDashboardComponent implements OnInit {
     this.projectService.update(project.id, { status: value }).subscribe({
       next: () => {
         project.status = value;
-        this.successMessage = 'Statut du projet mis a jour.';
+        this.successMessage = 'Project status updated.';
       },
       error: () => {
-        this.errorMessage = 'Impossible de modifier le statut du projet.';
+        this.errorMessage = 'Unable to update project status.';
       },
     });
   }
@@ -152,24 +152,24 @@ export class AssistantDashboardComponent implements OnInit {
   getStatusLabel(status: ProjectStatus): string {
     switch (status) {
       case 'in_progress':
-        return 'En cours';
+        return 'In progress';
       case 'completed':
-        return 'Termine';
+        return 'Completed';
       case 'cancelled':
-        return 'Annule';
+        return 'Cancelled';
       default:
-        return 'Brouillon';
+        return 'Draft';
     }
   }
 
   getPriorityLabel(priority: Project['priority']): string {
     switch (priority) {
       case 'high':
-        return 'Haute';
+        return 'High';
       case 'medium':
-        return 'Moyenne';
+        return 'Medium';
       default:
-        return 'Basse';
+        return 'Low';
     }
   }
 
@@ -188,3 +188,4 @@ export class AssistantDashboardComponent implements OnInit {
     });
   }
 }
+

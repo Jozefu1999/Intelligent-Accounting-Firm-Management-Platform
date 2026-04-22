@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -70,8 +70,8 @@ export class Recommendations implements OnInit {
           this.clients = [];
           this.errorMessage = this.getErrorMessage(
             error,
-            'Le chargement des clients a depasse le delai autorise.',
-            'Impossible de charger les clients pour les recommandations IA.',
+            'Client loading exceeded the allowed timeout.',
+            'Unable to load clients for AI recommendations.',
           );
           this.cdr.detectChanges();
         },
@@ -86,7 +86,7 @@ export class Recommendations implements OnInit {
 
     const clientId = this.form.controls.clientId.value;
     if (clientId <= 0) {
-      this.errorMessage = 'Selectionnez un client avant de lancer la generation.';
+      this.errorMessage = 'Select a client before starting generation.';
       this.cdr.detectChanges();
       return;
     }
@@ -106,16 +106,16 @@ export class Recommendations implements OnInit {
         next: (response) => {
           this.recommendations = this.normalizeRecommendations(response?.recommendations);
           this.successMessage = this.recommendations.length > 0
-            ? 'Recommandations generees avec succes.'
-            : 'Generation terminee sans recommandations exploitables.';
+            ? 'Recommendations generated successfully.'
+            : 'Generation completed without actionable recommendations.';
           this.cdr.detectChanges();
         },
         error: (error: unknown) => {
           this.recommendations = [];
           this.errorMessage = this.getErrorMessage(
             error,
-            'La generation IA a pris trop de temps. Reessayez dans un instant.',
-            'La generation des recommandations a echoue. Verifiez la configuration IA.',
+            'AI generation timed out. Please try again shortly.',
+            'Recommendation generation failed. Check AI configuration.',
           );
           this.cdr.detectChanges();
         },
@@ -210,44 +210,45 @@ export class Recommendations implements OnInit {
 
         if (normalizedBackendMessage.includes('model not found')
           || normalizedBackendMessage.includes('model "') && normalizedBackendMessage.includes('is unavailable')) {
-          return 'Le modele xAI configure est indisponible. Verifiez XAI_MODEL dans backend/.env (exemple: grok-4).';
+          return 'The configured xAI model is unavailable. Check XAI_MODEL in backend/.env (example: grok-4).';
         }
 
         if (normalizedBackendMessage.includes('gemini api key is invalid')) {
-          return 'La cle API Gemini est invalide ou non autorisee. Verifiez GEMINI_API_KEY dans backend/.env.';
+          return 'The Gemini API key is invalid or unauthorized. Check GEMINI_API_KEY in backend/.env.';
         }
 
         if (normalizedBackendMessage.includes('xai api key is invalid')) {
-          return 'La cle API xAI est invalide ou non autorisee. Verifiez XAI_API_KEY dans backend/.env.';
+          return 'The xAI API key is invalid or unauthorized. Check XAI_API_KEY in backend/.env.';
         }
 
         if (normalizedBackendMessage.includes('invalid api key')
           || normalizedBackendMessage.includes('unauthorized')) {
-          return 'La cle API IA est invalide ou non autorisee. Verifiez la configuration du provider dans backend/.env.';
+          return 'The AI API key is invalid or unauthorized. Check provider configuration in backend/.env.';
         }
 
         if (normalizedBackendMessage.includes('quota')
           || normalizedBackendMessage.includes('resource_exhausted')
           || normalizedBackendMessage.includes('rate limit')) {
           if (normalizedBackendMessage.includes('xai') || normalizedBackendMessage.includes('grok')) {
-            return 'La limite xAI est atteinte. Verifiez la facturation/limites xAI puis reessayez.';
+            return 'The xAI limit is reached. Check xAI billing/limits and try again.';
           }
 
           if (normalizedBackendMessage.includes('gemini')) {
-            return 'Le quota Gemini est atteint. Reessayez plus tard ou reduisez le volume des requetes.';
+            return 'Gemini quota is reached. Try again later or reduce request volume.';
           }
 
-          return 'La limite du provider IA est atteinte. Reessayez plus tard ou reduisez le volume des requetes.';
+          return 'The AI provider limit is reached. Try again later or reduce request volume.';
         }
 
         return backendMessage;
       }
 
       if (error.status === 0) {
-        return 'Le serveur API est inaccessible. Verifiez que le backend est lance.';
+        return 'API server is unreachable. Verify that the backend is running.';
       }
     }
 
     return defaultMessage;
   }
 }
+

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
@@ -39,18 +39,18 @@ export class AdminLayoutComponent {
     const currentUrl = this.router.url;
 
     if (currentUrl.includes('/admin/users')) {
-      return 'Gestion des utilisateurs';
+      return 'User Management';
     }
 
     if (currentUrl.includes('/admin/statistics')) {
-      return 'Statistiques globales';
+      return 'Global Statistics';
     }
 
     if (currentUrl.includes('/admin/ml')) {
-      return 'Modele ML';
+      return 'ML Model';
     }
 
-    return 'Tableau de bord';
+    return 'Dashboard';
   }
 
   logout(): void {
@@ -59,3 +59,4 @@ export class AdminLayoutComponent {
     void this.router.navigate(['/login']);
   }
 }
+

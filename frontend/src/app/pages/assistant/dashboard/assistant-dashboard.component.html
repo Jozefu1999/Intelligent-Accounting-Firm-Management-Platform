@@ -1,4 +1,4 @@
-<div class="dashboard-shell">
+﻿<div class="dashboard-shell">
   @if (errorMessage) {
     <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
       {{ errorMessage }}
@@ -9,42 +9,42 @@
     <div>
       <p class="hero-eyebrow">Assistant workspace</p>
       <h1 class="hero-title">
-        Bonjour {{ fullName || 'Assistant' }}
+        Hello {{ fullName || 'Assistant' }}
         <span class="role-pill">Assistant</span>
       </h1>
       <p class="hero-date">{{ todayLabel }}</p>
     </div>
 
     <div class="hero-actions">
-      <a routerLink="/assistant/projets/new" class="quick-action quick-action--primary">Ajouter projet</a>
-      <a routerLink="/assistant/documents" class="quick-action quick-action--ghost">Voir documents</a>
+      <a routerLink="/assistant/projets/new" class="quick-action quick-action--primary">Add project</a>
+      <a routerLink="/assistant/documents" class="quick-action quick-action--ghost">View documents</a>
     </div>
   </section>
 
   <section class="kpi-grid">
     <article class="kpi-card">
-      <p class="kpi-label">Projets assignes</p>
+      <p class="kpi-label">Assigned projects</p>
       <p class="kpi-value">{{ assignedProjectsCount }}</p>
-      <p class="kpi-sub">{{ inProgressProjectsCount }} en cours</p>
+      <p class="kpi-sub">{{ inProgressProjectsCount }} in progress</p>
     </article>
 
     <article class="kpi-card">
-      <p class="kpi-label">Documents uploades</p>
+      <p class="kpi-label">Uploaded documents</p>
       <p class="kpi-value">{{ uploadedDocumentsCount }}</p>
-      <p class="kpi-sub">Pieces disponibles</p>
+      <p class="kpi-sub">Available files</p>
     </article>
 
     <article class="kpi-card kpi-card--accent">
-      <p class="kpi-label">Taux d'avancement</p>
+      <p class="kpi-label">Completion rate</p>
       <p class="kpi-value">{{ completionRate }}%</p>
-      <p class="kpi-sub">{{ completedProjectsCount }} projet(s) termine(s)</p>
+      <p class="kpi-sub">{{ completedProjectsCount }} completed project(s)</p>
     </article>
   </section>
 
   <section class="projects-card">
     <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-slate-900">Derniers projets assignes</h2>
-      <a routerLink="/assistant/projets" class="text-sm font-semibold text-cyan-700 hover:text-cyan-800">Voir tout</a>
+      <h2 class="text-lg font-semibold text-slate-900">Latest assigned projects</h2>
+      <a routerLink="/assistant/projets" class="text-sm font-semibold text-cyan-700 hover:text-cyan-800">View all</a>
     </div>
 
     @if (isLoading) {
@@ -56,10 +56,10 @@
         <table class="w-full min-w-[760px] text-left">
           <thead class="border-b border-slate-200 bg-slate-50">
             <tr>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Titre</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Title</th>
               <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Client</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Priorite</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Priority</th>
               <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th>
             </tr>
           </thead>
@@ -79,7 +79,7 @@
             } @empty {
               <tr>
                 <td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">
-                  Aucun projet assigne pour le moment.
+                  No assigned projects at the moment.
                 </td>
               </tr>
             }
@@ -89,3 +89,4 @@
     }
   </section>
 </div>
+

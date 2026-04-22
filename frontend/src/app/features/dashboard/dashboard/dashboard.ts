@@ -83,7 +83,7 @@ export class Dashboard implements OnInit {
       return 'badge-active';
     }
 
-    if (statut === 'terminé') {
+    if (statut === 'terminé' || statut === 'termine' || statut === 'completed') {
       return 'badge-done';
     }
 
@@ -103,11 +103,55 @@ export class Dashboard implements OnInit {
       return 'risk-medium';
     }
 
-    if (risk === 'élevé') {
+    if (risk === 'élevé' || risk === 'eleve' || risk === 'high') {
       return 'risk-high';
     }
 
     return 'risk-low';
+  }
+
+  getStatusLabel(statut: string): string {
+    if (statut === 'en_cours') {
+      return 'In progress';
+    }
+
+    if (statut === 'terminé' || statut === 'termine' || statut === 'completed') {
+      return 'Completed';
+    }
+
+    if (statut === 'suspendu') {
+      return 'Suspended';
+    }
+
+    return statut || 'Unknown';
+  }
+
+  getRiskLabel(risk: string): string {
+    if (risk === 'faible') {
+      return 'Low';
+    }
+
+    if (risk === 'moyen') {
+      return 'Medium';
+    }
+
+    if (risk === 'élevé' || risk === 'eleve' || risk === 'high') {
+      return 'High';
+    }
+
+    return risk || 'Low';
+  }
+
+  getClientStatusLabel(status: string): string {
+    if (status === 'actif') {
+      return 'Active';
+    }
+
+    if (status === 'inactif') {
+      return 'Inactive';
+    }
+
+    return status || 'Active';
   }
 
   getProgressWidth(count: number, total: number): string {

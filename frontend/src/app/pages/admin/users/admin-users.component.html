@@ -1,4 +1,4 @@
-@if (errorMessage) {
+﻿@if (errorMessage) {
   <div class="admin-alert admin-alert-danger">{{ errorMessage }}</div>
 }
 
@@ -8,7 +8,7 @@
 
 <section class="page-header-row">
   <div>
-    <h2 class="page-title">Utilisateurs</h2>
+    <h2 class="page-title">Users</h2>
   </div>
 
   <div class="header-actions">
@@ -16,7 +16,7 @@
       type="search"
       [(ngModel)]="searchTerm"
       (ngModelChange)="onSearchChange()"
-      placeholder="Rechercher par nom ou email"
+      placeholder="Search by name or email"
       class="search-input"
     />
 
@@ -48,10 +48,10 @@
       <table>
         <thead>
           <tr>
-            <th>UTILISATEUR</th>
+            <th>USER</th>
             <th>ROLE</th>
-            <th>DATE INSCRIPTION</th>
-            <th>STATUT</th>
+            <th>REGISTRATION DATE</th>
+            <th>STATUS</th>
             <th>ACTIONS</th>
           </tr>
         </thead>
@@ -75,20 +75,20 @@
               <td>{{ formatDate(user.created_at) }}</td>
 
               <td>
-                <span class="badge badge-active">Actif</span>
+                <span class="badge badge-active">Active</span>
               </td>
 
               <td>
                 <div class="actions">
-                  <button type="button" class="icon-btn" (click)="openRoleEditor(user)" aria-label="Modifier role">
+                  <button type="button" class="icon-btn" (click)="openRoleEditor(user)" aria-label="Edit role">
                     <mat-icon>edit</mat-icon>
                   </button>
 
-                  <button type="button" class="icon-btn" (click)="openDetailsModal(user)" aria-label="Voir details">
+                  <button type="button" class="icon-btn" (click)="openDetailsModal(user)" aria-label="View details">
                     <mat-icon>visibility</mat-icon>
                   </button>
 
-                  <button type="button" class="icon-btn danger" (click)="openDeleteModal(user)" aria-label="Supprimer utilisateur">
+                  <button type="button" class="icon-btn danger" (click)="openDeleteModal(user)" aria-label="Delete user">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
@@ -100,8 +100,8 @@
                         <option [value]="role">{{ role }}</option>
                       }
                     </select>
-                    <button type="button" class="confirm-btn" (click)="confirmRoleChange(user)">Confirmer</button>
-                    <button type="button" class="cancel-btn" (click)="cancelRoleEditor()">Annuler</button>
+                    <button type="button" class="confirm-btn" (click)="confirmRoleChange(user)">Confirm</button>
+                    <button type="button" class="cancel-btn" (click)="cancelRoleEditor()">Cancel</button>
                   </div>
                 }
               </td>
@@ -111,7 +111,7 @@
               <td colspan="5">
                 <div class="empty-state">
                   <mat-icon>group_off</mat-icon>
-                  <p>Aucun utilisateur trouve.</p>
+                  <p>No users found.</p>
                 </div>
               </td>
             </tr>
@@ -121,9 +121,9 @@
     </div>
 
     <div class="pagination">
-      <button type="button" (click)="previousPage()" [disabled]="page === 1">Precedent</button>
-      <span>Page {{ page }} sur {{ totalPages }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page === totalPages">Suivant</button>
+      <button type="button" (click)="previousPage()" [disabled]="page === 1">Previous</button>
+      <span>Page {{ page }} of {{ totalPages }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page === totalPages">Next</button>
     </div>
   }
 </section>
@@ -131,22 +131,22 @@
 @if (detailsModalOpen) {
   <div class="modal-overlay" (click)="closeDetailsModal()">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h3>Details utilisateur</h3>
+      <h3>User details</h3>
 
       @if (detailsLoading) {
-        <p>Chargement...</p>
+        <p>Loading...</p>
       } @else if (detailsModalUser) {
         <div class="modal-grid">
-          <p><span>Nom complet:</span> {{ getDisplayName(detailsModalUser) }}</p>
+          <p><span>Full name:</span> {{ getDisplayName(detailsModalUser) }}</p>
           <p><span>Email:</span> {{ detailsModalUser.email }}</p>
           <p><span>Role:</span> {{ getRoleLabel(detailsModalUser.role) }}</p>
-          <p><span>Date creation:</span> {{ formatDate(detailsModalUser.created_at) }}</p>
-          <p><span>Projets lies:</span> {{ detailsModalUser.projects_linked_count }}</p>
+          <p><span>Created date:</span> {{ formatDate(detailsModalUser.created_at) }}</p>
+          <p><span>Linked projects:</span> {{ detailsModalUser.projects_linked_count }}</p>
         </div>
       }
 
       <div class="modal-actions">
-        <button type="button" (click)="closeDetailsModal()">Fermer</button>
+        <button type="button" (click)="closeDetailsModal()">Close</button>
       </div>
     </div>
   </div>
@@ -155,13 +155,14 @@
 @if (deleteModalOpen) {
   <div class="modal-overlay" (click)="closeDeleteModal()">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h3>Supprimer {{ deleteModalUser ? getDisplayName(deleteModalUser) : '' }} ?</h3>
-      <p>Cette action est irreversible.</p>
+      <h3>Delete {{ deleteModalUser ? getDisplayName(deleteModalUser) : '' }}?</h3>
+      <p>This action is irreversible.</p>
 
       <div class="modal-actions">
-        <button type="button" (click)="closeDeleteModal()">Annuler</button>
-        <button type="button" class="danger-btn" (click)="confirmDelete()">Confirmer</button>
+        <button type="button" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="danger-btn" (click)="confirmDelete()">Confirm</button>
       </div>
     </div>
   </div>
 }
+

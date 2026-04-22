@@ -1,60 +1,60 @@
-<div class="dashboard-page">
+﻿<div class="dashboard-page">
   <section class="hero-card client-fade-up">
     <div class="hero-content">
       <div class="hero-avatar">{{ avatarInitials }}</div>
       <div>
-        <p class="hero-eyebrow">Espace Client</p>
-        <h1 class="hero-title">Bonjour {{ fullName }}</h1>
-        <p class="hero-subtitle">Voici un apercu de vos dossiers en cours</p>
+        <p class="hero-eyebrow">Client Space</p>
+        <h1 class="hero-title">Hello {{ fullName }}</h1>
+        <p class="hero-subtitle">Here is an overview of your active cases</p>
       </div>
     </div>
 
     <div class="hero-date-block">
-      <p>Aujourd hui</p>
+      <p>Today</p>
       <strong>{{ todayLabel }}</strong>
     </div>
   </section>
 
   <section class="kpi-grid">
     <article class="kpi-card client-fade-up">
-      <p class="kpi-label">Mes projets en cours</p>
+      <p class="kpi-label">My active projects</p>
       <p class="kpi-value">{{ activeProjectsCount }}</p>
-      <p class="kpi-meta">Dossiers actifs</p>
+      <p class="kpi-meta">Active cases</p>
     </article>
 
     <article class="kpi-card client-fade-up">
-      <p class="kpi-label">Mes documents</p>
+      <p class="kpi-label">My documents</p>
       <p class="kpi-value">{{ documentsCount }}</p>
-      <p class="kpi-meta">Fichiers disponibles</p>
+      <p class="kpi-meta">Available files</p>
     </article>
 
     <article class="kpi-card client-fade-up">
-      <p class="kpi-label">Dernier contact</p>
+      <p class="kpi-label">Last contact</p>
       <p class="kpi-value kpi-value-sm">{{ lastContactDate }}</p>
-      <p class="kpi-meta">Suivi cabinet</p>
+      <p class="kpi-meta">Firm follow-up</p>
     </article>
   </section>
 
   <section class="dashboard-grid">
     <article class="panel client-fade-up">
       <div class="panel-head">
-        <h2>Mes projets recents</h2>
-        <a routerLink="/client/projects" class="panel-link">Voir tous mes projets</a>
+        <h2>My recent projects</h2>
+        <a routerLink="/client/projects" class="panel-link">View all my projects</a>
       </div>
 
       @if (isLoading) {
-        <p class="panel-info">Chargement des projets...</p>
+        <p class="panel-info">Loading projects...</p>
       } @else if (recentProjects.length === 0) {
-        <div class="panel-empty">Aucun projet en cours pour le moment.</div>
+        <div class="panel-empty">No active projects at the moment.</div>
       } @else {
         <div class="table-wrap">
           <table class="modern-table">
             <thead>
               <tr>
-                <th>TITRE</th>
+                <th>TITLE</th>
                 <th>TYPE</th>
-                <th>STATUT</th>
-                <th>RISQUE</th>
+                <th>STATUS</th>
+                <th>RISK</th>
                 <th>DATE</th>
               </tr>
             </thead>
@@ -79,12 +79,12 @@
     </article>
 
     <article class="contact-panel client-fade-up">
-      <p class="contact-kicker">Contact direct</p>
-      <h2>Contacter le cabinet</h2>
-      <p>Une question sur votre dossier ? Envoyez un message a votre expert comptable.</p>
+      <p class="contact-kicker">Direct contact</p>
+      <h2>Contact the firm</h2>
+      <p>Have a question about your case? Send a message to your accounting expert.</p>
 
       <button type="button" class="primary-btn" (click)="openContactModal()">
-        Envoyer un message
+        Send a message
       </button>
     </article>
   </section>
@@ -94,8 +94,8 @@
   <div class="modal-backdrop">
     <div class="modal-card client-fade-up">
       <div class="modal-head">
-        <h3>Contacter le cabinet</h3>
-        <button type="button" class="ghost-btn" (click)="closeContactModal()">Fermer</button>
+        <h3>Contact the firm</h3>
+        <button type="button" class="ghost-btn" (click)="closeContactModal()">Close</button>
       </div>
 
       @if (contactSuccessMessage) {
@@ -112,14 +112,14 @@
 
       <form [formGroup]="contactForm" (ngSubmit)="submitContact()" class="modal-form">
         <div>
-          <label>Sujet</label>
-          <input type="text" formControlName="sujet" class="field" placeholder="Ex: Question sur mon dossier projet..." />
+          <label>Subject</label>
+          <input type="text" formControlName="sujet" class="field" placeholder="Ex: Question about my project case..." />
         </div>
 
         <div>
-          <label>Selectionner un projet (optionnel)</label>
+          <label>Select a project (optional)</label>
           <select formControlName="project_id" class="field">
-            <option value="">Selectionner un projet (optionnel)</option>
+            <option value="">Select a project (optional)</option>
             @for (project of allProjects; track project.id) {
               <option [value]="project.id">{{ project.name }}</option>
             }
@@ -128,16 +128,17 @@
 
         <div>
           <label>Message</label>
-          <textarea formControlName="message" rows="5" class="field" placeholder="Decrivez votre demande en detail..."></textarea>
+          <textarea formControlName="message" rows="5" class="field" placeholder="Describe your request in detail..."></textarea>
           @if (contactForm.controls.message.touched && contactForm.controls.message.invalid) {
-            <p class="field-error">Le message doit contenir au moins 20 caracteres.</p>
+            <p class="field-error">The message must contain at least 20 characters.</p>
           }
         </div>
 
         <button type="submit" [disabled]="isSubmittingContact" class="primary-btn">
-          {{ isSubmittingContact ? 'Envoi...' : 'Envoyer le message' }}
+          {{ isSubmittingContact ? 'Sending...' : 'Send message' }}
         </button>
       </form>
     </div>
   </div>
 }
+

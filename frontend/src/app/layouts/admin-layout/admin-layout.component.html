@@ -1,9 +1,9 @@
-<div class="admin-shell">
+﻿<div class="admin-shell">
   <aside class="admin-sidebar">
     <div class="admin-brand">
       <div class="admin-logo">PC</div>
       <div>
-        <p class="admin-brand-title">Plateforme Comptable</p>
+        <p class="admin-brand-title">Accounting Platform</p>
         <p class="admin-brand-subtitle">ADMIN CONSOLE</p>
       </div>
     </div>
@@ -16,7 +16,7 @@
         class="admin-nav-item"
       >
         <mat-icon>space_dashboard</mat-icon>
-        <span>Tableau de bord</span>
+        <span>Dashboard</span>
       </a>
 
       <a
@@ -26,7 +26,7 @@
         class="admin-nav-item"
       >
         <mat-icon>manage_accounts</mat-icon>
-        <span>Utilisateurs</span>
+        <span>Users</span>
       </a>
 
       <a
@@ -36,7 +36,7 @@
         class="admin-nav-item"
       >
         <mat-icon>bar_chart</mat-icon>
-        <span>Statistiques</span>
+        <span>Statistics</span>
       </a>
 
       <a
@@ -46,7 +46,7 @@
         class="admin-nav-item"
       >
         <mat-icon>model_training</mat-icon>
-        <span>Modele ML</span>
+        <span>ML Model</span>
       </a>
     </nav>
 
@@ -54,14 +54,14 @@
       <div class="admin-user-chip">
         <div class="admin-user-avatar">{{ initials }}</div>
         <div>
-          <p class="admin-user-name">{{ fullName || 'Administrateur' }}</p>
-          <span class="admin-user-role">Administrateur</span>
+          <p class="admin-user-name">{{ fullName || 'Administrator' }}</p>
+          <span class="admin-user-role">Administrator</span>
         </div>
       </div>
 
       <a routerLink="/login" class="admin-logout" (click)="logout()">
         <mat-icon>logout</mat-icon>
-        <span>Deconnexion</span>
+        <span>Log out</span>
       </a>
     </div>
   </aside>
@@ -76,7 +76,7 @@
         </button>
 
         <div class="admin-topbar-user">
-          <p class="admin-topbar-name">{{ fullName || 'Administrateur' }}</p>
+          <p class="admin-topbar-name">{{ fullName || 'Administrator' }}</p>
           <div class="admin-topbar-avatar">{{ initials }}</div>
         </div>
       </div>
@@ -87,3 +87,4 @@
     </main>
   </section>
 </div>
+

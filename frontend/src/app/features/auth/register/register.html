@@ -1,4 +1,4 @@
-<div class="relative min-h-screen overflow-hidden bg-slate-100">
+﻿<div class="relative min-h-screen overflow-hidden bg-slate-100">
   <div class="pointer-events-none absolute -left-32 -top-20 h-80 w-80 rounded-full bg-emerald-300/35 blur-3xl"></div>
   <div class="pointer-events-none absolute -bottom-20 right-0 h-96 w-96 rounded-full bg-cyan-200/40 blur-3xl"></div>
 
@@ -10,39 +10,39 @@
             <mat-icon class="text-white">account_balance</mat-icon>
           </div>
           <div>
-            <p class="font-['Sora'] text-lg font-semibold tracking-tight">Plateforme Comptable</p>
+            <p class="font-['Sora'] text-lg font-semibold tracking-tight">Accounting Platform</p>
             <p class="text-xs uppercase tracking-[0.22em] text-teal-200">Onboarding</p>
           </div>
         </div>
 
         <h2 class="font-['Sora'] text-3xl font-semibold leading-tight sm:text-4xl">
-          Lancez votre espace,
-          <span class="text-cyan-300">en quelques minutes.</span>
+          Launch your workspace,
+          <span class="text-cyan-300">in minutes.</span>
         </h2>
         <p class="mt-4 max-w-xl text-sm leading-relaxed text-teal-100 sm:text-base">
-          Créez votre compte et activez un environnement conçu pour le pilotage comptable et l'analyse intelligente.
+          Create your account and activate an environment designed for accounting management and intelligent analysis.
         </p>
 
         <div class="mt-8 space-y-4">
           <div class="flex items-start gap-3 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-sm">
             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold">1</div>
             <div>
-              <p class="text-sm font-semibold text-white">Créez votre compte</p>
-              <p class="text-xs text-teal-100">Configurez rapidement votre identité cabinet et vos accès.</p>
+              <p class="text-sm font-semibold text-white">Create your account</p>
+              <p class="text-xs text-teal-100">Quickly configure your firm identity and access rights.</p>
             </div>
           </div>
           <div class="flex items-start gap-3 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-sm">
             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold">2</div>
             <div>
-              <p class="text-sm font-semibold text-white">Invitez votre équipe</p>
-              <p class="text-xs text-teal-100">Attribuez des rôles et structurez vos processus de travail.</p>
+              <p class="text-sm font-semibold text-white">Invite your team</p>
+              <p class="text-xs text-teal-100">Assign roles and structure your work processes.</p>
             </div>
           </div>
           <div class="flex items-start gap-3 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-sm">
             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold">3</div>
             <div>
-              <p class="text-sm font-semibold text-white">Démarrez vos analyses IA</p>
-              <p class="text-xs text-teal-100">Générez recommandations, plans et alertes de risque.</p>
+              <p class="text-sm font-semibold text-white">Start your AI analyses</p>
+              <p class="text-xs text-teal-100">Generate recommendations, plans, and risk alerts.</p>
             </div>
           </div>
         </div>
@@ -55,13 +55,13 @@
           <div class="rounded-xl bg-teal-900 p-1.5 text-white">
             <mat-icon>account_balance</mat-icon>
           </div>
-          <span class="font-['Sora'] text-base font-semibold text-slate-900">Plateforme Comptable</span>
+          <span class="font-['Sora'] text-base font-semibold text-slate-900">Accounting Platform</span>
         </div>
 
-        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">Inscription</p>
-        <h1 class="mt-2 font-['Sora'] text-3xl font-semibold tracking-tight text-slate-900">Créer un compte</h1>
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">Registration</p>
+        <h1 class="mt-2 font-['Sora'] text-3xl font-semibold tracking-tight text-slate-900">Create an account</h1>
         <p class="mt-2 text-sm leading-relaxed text-slate-500">
-          Renseignez vos informations pour sécuriser votre accès à la plateforme.
+          Enter your information to secure your access to the platform.
         </p>
 
         @if (errorMessage) {
@@ -74,7 +74,7 @@
         <form (ngSubmit)="onSubmit()" class="mt-7 space-y-4">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label class="mb-1.5 block text-sm font-medium text-slate-700">Prénom</label>
+              <label class="mb-1.5 block text-sm font-medium text-slate-700">First name</label>
               <input
                 type="text"
                 [(ngModel)]="first_name"
@@ -100,7 +100,7 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700">Adresse email</label>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Email address</label>
             <div class="relative">
               <mat-icon class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl text-slate-400">mail</mat-icon>
               <input
@@ -116,7 +116,7 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700">Mot de passe</label>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
             <div class="relative">
               <mat-icon class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl text-slate-400">lock</mat-icon>
               <input
@@ -126,7 +126,7 @@
                 required
                 minlength="6"
                 autocomplete="new-password"
-                placeholder="6 caractères minimum"
+                placeholder="6 characters minimum"
                 class="w-full rounded-2xl border border-slate-200 bg-white px-11 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
               />
             </div>
@@ -142,7 +142,7 @@
                 required
                 class="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-11 py-3.5 text-sm text-slate-900 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
               >
-                <option value="" disabled>Selectionnez un role</option>
+                <option value="" disabled>Select a role</option>
                 @for (item of roles; track item.value) {
                   <option [value]="item.value">{{ item.label }}</option>
                 }
@@ -158,19 +158,20 @@
           >
             @if (loading) {
               <mat-icon class="animate-spin text-base">refresh</mat-icon>
-              Création du compte...
+              Creating account...
             } @else {
-              Créer mon compte
+              Create my account
               <mat-icon class="text-base">arrow_forward</mat-icon>
             }
           </button>
         </form>
 
         <p class="mt-8 text-center text-sm text-slate-500">
-          Déjà inscrit ?
-          <a routerLink="/login" class="ml-1 font-semibold text-teal-700 hover:text-teal-800 hover:underline">Se connecter</a>
+          Already registered?
+          <a routerLink="/login" class="ml-1 font-semibold text-teal-700 hover:text-teal-800 hover:underline">Sign in</a>
         </p>
       </div>
     </section>
   </div>
 </div>
+

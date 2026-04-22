@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewRef } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -47,7 +47,7 @@ export class AssistantDocumentsComponent implements OnInit {
     this.documentService.getAll().pipe(
       timeout(12000),
       catchError(() => {
-        this.errorMessage = 'Impossible de charger les documents.';
+        this.errorMessage = 'Unable to load documents.';
         return of([] as Document[]);
       }),
       finalize(() => {
@@ -60,7 +60,7 @@ export class AssistantDocumentsComponent implements OnInit {
         this.triggerUiUpdate();
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger les documents.';
+        this.errorMessage = 'Unable to load documents.';
         this.triggerUiUpdate();
       },
     });
@@ -72,7 +72,7 @@ export class AssistantDocumentsComponent implements OnInit {
     this.projectService.getAll().pipe(
       timeout(12000),
       catchError(() => {
-        this.projectWarningMessage = 'La liste des projets n a pas pu etre chargee. L upload peut etre limite.';
+        this.projectWarningMessage = 'The project list could not be loaded. Upload may be limited.';
         return of([] as Project[]);
       }),
     ).subscribe({
@@ -109,7 +109,7 @@ export class AssistantDocumentsComponent implements OnInit {
 
   uploadDocument(): void {
     if (!this.selectedFile || !this.selectedProjectId) {
-      this.errorMessage = 'Veuillez selectionner un projet et un fichier.';
+      this.errorMessage = 'Please select a project and a file.';
       return;
     }
 
@@ -122,13 +122,13 @@ export class AssistantDocumentsComponent implements OnInit {
 
     this.documentService.upload(this.selectedFile, { project_id: this.selectedProjectId }).subscribe({
       next: () => {
-        this.successMessage = 'Document uploade avec succes.';
+        this.successMessage = 'Document uploaded successfully.';
         this.closeModal();
         this.loadDocuments();
         this.triggerUiUpdate();
       },
       error: () => {
-        this.errorMessage = 'Echec de l upload du document.';
+        this.errorMessage = 'Document upload failed.';
         this.isUploading = false;
         this.triggerUiUpdate();
       },
@@ -146,7 +146,7 @@ export class AssistantDocumentsComponent implements OnInit {
         window.URL.revokeObjectURL(downloadUrl);
       },
       error: () => {
-        this.errorMessage = 'Impossible de telecharger le document.';
+        this.errorMessage = 'Unable to download the document.';
         this.triggerUiUpdate();
       },
     });
@@ -185,7 +185,7 @@ export class AssistantDocumentsComponent implements OnInit {
       return '-';
     }
 
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
   }
 
   private triggerUiUpdate(): void {
@@ -195,3 +195,4 @@ export class AssistantDocumentsComponent implements OnInit {
     }
   }
 }
+

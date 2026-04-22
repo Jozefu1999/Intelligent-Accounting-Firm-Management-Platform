@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewRef } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -45,7 +45,7 @@ export class AssistantDashboardComponent implements OnInit {
   }
 
   get todayLabel(): string {
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' }).format(this.today);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(this.today);
   }
 
   get assignedProjectsCount(): number {
@@ -87,14 +87,14 @@ export class AssistantDashboardComponent implements OnInit {
       projects: this.projectService.getAll().pipe(
         timeout(12000),
         catchError(() => {
-          this.errorMessage = 'Impossible de charger les projets assignes.';
+          this.errorMessage = 'Unable to load assigned projects.';
           return of([] as Project[]);
         }),
       ),
       documents: this.documentService.getAll().pipe(
         timeout(12000),
         catchError(() => {
-          this.warningMessage = 'Les documents n ont pas pu etre charges. Les statistiques affichent uniquement les donnees disponibles.';
+          this.warningMessage = 'Documents could not be loaded. Statistics show only available data.';
           return of([] as Document[]);
         }),
       ),
@@ -110,7 +110,7 @@ export class AssistantDashboardComponent implements OnInit {
         this.triggerUiUpdate();
       },
       error: () => {
-        this.errorMessage = 'Impossible de charger le tableau de bord assistant.';
+        this.errorMessage = 'Unable to load the assistant dashboard.';
         this.triggerUiUpdate();
       },
     });
@@ -119,24 +119,24 @@ export class AssistantDashboardComponent implements OnInit {
   getStatusLabel(status: Project['status']): string {
     switch (status) {
       case 'in_progress':
-        return 'En cours';
+        return 'In progress';
       case 'completed':
-        return 'Termine';
+        return 'Completed';
       case 'cancelled':
-        return 'Suspendu';
+        return 'Cancelled';
       default:
-        return 'Brouillon';
+        return 'Draft';
     }
   }
 
   getPriorityLabel(priority: Project['priority']): string {
     switch (priority) {
       case 'high':
-        return 'Haute';
+        return 'High';
       case 'medium':
-        return 'Moyenne';
+        return 'Medium';
       default:
-        return 'Basse';
+        return 'Low';
     }
   }
 
@@ -150,7 +150,7 @@ export class AssistantDashboardComponent implements OnInit {
       return '-';
     }
 
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(date);
   }
 
   getStatusBadgeClass(status: Project['status']): string {
@@ -195,3 +195,4 @@ export class AssistantDashboardComponent implements OnInit {
     }
   }
 }
+

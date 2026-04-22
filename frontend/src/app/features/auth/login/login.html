@@ -1,4 +1,4 @@
-<div class="relative min-h-screen overflow-hidden bg-slate-100">
+﻿<div class="relative min-h-screen overflow-hidden bg-slate-100">
   <div class="pointer-events-none absolute -left-28 top-10 h-72 w-72 rounded-full bg-sky-300/35 blur-3xl"></div>
   <div class="pointer-events-none absolute -right-28 bottom-10 h-80 w-80 rounded-full bg-emerald-200/40 blur-3xl"></div>
 
@@ -10,42 +10,42 @@
             <mat-icon class="text-white">account_balance</mat-icon>
           </div>
           <div>
-            <p class="font-['Sora'] text-lg font-semibold tracking-tight">Plateforme Comptable</p>
+            <p class="font-['Sora'] text-lg font-semibold tracking-tight">Accounting Platform</p>
             <p class="text-xs uppercase tracking-[0.22em] text-slate-300">Cabinet Workspace</p>
           </div>
         </div>
 
         <h2 class="font-['Sora'] text-3xl font-semibold leading-tight sm:text-4xl">
-          Pilotez votre cabinet
-          <span class="text-cyan-300">avec précision.</span>
+          Manage your firm
+          <span class="text-cyan-300">with precision.</span>
         </h2>
         <p class="mt-4 max-w-xl text-sm leading-relaxed text-slate-200 sm:text-base">
-          Unifiez clients, projets, documents et décisions stratégiques dans un tableau de bord moderne conçu pour les experts-comptables.
+          Unify clients, projects, documents, and strategic decisions in a modern dashboard designed for accounting experts.
         </p>
 
         <div class="mt-10 grid gap-3 sm:grid-cols-2">
           <div class="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
             <p class="text-2xl font-semibold text-white">+42%</p>
-            <p class="mt-1 text-xs uppercase tracking-wider text-slate-200">Suivi opérationnel</p>
+            <p class="mt-1 text-xs uppercase tracking-wider text-slate-200">Operational tracking</p>
           </div>
           <div class="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
             <p class="text-2xl font-semibold text-white">24h</p>
-            <p class="mt-1 text-xs uppercase tracking-wider text-slate-200">Temps moyen de réponse</p>
+            <p class="mt-1 text-xs uppercase tracking-wider text-slate-200">Average response time</p>
           </div>
         </div>
 
         <div class="mt-8 space-y-3 text-sm text-slate-100">
           <div class="flex items-center gap-3">
             <mat-icon class="text-cyan-300">check_circle</mat-icon>
-            <span>Gestion centralisée de vos portefeuilles clients</span>
+            <span>Centralized management of your client portfolios</span>
           </div>
           <div class="flex items-center gap-3">
             <mat-icon class="text-cyan-300">check_circle</mat-icon>
-            <span>Outils IA pour recommandations et plans d'affaires</span>
+            <span>AI tools for recommendations and business plans</span>
           </div>
           <div class="flex items-center gap-3">
             <mat-icon class="text-cyan-300">check_circle</mat-icon>
-            <span>Accès sécurisé via JWT et contrôle des rôles</span>
+            <span>Secure access via JWT and role-based control</span>
           </div>
         </div>
       </div>
@@ -57,13 +57,13 @@
           <div class="rounded-xl bg-slate-900 p-1.5 text-white">
             <mat-icon>account_balance</mat-icon>
           </div>
-          <span class="font-['Sora'] text-base font-semibold text-slate-900">Plateforme Comptable</span>
+          <span class="font-['Sora'] text-base font-semibold text-slate-900">Accounting Platform</span>
         </div>
 
-        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-700">Connexion sécurisée</p>
-        <h1 class="mt-2 font-['Sora'] text-3xl font-semibold tracking-tight text-slate-900">Bon retour</h1>
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-700">Secure login</p>
+        <h1 class="mt-2 font-['Sora'] text-3xl font-semibold tracking-tight text-slate-900">Welcome back</h1>
         <p class="mt-2 text-sm leading-relaxed text-slate-500">
-          Connectez-vous pour accéder à votre espace de gestion et à vos analyses.
+          Sign in to access your management workspace and analytics.
         </p>
 
         @if (errorMessage) {
@@ -75,7 +75,7 @@
 
         <form (ngSubmit)="onSubmit()" class="mt-7 space-y-5">
           <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700">Adresse email</label>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Email address</label>
             <div class="relative">
               <mat-icon class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl text-slate-400">mail</mat-icon>
               <input
@@ -91,7 +91,7 @@
           </div>
 
           <div>
-            <label class="mb-1.5 block text-sm font-medium text-slate-700">Mot de passe</label>
+            <label class="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
             <div class="relative">
               <mat-icon class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl text-slate-400">lock</mat-icon>
               <input
@@ -100,7 +100,7 @@
                 name="password"
                 required
                 autocomplete="current-password"
-                placeholder="Votre mot de passe"
+                placeholder="Your password"
                 class="w-full rounded-2xl border border-slate-200 bg-white px-11 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
               />
             </div>
@@ -113,19 +113,20 @@
           >
             @if (loading) {
               <mat-icon class="animate-spin text-base">refresh</mat-icon>
-              Connexion en cours...
+              Signing in...
             } @else {
-              Continuer
+              Continue
               <mat-icon class="text-base">arrow_forward</mat-icon>
             }
           </button>
         </form>
 
         <p class="mt-8 text-center text-sm text-slate-500">
-          Pas encore de compte ?
-          <a routerLink="/register" class="ml-1 font-semibold text-cyan-700 hover:text-cyan-800 hover:underline">Créer mon compte</a>
+          Don't have an account yet?
+          <a routerLink="/register" class="ml-1 font-semibold text-cyan-700 hover:text-cyan-800 hover:underline">Create my account</a>
         </p>
       </div>
     </section>
   </div>
 </div>
+
