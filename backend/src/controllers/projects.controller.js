@@ -1,12 +1,17 @@
 const { Op } = require('sequelize');
 const { Project, Client } = require('../models');
 const { normalizeRole } = require('../utils/roles');
-const { resolveClientIdsForUser } = require('../utils/client-scope');
+const {
+  resolveClientIdsForUser,
+  resolveAssistantClientIds,
+} = require('../utils/client-scope');
 
 const parseNumericId = (value) => {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 };
+
+const hasClientAccess = (clientIds, clientId) => clientIds.includes(Number(clientId));
 
 const getAll = async (req, res, next) => {
   try {
@@ -14,7 +19,26 @@ const getAll = async (req, res, next) => {
     const normalizedRole = normalizeRole(req.user.role);
     const where = {};
 
-    if (normalizedRole === 'visiteur') {
+    if (normalizedRole === 'assistant') {
+      const assistantClientIds = await resolveAssistantClientIds(req.user);
+
+      if (!assistantClientIds.length) {
+        return res.json([]);
+      }
+
+      if (requestedClientId && requestedClientId !== 'me') {
+        const parsedClientId = parseNumericId(requestedClientId);
+        if (!parsedClientId || !hasClientAccess(assistantClientIds, parsedClientId)) {
+          return res.status(403).json({ message: 'Forbidden. You can only access projects linked to your account.' });
+        }
+
+        where.client_id = parsedClientId;
+      } else {
+        where.client_id = {
+          [Op.in]: assistantClientIds,
+        };
+      }
+    } else if (normalizedRole === 'visiteur') {
       const ownedClientIds = await resolveClientIdsForUser(req.user);
 
       if (!ownedClientIds.length) {
@@ -64,10 +88,20 @@ const getById = async (req, res, next) => {
       return res.status(404).json({ message: 'Project not found.' });
     }
 
-    if (normalizeRole(req.user.role) === 'visiteur') {
+    const normalizedRole = normalizeRole(req.user.role);
+
+    if (normalizedRole === 'assistant') {
+      const assistantClientIds = await resolveAssistantClientIds(req.user);
+
+      if (!hasClientAccess(assistantClientIds, project.client_id)) {
+        return res.status(403).json({ message: 'Forbidden. You can only access projects linked to your account.' });
+      }
+    }
+
+    if (normalizedRole === 'visiteur') {
       const ownedClientIds = await resolveClientIdsForUser(req.user);
 
-      if (!ownedClientIds.includes(project.client_id)) {
+      if (!hasClientAccess(ownedClientIds, project.client_id)) {
         return res.status(403).json({ message: 'Forbidden. You can only access your own projects.' });
       }
     }
@@ -80,8 +114,23 @@ const getById = async (req, res, next) => {
 
 const create = async (req, res, next) => {
   try {
-    if (normalizeRole(req.user.role) === 'visiteur') {
+    const normalizedRole = normalizeRole(req.user.role);
+
+    if (normalizedRole === 'visiteur') {
       return res.status(403).json({ message: 'Forbidden. Client role has read-only access to projects.' });
+    }
+
+    if (normalizedRole === 'assistant') {
+      const assistantClientIds = await resolveAssistantClientIds(req.user);
+      const requestedClientId = parseNumericId(req.body.client_id);
+
+      if (!requestedClientId) {
+        return res.status(400).json({ message: 'Invalid client_id value.' });
+      }
+
+      if (!hasClientAccess(assistantClientIds, requestedClientId)) {
+        return res.status(403).json({ message: 'Forbidden. You can only create projects for clients linked to your account.' });
+      }
     }
 
     const project = await Project.create(req.body);
@@ -93,7 +142,9 @@ const create = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    if (normalizeRole(req.user.role) === 'visiteur') {
+    const normalizedRole = normalizeRole(req.user.role);
+
+    if (normalizedRole === 'visiteur') {
       return res.status(403).json({ message: 'Forbidden. Client role has read-only access to projects.' });
     }
 
@@ -101,6 +152,27 @@ const update = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({ message: 'Project not found.' });
     }
+
+    if (normalizedRole === 'assistant') {
+      const assistantClientIds = await resolveAssistantClientIds(req.user);
+
+      if (!hasClientAccess(assistantClientIds, project.client_id)) {
+        return res.status(403).json({ message: 'Forbidden. You can only update projects linked to your account.' });
+      }
+
+      if (req.body.client_id !== undefined) {
+        const nextClientId = parseNumericId(req.body.client_id);
+
+        if (!nextClientId) {
+          return res.status(400).json({ message: 'Invalid client_id value.' });
+        }
+
+        if (!hasClientAccess(assistantClientIds, nextClientId)) {
+          return res.status(403).json({ message: 'Forbidden. You can only reassign to clients linked to your account.' });
+        }
+      }
+    }
+
     await project.update(req.body);
     res.json(project);
   } catch (error) {
@@ -110,7 +182,9 @@ const update = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
   try {
-    if (normalizeRole(req.user.role) === 'visiteur') {
+    const normalizedRole = normalizeRole(req.user.role);
+
+    if (normalizedRole === 'visiteur') {
       return res.status(403).json({ message: 'Forbidden. Client role has read-only access to projects.' });
     }
 
@@ -118,6 +192,15 @@ const remove = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({ message: 'Project not found.' });
     }
+
+    if (normalizedRole === 'assistant') {
+      const assistantClientIds = await resolveAssistantClientIds(req.user);
+
+      if (!hasClientAccess(assistantClientIds, project.client_id)) {
+        return res.status(403).json({ message: 'Forbidden. You can only delete projects linked to your account.' });
+      }
+    }
+
     await project.destroy();
     res.json({ message: 'Project deleted successfully.' });
   } catch (error) {

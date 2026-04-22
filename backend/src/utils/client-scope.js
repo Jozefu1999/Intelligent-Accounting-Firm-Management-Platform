@@ -46,6 +46,21 @@ const resolveClientIdsForUser = async (authUser) => {
   return clients.map((client) => client.id);
 };
 
+const resolveAssistantClientIds = async (authUser) => {
+  if (!authUser?.id) {
+    return [];
+  }
+
+  const clients = await Client.findAll({
+    attributes: ['id'],
+    where: {
+      assigned_expert_id: authUser.id,
+    },
+  });
+
+  return clients.map((client) => client.id);
+};
+
 const getProjectIdsForClientIds = async (clientIds) => {
   if (!Array.isArray(clientIds) || clientIds.length === 0) {
     return [];
@@ -83,6 +98,7 @@ const hasProjectAccessByClientIds = async (projectId, clientIds) => {
 
 module.exports = {
   resolveClientIdsForUser,
+  resolveAssistantClientIds,
   getProjectIdsForClientIds,
   hasProjectAccessByClientIds,
 };

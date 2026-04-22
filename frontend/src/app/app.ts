@@ -25,7 +25,7 @@ export class App {
     const currentUrl = this.router.url ?? '';
     const currentPath = currentUrl.split('?')[0].split('#')[0];
 
-    return ['/assistant', '/client', '/admin']
+    return ['/assistant', '/client', '/admin', '/expert']
       .some((prefix) => currentPath === prefix || currentPath.startsWith(`${prefix}/`));
   }
 }

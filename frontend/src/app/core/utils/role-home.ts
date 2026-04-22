@@ -1,7 +1,7 @@
 import { UserRole } from '../models';
 
 const ROLE_HOME_MAP: Record<UserRole, string> = {
-  expert_comptable: '/dashboard',
+  expert_comptable: '/expert/dashboard',
   assistant: '/assistant/dashboard',
   administrateur: '/admin/dashboard',
   visiteur: '/client/dashboard',
