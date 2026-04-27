@@ -3,11 +3,11 @@
 }
 
 .admin-card {
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
   background: #ffffff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  padding: 24px;
+  box-shadow: 0 22px 34px -30px rgba(15, 23, 42, 0.5);
+  padding: 1.15rem;
 }
 
 .ml-hero {
@@ -30,9 +30,9 @@
 }
 
 .run-btn {
-  border-radius: 0.7rem;
-  border: 1px solid #2563eb;
-  background: #2563eb;
+  border-radius: 0.8rem;
+  border: 1px solid #0f766e;
+  background: linear-gradient(145deg, #0f766e 0%, #0e7490 100%);
   color: #ffffff;
   font-size: 0.82rem;
   font-weight: 700;
@@ -40,8 +40,8 @@
 }
 
 .run-btn:disabled {
-  background: #93c5fd;
-  border-color: #93c5fd;
+  background: #99f6e4;
+  border-color: #99f6e4;
 }
 
 .metrics-grid {

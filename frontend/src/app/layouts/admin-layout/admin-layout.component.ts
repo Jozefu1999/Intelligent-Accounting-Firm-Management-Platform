@@ -2,7 +2,6 @@
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
-import { User } from '../../core/models';
 import { AuthService } from '../../core/services/auth';
 
 @Component({
@@ -13,49 +12,49 @@ import { AuthService } from '../../core/services/auth';
   styleUrl: './admin-layout.component.css',
 })
 export class AdminLayoutComponent {
-  currentUser: User | null = null;
+  isSidebarOpen = false;
+  readonly todayLabel = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(new Date());
 
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {
-    this.currentUser = this.authService.getCurrentUser();
-  }
+  ) {}
 
-  get fullName(): string {
-    const firstName = this.currentUser?.prenom || this.currentUser?.first_name || '';
-    const lastName = this.currentUser?.nom || this.currentUser?.last_name || '';
-    return `${firstName} ${lastName}`.trim();
-  }
-
-  get initials(): string {
-    const firstNameInitial = (this.currentUser?.prenom || this.currentUser?.first_name || '').charAt(0);
-    const lastNameInitial = (this.currentUser?.nom || this.currentUser?.last_name || '').charAt(0);
-    const combined = `${firstNameInitial}${lastNameInitial}`.trim();
-    return combined ? combined.toUpperCase() : 'AD';
-  }
-
-  get pageTitle(): string {
-    const currentUrl = this.router.url;
-
-    if (currentUrl.includes('/admin/users')) {
-      return 'User Management';
+  get userDisplayName(): string {
+    const rawUser = localStorage.getItem('user');
+    if (!rawUser) {
+      return 'Administrator';
     }
 
-    if (currentUrl.includes('/admin/statistics')) {
-      return 'Global Statistics';
-    }
+    try {
+      const user = JSON.parse(rawUser) as {
+        first_name?: string;
+        last_name?: string;
+        prenom?: string;
+        nom?: string;
+      };
 
-    if (currentUrl.includes('/admin/ml')) {
-      return 'ML Model';
-    }
+      const firstName = user.prenom || user.first_name || '';
+      const lastName = user.nom || user.last_name || '';
+      const fullName = `${firstName} ${lastName}`.trim();
 
-    return 'Dashboard';
+      return fullName || 'Administrator';
+    } catch {
+      return 'Administrator';
+    }
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
   }
 
   logout(): void {
     this.authService.logout();
-    localStorage.clear();
+    this.closeSidebar();
     void this.router.navigate(['/login']);
   }
 }
