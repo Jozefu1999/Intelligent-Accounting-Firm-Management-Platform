@@ -10,13 +10,13 @@ Generated automatically by `train_risk_model.py`.
 |---|---|
 | Source | `project_risk_raw_dataset.csv` (real project data) |
 | Total rows | 4000 |
-| Features used | 10 |
+| Features used | 13 (10 base + 3 engineered) |
 | Label column | `Risk_Level` (Critical merged → High) |
 | Classes | Low / Medium / High |
 
 ### Feature Engineering
 
-| Feature | Source Column | Notes |
+| Feature | Source / Formula | Notes |
 |---|---|---|
 | `team_size` | `Team_Size` | Direct numeric |
 | `budget_usd` | `Project_Budget_USD` | Direct numeric (USD) |
@@ -28,14 +28,9 @@ Generated automatically by `train_risk_model.py`.
 | `team_experience` | `Team_Experience_Level` | Ordinal: Junior=0, Mixed=1, Senior=2, Expert=3 |
 | `requirement_stability` | `Requirement_Stability` | Ordinal: Volatile=0, Moderate=1, Stable=2 |
 | `external_dependencies` | `External_Dependencies_Count` | Direct numeric |
-
-### Class Distribution (full dataset)
-
-| Class | Rows | Merged from |
-|---|---|---|
-| Low | ~806 | Low |
-| Medium | ~1 396 | Medium |
-| High | ~1 798 | High + Critical |
+| `budget_per_person` | `budget_usd / team_size` | Resource adequacy per member |
+| `timeline_pressure` | `complexity_score / duration_months` | Complexity rate per time unit |
+| `team_effectiveness` | `team_experience × success_rate` | Combined quality × track record |
 
 ---
 
@@ -43,14 +38,14 @@ Generated automatically by `train_risk_model.py`.
 
 ```
 Raw CSV (4 000 rows, 51 cols)
-  → Select 10 features + encode categoricals
+  → Select 10 feature columns + encode categoricals
   → Merge Critical → High (3-class problem)
-  → Drop nulls (none in selected features)
+  → Add 3 engineered interaction features → 13 total
   → Stratified 80/20 train-test split (random_state=42)
-  → StandardScaler (fit on train, apply to test — no leakage)
-  → Train RandomForest + XGBoost independently
-  → Evaluate both on held-out test set
-  → Save best model
+  → StandardScaler (fit on train ONLY — no data leakage)
+  → RandomizedSearchCV (n_iter=25, cv=5) for each model
+  → Voting ensemble from top 3 tuned models
+  → Save winner
 ```
 
 ### Train / Test Split
@@ -64,112 +59,49 @@ Both sets are **stratified** to preserve the original class ratios.
 
 ---
 
-## 3. Model A — Random Forest
+## 3. Model Comparison
 
-**Parameters:** `n_estimators=300`, `min_samples_leaf=2`, `class_weight='balanced'`
+| Model | Test Accuracy | CV Score |
+|---|---|---|
+| RandomForest | 54.12% | 53.97% |
+| ExtraTrees | 53.00% | 53.41% |
+| GradBoost | 51.38% | 53.75% |
+| XGBoost | 54.62% | 54.78% |
+| VotingEnsemble | 54.25% | N/A |
+
+---
+
+## 4. Winner — XGBoost
+
+**Accuracy: 54.62%**
 
 ### Classification Report
 
 | Class    | Precision | Recall | F1   | Support |
 |---|---|---|---|---|
-| Low      | 0.552     | 0.429  | 0.483 |     161 |
-| Medium   | 0.438     | 0.441  | 0.439 |     279 |
-| High     | 0.619     | 0.678  | 0.647 |     360 |
-| **Overall** | —         | —      | —    | **Acc: 54.50%** |
+| Low      | 0.614     | 0.317  | 0.418 |     161 |
+| Medium   | 0.424     | 0.401  | 0.413 |     279 |
+| High     | 0.605     | 0.761  | 0.674 |     360 |
+| **Overall** | —         | —      | —    | **Acc: 54.62%** |
 
 ### Confusion Matrix
 
 | Actual \ Predicted | Low | Medium | High |
 |---|---|---|---|
-| **Low** | 69 | 65 | 27 |
-| **Medium** | 33 | 123 | 123 |
-| **High** | 23 | 93 | 244 |
+| **Low** | 51 | 75 | 35 |
+| **Medium** | 23 | 112 | 144 |
+| **High** | 9 | 77 | 274 |
 
 ---
 
-## 4. Model B — XGBoost
+## 5. Notes on Accuracy
 
-**Parameters:** `n_estimators=400`, `max_depth=6`, `learning_rate=0.05`, `subsample=0.8`, `colsample_bytree=0.8`, sample-weight balancing
-
-### Classification Report
-
-| Class    | Precision | Recall | F1   | Support |
-|---|---|---|---|---|
-| Low      | 0.455     | 0.441  | 0.448 |     161 |
-| Medium   | 0.396     | 0.394  | 0.395 |     279 |
-| High     | 0.607     | 0.617  | 0.612 |     360 |
-| **Overall** | —         | —      | —    | **Acc: 50.38%** |
-
-### Confusion Matrix
-
-| Actual \ Predicted | Low | Medium | High |
-|---|---|---|---|
-| **Low** | 71 | 63 | 27 |
-| **Medium** | 52 | 110 | 117 |
-| **High** | 33 | 105 | 222 |
-
----
-
-## 5. Comparison & Winner
-
-| Model | Test Accuracy |
+| Benchmark | Accuracy |
 |---|---|
-| RandomForest | 54.50% |
-| XGBoost | 50.38% |
-| **Winner** | **RandomForest** |
+| Majority-class guess (always High) | ~44.95% |
+| Previous model (RF, 10 features, no tuning) | 54.50% |
+| **This model (XGBoost)** | **54.62%** |
 
-The **RandomForest** model was saved to `models/risk_model.pkl`.
-
----
-
-## 6. Accuracy Analysis & Context
-
-### Baselines
-
-| Baseline | Accuracy | Notes |
-|---|---|---|
-| Always predict "High" | 44.95% | Majority-class baseline |
-| Random (uniform) | 33.33% | Worst case |
-| **Our model (RF, 10 features)** | **54.50%** | **10 user-inputtable features** |
-
-### Feature Availability Tradeoff
-
-The CSV contains 51 columns (48 usable features). Risk classification accuracy depends
-on how many of those features are available at inference time:
-
-| Features available | RF accuracy | XGBoost accuracy |
-|---|---|---|
-| **10 (form inputs only)** | **54.50%** | **50.38%** |
-| 48 (full dataset, lab conditions) | 66.50% | **74.50%** |
-
-For a production system where users provide all 48 professional assessment scores,
-XGBoost at **74.5%** would be the better choice. For this deployment (10 web-form
-inputs), **RandomForest (54.5%)** is more robust because it degrades more gracefully
-when features are missing.
-
-### Why 54.5% is Reasonable
-
-Project risk classification is inherently uncertain. Unlike fraud detection or image
-recognition where features are strongly discriminative, risk labels in project datasets
-are often assigned by subjective expert judgement. Academic literature on project risk
-prediction reports typical accuracies of **50–70%** for comparable feature counts and
-dataset sizes.
-
-Our model achieves a **+9.5 percentage-point improvement** over the majority-class
-baseline (44.95% → 54.50%), demonstrating genuine learning from the data.
-
----
-
-## 7. Why the Previous Model Gave Wrong Predictions
-
-The old synthetic-data model used `annual_revenue` and `estimated_budget` as separate
-features plus `budget_ratio = log1p(budget/revenue)`. It had no knowledge of real
-project-management signals like team experience, requirement volatility, or budget
-utilisation. A budget of 80 000 TND with a 50 000 TND revenue appeared "normal" because
-the synthetic generator never created that combination, causing the model to default to
-*Medium* instead of *High*.
-
-The new model is trained on **4 000 real project records** covering the full range of
-risk scenarios, with features that directly capture team capability (`team_experience`,
-`requirement_stability`) and financial stress (`budget_utilization`). These are far more
-reliable predictors than synthetic revenue/budget ratios.
+With only 10 user-inputtable features the theoretical ceiling is ~65–70%.
+Academic literature reports 50–70% for project-risk classification with similar feature sets.
+Using all 48 CSV features (RF) reaches ~66.5% — but those require a full professional assessment form.

@@ -14,6 +14,11 @@ Input JSON keys:
   requirement_stability : int    – Volatile=0, Moderate=1, Stable=2 (default: 1)
   external_dependencies : int    – Count of external dependencies (default: 2)
 
+Engineered features (computed automatically if model expects 13 features):
+  budget_per_person   = budget_usd / team_size
+  timeline_pressure   = complexity_score / duration_months
+  team_effectiveness  = team_experience * success_rate
+
 Usage:
     python predict.py '{"team_size": 8, "budget_usd": 400000, ...}'
 """
@@ -23,19 +28,6 @@ import os
 import sys
 
 import joblib
-
-FEATURES = [
-    'team_size',
-    'budget_usd',
-    'duration_months',
-    'complexity_score',
-    'stakeholder_count',
-    'success_rate',
-    'budget_utilization',
-    'team_experience',
-    'requirement_stability',
-    'external_dependencies',
-]
 
 RISK_LABELS = {0: 'low', 1: 'medium', 2: 'high'}
 
@@ -55,26 +47,41 @@ def load_models():
     base        = os.path.dirname(os.path.abspath(__file__))
     model_path  = os.path.join(base, 'models', 'risk_model.pkl')
     scaler_path = os.path.join(base, 'models', 'risk_scaler.pkl')
+    meta_path   = os.path.join(base, 'models', 'risk_meta.json')
     model  = joblib.load(model_path)
     scaler = joblib.load(scaler_path) if os.path.exists(scaler_path) else None
-    return model, scaler
+    meta   = json.load(open(meta_path)) if os.path.exists(meta_path) else {}
+    return model, scaler, meta
 
 
 def predict_risk(data: dict):
-    model, scaler = load_models()
+    model, scaler, meta = load_models()
+
+    # ── Extract the 10 base inputs ────────────────────────────────────────────
+    team_size       = float(data['team_size'])
+    budget_usd      = float(data['budget_usd'])
+    duration_months = float(data.get('duration_months',       FEATURE_DEFAULTS['duration_months']))
+    complexity_score = float(data.get('complexity_score',     FEATURE_DEFAULTS['complexity_score']))
+    stakeholder_count = float(data.get('stakeholder_count',   FEATURE_DEFAULTS['stakeholder_count']))
+    success_rate    = float(data.get('success_rate',          FEATURE_DEFAULTS['success_rate']))
+    budget_util     = float(data.get('budget_utilization',    FEATURE_DEFAULTS['budget_utilization']))
+    team_exp        = float(data.get('team_experience',       FEATURE_DEFAULTS['team_experience']))
+    req_stability   = float(data.get('requirement_stability', FEATURE_DEFAULTS['requirement_stability']))
+    ext_deps        = float(data.get('external_dependencies', FEATURE_DEFAULTS['external_dependencies']))
 
     features = [
-        float(data['team_size']),
-        float(data['budget_usd']),
-        float(data.get('duration_months',       FEATURE_DEFAULTS['duration_months'])),
-        float(data.get('complexity_score',      FEATURE_DEFAULTS['complexity_score'])),
-        float(data.get('stakeholder_count',     FEATURE_DEFAULTS['stakeholder_count'])),
-        float(data.get('success_rate',          FEATURE_DEFAULTS['success_rate'])),
-        float(data.get('budget_utilization',    FEATURE_DEFAULTS['budget_utilization'])),
-        float(data.get('team_experience',       FEATURE_DEFAULTS['team_experience'])),
-        float(data.get('requirement_stability', FEATURE_DEFAULTS['requirement_stability'])),
-        float(data.get('external_dependencies', FEATURE_DEFAULTS['external_dependencies'])),
+        team_size, budget_usd, duration_months, complexity_score,
+        stakeholder_count, success_rate, budget_util,
+        team_exp, req_stability, ext_deps,
     ]
+
+    # ── Append engineered features if the saved model expects 13 ─────────────
+    n_features = meta.get('n_features', 10)
+    if n_features >= 13:
+        budget_per_person  = budget_usd / max(team_size, 1)
+        timeline_pressure  = complexity_score / max(duration_months, 1)
+        team_effectiveness = team_exp * success_rate
+        features += [budget_per_person, timeline_pressure, team_effectiveness]
 
     X = [features]
     if scaler is not None:
