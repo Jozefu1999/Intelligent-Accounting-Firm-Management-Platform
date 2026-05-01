@@ -1,36 +1,79 @@
 <section class="admin-card ml-hero">
   <div>
-    <h2>ML Model</h2>
-    <p>Monitoring and retraining console for the risk prediction model.</p>
+    <h2>ML Models</h2>
+    <p>Monitor and retrain the risk prediction and project classification models.</p>
   </div>
-
-  <button type="button" class="run-btn" [disabled]="isRunning" (click)="runRetrain()">
-    {{ isRunning ? 'Running...' : 'Start retrain' }}
+  <button type="button" class="run-btn" [disabled]="!!retrainingModel" (click)="retrain('all')">
+    {{ retrainingModel === 'all' ? 'Running...' : 'Retrain All Models' }}
   </button>
 </section>
 
-<section class="metrics-grid">
-  <article class="admin-card metric-card">
-    <p>Status</p>
-    <strong>{{ statusMessage }}</strong>
-  </article>
+@if (successMessage) {
+  <div class="alert alert-success">{{ successMessage }}</div>
+}
+@if (errorMessage) {
+  <div class="alert alert-error">{{ errorMessage }}</div>
+}
 
-  <article class="admin-card metric-card">
-    <p>Last run</p>
-    <strong>{{ lastRun }}</strong>
-  </article>
+@if (isLoading) {
+  <div class="loading-row">Loading model status...</div>
+} @else {
+  @for (info of models; track info.model) {
+    <section class="admin-card model-card">
+      <div class="model-header">
+        <div>
+          <h3>{{ getModelLabel(info.model) }}</h3>
+          <span class="model-status-badge" [class.badge-ok]="info.exists" [class.badge-missing]="!info.exists">
+            {{ info.exists ? 'Trained' : 'Not trained' }}
+          </span>
+        </div>
+        <button
+          type="button"
+          class="run-btn run-btn-sm"
+          [disabled]="!!retrainingModel"
+          (click)="retrain(info.model === 'risk' ? 'risk' : 'classification')"
+        >
+          {{ retrainingModel === info.model ? 'Running...' : 'Retrain' }}
+        </button>
+      </div>
 
-  <article class="admin-card metric-card">
-    <p>Estimated accuracy</p>
-    <strong>{{ accuracy }}</strong>
-  </article>
-</section>
+      <div class="metrics-grid">
+        <article class="metric-card">
+          <p>Status</p>
+          <strong>{{ info.running ? 'Training in progress...' : (info.error ? 'Error' : 'Ready') }}</strong>
+        </article>
+        <article class="metric-card">
+          <p>Last retrain</p>
+          <strong>{{ formatDate(info.lastRun) }}</strong>
+        </article>
+        <article class="metric-card">
+          <p>Accuracy</p>
+          <strong>{{ getAccuracyDisplay(info) }}</strong>
+        </article>
+        <article class="metric-card">
+          <p>Model file updated</p>
+          <strong>{{ formatDate(info.lastModified) }}</strong>
+        </article>
+        <article class="metric-card">
+          <p>Data source</p>
+          <strong>{{ info.dataSource ?? '—' }}</strong>
+        </article>
+      </div>
+
+      @if (info.error) {
+        <div class="model-error">Last error: {{ info.error }}</div>
+      }
+    </section>
+  }
+}
 
 <section class="admin-card notes-card">
   <h3>Operational notes</h3>
   <ul>
-    <li>Verify project data is up to date before retraining.</li>
+    <li>Verify project and client data is up to date before retraining.</li>
     <li>Run retraining during low-activity windows.</li>
-    <li>Monitor accuracy variations after execution.</li>
+    <li>Set the <code>DB_URL</code> environment variable to train on real database data.</li>
+    <li>Monitor accuracy after each execution — a drop may indicate data drift.</li>
+    <li>Both models fall back to synthetic data when real data is insufficient.</li>
   </ul>
 </section>

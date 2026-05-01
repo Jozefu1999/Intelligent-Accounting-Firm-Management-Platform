@@ -428,17 +428,27 @@ const getRecommendations = async (req, res, next) => {
 
 const predictRisk = async (req, res, next) => {
   try {
-    const { annual_revenue, estimated_budget, sector_code } = req.body;
+    const { annual_revenue, estimated_budget, sector_code, sector } = req.body;
 
-    const features = JSON.stringify([annual_revenue, estimated_budget, sector_code]);
+    const payload = {
+      annual_revenue,
+      estimated_budget,
+      sector_code: sector_code ?? sector ?? 5,
+    };
+
+    const features = JSON.stringify(payload);
     const scriptPath = path.join(__dirname, '../../ml/predict.py');
+    const python = process.env.PYTHON_EXECUTABLE || 'python';
 
-    exec(`python "${scriptPath}" '${features}'`, (error, stdout, stderr) => {
+    exec(`"${python}" "${scriptPath}" "${features.replace(/"/g, '\\"')}"`, (error, stdout, stderr) => {
       if (error) {
-        return res.status(500).json({ message: 'ML prediction failed.', error: stderr });
+        return res.status(500).json({ message: 'ML risk prediction failed.', error: stderr });
       }
       try {
         const result = JSON.parse(stdout.trim());
+        if (result.error) {
+          return res.status(500).json({ message: result.error });
+        }
         res.json(result);
       } catch {
         res.status(500).json({ message: 'Failed to parse ML output.' });
@@ -449,4 +459,50 @@ const predictRisk = async (req, res, next) => {
   }
 };
 
-module.exports = { generateBusinessPlan, getRecommendations, predictRisk };
+const classifyProject = async (req, res, next) => {
+  try {
+    const {
+      annual_revenue,
+      estimated_budget,
+      sector_code,
+      sector,
+      priority = 'medium',
+      duration_days = 90,
+    } = req.body;
+
+    if (annual_revenue == null || estimated_budget == null) {
+      return res.status(400).json({ message: 'annual_revenue and estimated_budget are required.' });
+    }
+
+    const payload = {
+      annual_revenue,
+      estimated_budget,
+      sector_code: sector_code ?? sector ?? 5,
+      priority,
+      duration_days,
+    };
+
+    const features = JSON.stringify(payload);
+    const scriptPath = path.join(__dirname, '../../ml/classify_project.py');
+    const python = process.env.PYTHON_EXECUTABLE || 'python';
+
+    exec(`"${python}" "${scriptPath}" "${features.replace(/"/g, '\\"')}"`, (error, stdout, stderr) => {
+      if (error) {
+        return res.status(500).json({ message: 'ML project classification failed.', error: stderr });
+      }
+      try {
+        const result = JSON.parse(stdout.trim());
+        if (result.error) {
+          return res.status(500).json({ message: result.error });
+        }
+        res.json(result);
+      } catch {
+        res.status(500).json({ message: 'Failed to parse ML classification output.' });
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { generateBusinessPlan, getRecommendations, predictRisk, classifyProject };

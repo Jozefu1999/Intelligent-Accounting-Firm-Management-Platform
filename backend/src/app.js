@@ -17,6 +17,7 @@ const dashboardRoutes = require('./routes/dashboard.routes');
 const aiRoutes = require('./routes/ai.routes');
 const adminRoutes = require('./routes/adminRoutes');
 const contactRoutes = require('./routes/contact.routes');
+const mlRoutes = require('./routes/ml.routes');
 
 // Import models to register associations
 require('./models');
@@ -42,6 +43,7 @@ app.use('/api/documents', documentsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/ml', mlRoutes);
 app.use('/api/contact', contactRoutes);
 
 // Health check
