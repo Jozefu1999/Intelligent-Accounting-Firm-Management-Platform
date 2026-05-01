@@ -36,6 +36,7 @@ FEATURES = [
     'success_rate',
     'complexity_score',
     'stakeholder_count',
+    'budget_ratio',   # log1p(estimated_budget / annual_revenue)
 ]
 
 FEATURE_DEFAULTS = {
@@ -66,9 +67,13 @@ def predict_risk(data: dict):
     sector_code = sector_name_to_code(sector_raw)
 
     # Build feature vector with defaults for optional fields
+    annual_revenue = float(data['annual_revenue'])
+    estimated_budget = float(data['estimated_budget'])
+    budget_ratio = float(__import__('math').log1p(estimated_budget / max(annual_revenue, 1.0)))
+
     features = [
-        float(data['annual_revenue']),
-        float(data['estimated_budget']),
+        annual_revenue,
+        estimated_budget,
         float(sector_code),
         float(data.get('duration_days', FEATURE_DEFAULTS['duration_days'])),
         float(data.get('team_size', FEATURE_DEFAULTS['team_size'])),
@@ -76,6 +81,7 @@ def predict_risk(data: dict):
         float(data.get('success_rate', FEATURE_DEFAULTS['success_rate'])),
         float(data.get('complexity_score', FEATURE_DEFAULTS['complexity_score'])),
         float(data.get('stakeholder_count', FEATURE_DEFAULTS['stakeholder_count'])),
+        budget_ratio,
     ]
 
     X = [features]

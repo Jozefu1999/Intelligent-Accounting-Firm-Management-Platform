@@ -47,6 +47,7 @@ FEATURES = [
     'success_rate',
     'complexity_score',
     'stakeholder_count',
+    'budget_ratio',   # log1p(estimated_budget / annual_revenue) — key financial stress indicator
 ]
 
 
@@ -87,6 +88,7 @@ def load_db_data(db_url: str):
         df['success_rate'] = df['success_rate'].fillna(0.65)
         df['complexity_score'] = df['complexity_score'].fillna(2)
         df['stakeholder_count'] = df['stakeholder_count'].fillna(3)
+        df['budget_ratio'] = np.log1p(df['estimated_budget'] / np.maximum(df['annual_revenue'], 1.0))
         return df[FEATURES + ['risk']].dropna()
     except Exception as exc:
         print(f"[DB] Could not load DB data: {exc}. Using synthetic data.", file=sys.stderr)
@@ -107,7 +109,7 @@ def generate_synthetic_data(n_samples=2000):
 
         if risk_class == 0:  # Low risk profile
             annual_revenue = np.random.lognormal(mean=13.0, sigma=0.8, size=n)  # larger firms
-            budget_pct = np.random.beta(1.2, 8, size=n) * 0.08              # very low budget/revenue
+            budget_pct = np.random.beta(1.2, 8, size=n) * 0.08              # very low budget/revenue (≤8%)
             debt_ratio = np.random.beta(2, 8, size=n)                       # low debt (mean ~0.2)
             success_rate = np.random.beta(7, 2, size=n)                     # good history (mean ~0.78)
             complexity_score = np.random.choice([1, 2], size=n, p=[0.55, 0.45])
@@ -115,10 +117,12 @@ def generate_synthetic_data(n_samples=2000):
             team_size = np.random.randint(2, 15, size=n)
             stakeholder_count = np.random.randint(1, 8, size=n)
             sector_code = np.random.choice([0, 2, 3, 4, 8, 10], size=n)    # safer sectors
+            annual_revenue = np.clip(annual_revenue, 20_000, 5_000_000)
+            estimated_budget = np.clip(annual_revenue * budget_pct, 1_000, 500_000)
 
         elif risk_class == 1:  # Medium risk profile
             annual_revenue = np.random.lognormal(mean=12.2, sigma=1.1, size=n)
-            budget_pct = np.random.beta(2, 5, size=n) * 0.25               # moderate budget
+            budget_pct = np.random.beta(2, 5, size=n) * 0.25               # moderate budget (≤25%)
             debt_ratio = np.random.beta(3, 5, size=n)                       # moderate debt (mean ~0.375)
             success_rate = np.random.beta(4, 3, size=n)                     # average history (mean ~0.57)
             complexity_score = np.random.choice([2, 3, 4], size=n, p=[0.3, 0.45, 0.25])
@@ -126,10 +130,25 @@ def generate_synthetic_data(n_samples=2000):
             team_size = np.random.randint(2, 12, size=n)
             stakeholder_count = np.random.randint(2, 14, size=n)
             sector_code = np.random.randint(0, 11, size=n)
+            annual_revenue = np.clip(annual_revenue, 20_000, 5_000_000)
+            estimated_budget = np.clip(annual_revenue * budget_pct, 1_000, 1_000_000)
 
         else:  # High risk profile
             annual_revenue = np.random.lognormal(mean=11.0, sigma=1.4, size=n)  # smaller firms
-            budget_pct = np.random.beta(3, 3, size=n) * 0.55               # high budget/revenue
+            annual_revenue = np.clip(annual_revenue, 1_000, 500_000)
+            # Mix three budget overextension tiers so the model learns:
+            #   tier 1 (40%): moderate overrun  — budget is 30-100% of revenue
+            #   tier 2 (35%): severe overrun    — budget is 1-100× revenue
+            #   tier 3 (25%): catastrophic overrun — budget is 100-5000× revenue
+            n1 = int(n * 0.40)
+            n2 = int(n * 0.35)
+            n3 = n - n1 - n2
+            br1 = np.random.beta(3, 3, n1) * 0.70 + 0.30          # 0.30 – 1.00
+            br2 = np.random.uniform(1.0, 100.0, n2)                # 1× – 100×
+            br3 = np.random.uniform(100.0, 5000.0, n3)             # 100× – 5000×
+            budget_ratio_raw = np.concatenate([br1, br2, br3])
+            np.random.shuffle(budget_ratio_raw)
+            estimated_budget = annual_revenue * budget_ratio_raw
             debt_ratio = np.random.beta(6, 3, size=n)                       # high debt (mean ~0.67)
             success_rate = np.random.beta(2, 6, size=n)                     # poor history (mean ~0.25)
             complexity_score = np.random.choice([3, 4, 5], size=n, p=[0.2, 0.4, 0.4])
@@ -138,8 +157,7 @@ def generate_synthetic_data(n_samples=2000):
             stakeholder_count = np.random.randint(8, 21, size=n)
             sector_code = np.random.choice([1, 7, 9], size=n)              # risky sectors
 
-        annual_revenue = np.clip(annual_revenue, 20_000, 5_000_000)
-        estimated_budget = np.clip(annual_revenue * budget_pct, 1_000, 1_000_000)
+        budget_ratio_col = np.log1p(estimated_budget / np.maximum(annual_revenue, 1.0))
 
         frames.append(pd.DataFrame({
             'annual_revenue': annual_revenue,
@@ -151,6 +169,7 @@ def generate_synthetic_data(n_samples=2000):
             'success_rate': np.clip(success_rate, 0.0, 1.0),
             'complexity_score': complexity_score.astype(float),
             'stakeholder_count': stakeholder_count.astype(float),
+            'budget_ratio': budget_ratio_col,
             'risk': risk_class,
         }))
 
