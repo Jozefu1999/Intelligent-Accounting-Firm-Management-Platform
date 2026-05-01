@@ -1,0 +1,1 @@
+{"algorithm": "RandomForest", "features": ["team_size", "budget_usd", "duration_months", "complexity_score", "stakeholder_count", "success_rate", "budget_utilization", "team_experience", "requirement_stability", "external_dependencies"]}
