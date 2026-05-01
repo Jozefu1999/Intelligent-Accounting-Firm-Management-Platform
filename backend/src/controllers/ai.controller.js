@@ -428,16 +428,37 @@ const getRecommendations = async (req, res, next) => {
 
 const predictRisk = async (req, res, next) => {
   try {
-    const { annual_revenue, estimated_budget, sector_code, sector } = req.body;
+    const {
+      annual_revenue,
+      estimated_budget,
+      sector_code,
+      sector,
+      duration_days,
+      team_size,
+      debt_ratio,
+      success_rate,
+      complexity_score,
+      stakeholder_count,
+    } = req.body;
+
+    if (annual_revenue == null || estimated_budget == null) {
+      return res.status(400).json({ message: 'annual_revenue and estimated_budget are required.' });
+    }
 
     const payload = {
       annual_revenue,
       estimated_budget,
       sector_code: sector_code ?? sector ?? 5,
+      ...(duration_days != null && { duration_days }),
+      ...(team_size != null && { team_size }),
+      ...(debt_ratio != null && { debt_ratio }),
+      ...(success_rate != null && { success_rate }),
+      ...(complexity_score != null && { complexity_score }),
+      ...(stakeholder_count != null && { stakeholder_count }),
     };
 
     const features = JSON.stringify(payload);
-    const scriptPath = path.join(__dirname, '../../ml/predict.py');
+    const scriptPath = path.join(__dirname, '../../../ml/predict.py');
     const python = process.env.PYTHON_EXECUTABLE || 'python';
 
     exec(`"${python}" "${scriptPath}" "${features.replace(/"/g, '\\"')}"`, (error, stdout, stderr) => {
@@ -483,7 +504,7 @@ const classifyProject = async (req, res, next) => {
     };
 
     const features = JSON.stringify(payload);
-    const scriptPath = path.join(__dirname, '../../ml/classify_project.py');
+    const scriptPath = path.join(__dirname, '../../../ml/classify_project.py');
     const python = process.env.PYTHON_EXECUTABLE || 'python';
 
     exec(`"${python}" "${scriptPath}" "${features.replace(/"/g, '\\"')}"`, (error, stdout, stderr) => {

@@ -5,8 +5,18 @@ Supports two modes:
   1. DB mode  : reads real project + client data via DB_URL env variable
   2. Synthetic : generates synthetic data as fallback (default)
 
-Features : annual_revenue, estimated_budget, sector_code
-Labels   : 0=low, 1=medium, 2=high
+Features (9):
+  annual_revenue       – Client annual revenue in TND
+  estimated_budget     – Project budget in TND
+  sector_code          – Industry sector (0-10, see constants.py)
+  duration_days        – Planned project duration in days
+  team_size            – Number of people assigned to the project
+  debt_ratio           – Client debt-to-asset ratio (0.0-1.0)
+  success_rate         – Historical project success rate (0.0-1.0)
+  complexity_score     – Project complexity (1=simple … 5=very complex)
+  stakeholder_count    – Number of stakeholders involved
+
+Labels: 0=low, 1=medium, 2=high
 
 Usage:
     python train_risk_model.py                        # synthetic data
@@ -17,7 +27,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.preprocessing import StandardScaler
@@ -26,6 +36,18 @@ import joblib
 from constants import RISK_LABELS, RISK_CODES, sector_name_to_code
 
 MIN_DB_SAMPLES = 30  # Minimum records needed to use DB data
+
+FEATURES = [
+    'annual_revenue',
+    'estimated_budget',
+    'sector_code',
+    'duration_days',
+    'team_size',
+    'debt_ratio',
+    'success_rate',
+    'complexity_score',
+    'stakeholder_count',
+]
 
 
 def load_db_data(db_url: str):
@@ -38,6 +60,12 @@ def load_db_data(db_url: str):
                 c.annual_revenue,
                 p.estimated_budget,
                 c.sector,
+                p.duration_days,
+                p.team_size,
+                c.debt_ratio,
+                c.success_rate,
+                p.complexity_score,
+                p.stakeholder_count,
                 c.risk_level
             FROM projects p
             JOIN clients c ON p.client_id = c.id
@@ -52,53 +80,87 @@ def load_db_data(db_url: str):
         print(f"[DB] Loaded {len(df)} real records for training.", file=sys.stderr)
         df['sector_code'] = df['sector'].apply(sector_name_to_code)
         df['risk'] = df['risk_level'].map(RISK_CODES).fillna(1).astype(int)
-        return df[['annual_revenue', 'estimated_budget', 'sector_code', 'risk']].dropna()
+        # Fill missing optional columns with sensible defaults
+        df['duration_days'] = df['duration_days'].fillna(90)
+        df['team_size'] = df['team_size'].fillna(3)
+        df['debt_ratio'] = df['debt_ratio'].fillna(0.3)
+        df['success_rate'] = df['success_rate'].fillna(0.65)
+        df['complexity_score'] = df['complexity_score'].fillna(2)
+        df['stakeholder_count'] = df['stakeholder_count'].fillna(3)
+        return df[FEATURES + ['risk']].dropna()
     except Exception as exc:
         print(f"[DB] Could not load DB data: {exc}. Using synthetic data.", file=sys.stderr)
         return None
 
 
-def generate_synthetic_data(n_samples=1000):
-    """Generate synthetic training data with realistic distributions."""
+def generate_synthetic_data(n_samples=2000):
+    """
+    Generate synthetic training data with realistic Tunisian market distributions.
+    Classes are explicitly balanced (1/3 each) to avoid label imbalance.
+    """
     np.random.seed(42)
+    n_per_class = n_samples // 3
+    frames = []
 
-    annual_revenue = np.random.lognormal(mean=12, sigma=1.5, size=n_samples)
-    annual_revenue = np.clip(annual_revenue, 10_000, 10_000_000)
+    for risk_class in [0, 1, 2]:  # 0=low, 1=medium, 2=high
+        n = n_per_class
 
-    # Budget: between 0.5% and 60% of revenue
-    budget_pct = np.random.beta(1.5, 5, size=n_samples) * 0.6
-    estimated_budget = annual_revenue * budget_pct
-    estimated_budget = np.clip(estimated_budget, 500, 800_000)
+        if risk_class == 0:  # Low risk profile
+            annual_revenue = np.random.lognormal(mean=13.0, sigma=0.8, size=n)  # larger firms
+            budget_pct = np.random.beta(1.2, 8, size=n) * 0.08              # very low budget/revenue
+            debt_ratio = np.random.beta(2, 8, size=n)                       # low debt (mean ~0.2)
+            success_rate = np.random.beta(7, 2, size=n)                     # good history (mean ~0.78)
+            complexity_score = np.random.choice([1, 2], size=n, p=[0.55, 0.45])
+            duration_days = np.random.randint(14, 120, size=n)
+            team_size = np.random.randint(2, 15, size=n)
+            stakeholder_count = np.random.randint(1, 8, size=n)
+            sector_code = np.random.choice([0, 2, 3, 4, 8, 10], size=n)    # safer sectors
 
-    sector_code = np.random.randint(0, 11, size=n_samples)
+        elif risk_class == 1:  # Medium risk profile
+            annual_revenue = np.random.lognormal(mean=12.2, sigma=1.1, size=n)
+            budget_pct = np.random.beta(2, 5, size=n) * 0.25               # moderate budget
+            debt_ratio = np.random.beta(3, 5, size=n)                       # moderate debt (mean ~0.375)
+            success_rate = np.random.beta(4, 3, size=n)                     # average history (mean ~0.57)
+            complexity_score = np.random.choice([2, 3, 4], size=n, p=[0.3, 0.45, 0.25])
+            duration_days = np.random.randint(60, 300, size=n)
+            team_size = np.random.randint(2, 12, size=n)
+            stakeholder_count = np.random.randint(2, 14, size=n)
+            sector_code = np.random.randint(0, 11, size=n)
 
-    budget_ratio = estimated_budget / (annual_revenue + 1)
+        else:  # High risk profile
+            annual_revenue = np.random.lognormal(mean=11.0, sigma=1.4, size=n)  # smaller firms
+            budget_pct = np.random.beta(3, 3, size=n) * 0.55               # high budget/revenue
+            debt_ratio = np.random.beta(6, 3, size=n)                       # high debt (mean ~0.67)
+            success_rate = np.random.beta(2, 6, size=n)                     # poor history (mean ~0.25)
+            complexity_score = np.random.choice([3, 4, 5], size=n, p=[0.2, 0.4, 0.4])
+            duration_days = np.random.randint(180, 730, size=n)
+            team_size = np.random.randint(1, 6, size=n)
+            stakeholder_count = np.random.randint(8, 21, size=n)
+            sector_code = np.random.choice([1, 7, 9], size=n)              # risky sectors
 
-    # Risk rules
-    risk = np.where(
-        budget_ratio > 0.30, 2,
-        np.where(budget_ratio > 0.10, 1, 0)
-    )
+        annual_revenue = np.clip(annual_revenue, 20_000, 5_000_000)
+        estimated_budget = np.clip(annual_revenue * budget_pct, 1_000, 1_000_000)
 
-    # High-risk sectors (finance=7, real-estate=9) add noise upward
-    high_risk_sector = np.isin(sector_code, [7, 9])
-    risk = np.clip(risk + np.where(high_risk_sector, 1, 0), 0, 2)
+        frames.append(pd.DataFrame({
+            'annual_revenue': annual_revenue,
+            'estimated_budget': estimated_budget,
+            'sector_code': sector_code.astype(float),
+            'duration_days': duration_days.astype(float),
+            'team_size': team_size.astype(float),
+            'debt_ratio': np.clip(debt_ratio, 0.0, 1.0),
+            'success_rate': np.clip(success_rate, 0.0, 1.0),
+            'complexity_score': complexity_score.astype(float),
+            'stakeholder_count': stakeholder_count.astype(float),
+            'risk': risk_class,
+        }))
 
-    # Low-revenue clients are inherently riskier
-    low_revenue = annual_revenue < 50_000
-    risk = np.clip(risk + np.where(low_revenue, 1, 0), 0, 2)
-
-    return pd.DataFrame({
-        'annual_revenue': annual_revenue,
-        'estimated_budget': estimated_budget,
-        'sector_code': sector_code,
-        'risk': risk.astype(int),
-    })
+    df = pd.concat(frames, ignore_index=True)
+    return df.sample(frac=1, random_state=42).reset_index(drop=True)
 
 
 def train(df):
     """Train and return (model, scaler, report_dict)."""
-    X = df[['annual_revenue', 'estimated_budget', 'sector_code']].values
+    X = df[FEATURES].values
     y = df['risk'].values
 
     scaler = StandardScaler()
@@ -108,13 +170,12 @@ def train(df):
         X_scaled, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    model = RandomForestClassifier(
-        n_estimators=200,
-        max_depth=10,
-        min_samples_split=5,
+    model = GradientBoostingClassifier(
+        n_estimators=300,
+        max_depth=5,
+        learning_rate=0.08,
+        subsample=0.85,
         random_state=42,
-        class_weight='balanced',
-        n_jobs=-1,
     )
     model.fit(X_train, y_train)
 
@@ -141,7 +202,7 @@ def main():
 
     if df is None:
         print("[TRAIN] Generating synthetic training data...")
-        df = generate_synthetic_data(1000)
+        df = generate_synthetic_data(2000)
 
     print(f"[TRAIN] Training risk model on {len(df)} samples (source: {data_source})...")
     model, scaler, report = train(df)

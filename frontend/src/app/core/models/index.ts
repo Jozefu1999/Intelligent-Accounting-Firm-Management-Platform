@@ -148,7 +148,14 @@ export interface AiRecommendationsResponse {
 export interface RiskPredictionRequest {
   annual_revenue: number;
   estimated_budget: number;
-  sector_code: number | string;
+  sector_code?: number | string;
+  sector?: string;
+  duration_days?: number;
+  team_size?: number;
+  debt_ratio?: number;
+  success_rate?: number;
+  complexity_score?: number;
+  stakeholder_count?: number;
 }
 
 export interface RiskPredictionResponse {

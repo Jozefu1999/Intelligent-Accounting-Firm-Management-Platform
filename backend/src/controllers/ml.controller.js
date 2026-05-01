@@ -6,7 +6,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const ML_DIR = path.resolve(__dirname, '../../ml');
+const ML_DIR = path.resolve(__dirname, '../../../ml');
 const MODELS_DIR = path.join(ML_DIR, 'models');
 const PYTHON_SCRIPTS = {
   risk: path.join(ML_DIR, 'train_risk_model.py'),
