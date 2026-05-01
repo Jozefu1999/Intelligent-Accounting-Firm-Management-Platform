@@ -146,22 +146,21 @@ export interface AiRecommendationsResponse {
 }
 
 export interface RiskPredictionRequest {
-  annual_revenue: number;
-  estimated_budget: number;
-  sector_code?: number | string;
-  sector?: string;
-  duration_days?: number;
-  team_size?: number;
-  debt_ratio?: number;
-  success_rate?: number;
+  team_size: number;
+  budget_usd: number;
+  duration_months?: number;
   complexity_score?: number;
   stakeholder_count?: number;
+  success_rate?: number;
+  budget_utilization?: number;
+  team_experience?: number;
+  requirement_stability?: number;
+  external_dependencies?: number;
 }
 
 export interface RiskPredictionResponse {
   risk_level: string;
   score: number;
-  sector_code?: number;
   probabilities: {
     low: number;
     medium: number;

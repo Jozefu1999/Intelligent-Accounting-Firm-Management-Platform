@@ -429,32 +429,33 @@ const getRecommendations = async (req, res, next) => {
 const predictRisk = async (req, res, next) => {
   try {
     const {
-      annual_revenue,
-      estimated_budget,
-      sector_code,
-      sector,
-      duration_days,
       team_size,
-      debt_ratio,
-      success_rate,
+      budget_usd,
+      duration_months,
       complexity_score,
       stakeholder_count,
+      success_rate,
+      budget_utilization,
+      team_experience,
+      requirement_stability,
+      external_dependencies,
     } = req.body;
 
-    if (annual_revenue == null || estimated_budget == null) {
-      return res.status(400).json({ message: 'annual_revenue and estimated_budget are required.' });
+    if (team_size == null || budget_usd == null) {
+      return res.status(400).json({ message: 'team_size and budget_usd are required.' });
     }
 
     const payload = {
-      annual_revenue,
-      estimated_budget,
-      sector_code: sector_code ?? sector ?? 5,
-      ...(duration_days != null && { duration_days }),
-      ...(team_size != null && { team_size }),
-      ...(debt_ratio != null && { debt_ratio }),
-      ...(success_rate != null && { success_rate }),
-      ...(complexity_score != null && { complexity_score }),
-      ...(stakeholder_count != null && { stakeholder_count }),
+      team_size,
+      budget_usd,
+      ...(duration_months       != null && { duration_months }),
+      ...(complexity_score      != null && { complexity_score }),
+      ...(stakeholder_count     != null && { stakeholder_count }),
+      ...(success_rate          != null && { success_rate }),
+      ...(budget_utilization    != null && { budget_utilization }),
+      ...(team_experience       != null && { team_experience }),
+      ...(requirement_stability != null && { requirement_stability }),
+      ...(external_dependencies != null && { external_dependencies }),
     };
 
     const features = JSON.stringify(payload);

@@ -2,8 +2,207 @@
 	<header class="ai-header">
 		<p class="ai-eyebrow">AI TOOLS</p>
 		<h1>Risk Prediction</h1>
-		<p>Evaluate project risk using 9 financial and operational indicators. All amounts in <strong>TND</strong>.</p>
+		<p>Evaluate project risk using 10 real-world indicators trained on 4 000 project records.</p>
 	</header>
+
+	<div class="ai-grid">
+		<!-- ====== FORM ====== -->
+		<article class="ai-card ai-form-card">
+			<h2>Project Parameters</h2>
+			<p>Fill all fields for best accuracy. Optional fields use safe defaults.</p>
+
+			<form [formGroup]="form" (ngSubmit)="predictRisk()" class="ai-form-stack">
+
+				<!-- SECTION: Financials -->
+				<p class="form-section-title">
+					<mat-icon>account_balance</mat-icon>
+					Project Financials
+				</p>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="budgetUsd">Project Budget (TND)</label>
+						<input id="budgetUsd" type="number" min="1" formControlName="budgetUsd" placeholder="e.g. 400 000" />
+					</div>
+					<div class="form-col">
+						<label for="budgetUtilization">Budget Utilisation (%)</label>
+						<input id="budgetUtilization" type="number" min="60" max="130" formControlName="budgetUtilization" placeholder="e.g. 90" />
+						<span class="field-hint">Actual spend vs. planned (100% = on budget, &gt;100% = over)</span>
+					</div>
+				</div>
+
+				<!-- SECTION: Project Details -->
+				<p class="form-section-title">
+					<mat-icon>engineering</mat-icon>
+					Project Details
+				</p>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="durationMonths">Duration (months)</label>
+						<input id="durationMonths" type="number" min="1" max="60" formControlName="durationMonths" placeholder="e.g. 12" />
+					</div>
+					<div class="form-col">
+						<label for="teamSize">Team Size</label>
+						<input id="teamSize" type="number" min="1" max="50" formControlName="teamSize" placeholder="e.g. 8" />
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="complexityScore">Complexity</label>
+						<select id="complexityScore" formControlName="complexityScore">
+							@for (opt of complexityOptions; track opt.value) {
+								<option [value]="opt.value">{{ opt.label }}</option>
+							}
+						</select>
+					</div>
+					<div class="form-col">
+						<label for="stakeholderCount">Stakeholder Count</label>
+						<input id="stakeholderCount" type="number" min="1" max="30" formControlName="stakeholderCount" placeholder="e.g. 8" />
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="externalDependencies">External Dependencies</label>
+						<input id="externalDependencies" type="number" min="0" max="10" formControlName="externalDependencies" placeholder="e.g. 2" />
+						<span class="field-hint">Number of external systems / vendors relied on</span>
+					</div>
+				</div>
+
+				<!-- SECTION: Team & History -->
+				<p class="form-section-title">
+					<mat-icon>groups</mat-icon>
+					Team &amp; History
+				</p>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="teamExperience">Team Experience</label>
+						<select id="teamExperience" formControlName="teamExperience">
+							@for (opt of experienceOptions; track opt.value) {
+								<option [value]="opt.value">{{ opt.label }}</option>
+							}
+						</select>
+					</div>
+					<div class="form-col">
+						<label for="requirementStability">Requirement Stability</label>
+						<select id="requirementStability" formControlName="requirementStability">
+							@for (opt of stabilityOptions; track opt.value) {
+								<option [value]="opt.value">{{ opt.label }}</option>
+							}
+						</select>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="successRate">Past Success Rate (%)</label>
+						<input id="successRate" type="number" min="0" max="100" formControlName="successRate" placeholder="e.g. 75" />
+						<span class="field-hint">Historical project delivery success</span>
+					</div>
+				</div>
+
+				<button type="submit" class="primary-btn" [disabled]="isPredicting">
+					@if (isPredicting) {
+						<mat-icon class="spin">autorenew</mat-icon>
+						<span>Analysing...</span>
+					} @else {
+						<mat-icon>analytics</mat-icon>
+						<span>Run Risk Analysis</span>
+					}
+				</button>
+			</form>
+
+			@if (errorMessage) {
+				<div class="alert alert-error">
+					<mat-icon>error</mat-icon>
+					<span>{{ errorMessage }}</span>
+				</div>
+			}
+			@if (successMessage) {
+				<div class="alert alert-success">
+					<mat-icon>check_circle</mat-icon>
+					<span>{{ successMessage }}</span>
+				</div>
+			}
+		</article>
+
+		<!-- ====== RESULT ====== -->
+		<article class="ai-card ai-result-card">
+			@if (prediction; as result) {
+				<header class="result-header">
+					<h2>Prediction Result</h2>
+					<p>Model confidence: {{ toPercent(result.score) }}%</p>
+				</header>
+
+				<div class="risk-summary" [class]="'risk-summary risk-summary--' + result.risk_level">
+					<mat-icon class="risk-icon">{{ getRiskIcon(result.risk_level) }}</mat-icon>
+					<div>
+						<p class="risk-summary-label">Predicted Risk Level</p>
+						<div class="risk-badge" [class]="'risk-badge ' + getRiskClass(result.risk_level)">
+							{{ getRiskLabel(result.risk_level) }}
+						</div>
+					</div>
+				</div>
+
+				<div class="probability-grid">
+					<p class="probability-title">Probability Breakdown</p>
+					@for (level of probabilityLevels; track level) {
+						<div class="probability-row">
+							<div class="probability-meta">
+								<span>{{ getProbabilityLabel(level) }}</span>
+								<span class="probability-pct">{{ toPercent(getProbability(level)) }}%</span>
+							</div>
+							<div class="probability-track">
+								<div
+									class="probability-bar"
+									[class]="'probability-bar ' + getProbabilityBarClass(level)"
+									[style.width]="getProbabilityWidth(level)"
+								></div>
+							</div>
+						</div>
+					}
+				</div>
+
+				<!-- Input summary -->
+				<div class="input-summary">
+					<p class="input-summary-title">Analysis Inputs</p>
+					<div class="input-grid">
+						<span class="input-key">Budget</span>
+						<span class="input-val">{{ form.value.budgetUsd | number }} TND</span>
+						<span class="input-key">Budget utilisation</span>
+						<span class="input-val">{{ form.value.budgetUtilization }}%</span>
+						<span class="input-key">Duration</span>
+						<span class="input-val">{{ form.value.durationMonths }} months</span>
+						<span class="input-key">Team</span>
+						<span class="input-val">{{ form.value.teamSize }} people</span>
+						<span class="input-key">Complexity</span>
+						<span class="input-val">{{ getComplexityLabel(form.value.complexityScore ?? 6) }}</span>
+						<span class="input-key">Stakeholders</span>
+						<span class="input-val">{{ form.value.stakeholderCount }}</span>
+						<span class="input-key">Ext. dependencies</span>
+						<span class="input-val">{{ form.value.externalDependencies }}</span>
+						<span class="input-key">Experience</span>
+						<span class="input-val">{{ getExperienceLabel(form.value.teamExperience ?? 1) }}</span>
+						<span class="input-key">Req. stability</span>
+						<span class="input-val">{{ getStabilityLabel(form.value.requirementStability ?? 1) }}</span>
+						<span class="input-key">Success rate</span>
+						<span class="input-val">{{ form.value.successRate }}%</span>
+					</div>
+				</div>
+			} @else {
+				<div class="result-placeholder">
+					<mat-icon>shield</mat-icon>
+					<h2>No prediction yet</h2>
+					<p>Fill the parameters on the left and click <strong>Run Risk Analysis</strong> to get a risk assessment.</p>
+				</div>
+			}
+		</article>
+	</div>
+</section>
+
 
 	<div class="ai-grid">
 		<!-- ====== FORM ====== -->
