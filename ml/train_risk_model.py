@@ -53,7 +53,9 @@ y_pred = model.predict(X_test)
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=['low', 'medium', 'high']))
 
-# Save the model
-os.makedirs('models', exist_ok=True)
-joblib.dump(model, 'models/risk_model.pkl')
-print("Model saved to models/risk_model.pkl")
+# Save the model next to this script so predict.py can load it reliably
+model_dir = os.path.join(os.path.dirname(__file__), 'models')
+os.makedirs(model_dir, exist_ok=True)
+model_path = os.path.join(model_dir, 'risk_model.pkl')
+joblib.dump(model, model_path)
+print(f"Model saved to {model_path}")

@@ -1,8 +1,12 @@
 const OpenAI = require('openai');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const { AiBusinessPlan, Project, Client } = require('../models');
+
+const execFileAsync = promisify(execFile);
 
 const DEFAULT_GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/openai';
 const DEFAULT_GEMINI_NATIVE_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
@@ -17,6 +21,29 @@ const readEnv = (key) => {
   const value = process.env[key];
   return typeof value === 'string' ? value.trim() : '';
 };
+
+const resolvePythonBin = () => {
+  const envPython = readEnv('PYTHON_BIN') || readEnv('PYTHON_EXECUTABLE');
+  if (envPython) {
+    return envPython;
+  }
+
+  const projectRoot = path.resolve(__dirname, '../../../');
+  const candidates = process.platform === 'win32'
+    ? [path.join(projectRoot, '.venv', 'Scripts', 'python.exe')]
+    : [path.join(projectRoot, '.venv', 'bin', 'python')];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  return 'python';
+};
+
+const resolveMlScriptPath = () => path.join(__dirname, '../../../ml/predict.py');
+const resolveMlModelPath = () => path.join(__dirname, '../../../ml/models/risk_model.pkl');
 
 const parseInteger = (value, fallbackValue) => {
   const parsed = Number.parseInt(value, 10);
@@ -430,22 +457,59 @@ const predictRisk = async (req, res, next) => {
   try {
     const { annual_revenue, estimated_budget, sector_code } = req.body;
 
-    const features = JSON.stringify([annual_revenue, estimated_budget, sector_code]);
-    const scriptPath = path.join(__dirname, '../../ml/predict.py');
+    const annualRevenue = Number(annual_revenue);
+    const estimatedBudget = Number(estimated_budget);
+    const sectorCode = Number(sector_code);
 
-    exec(`python "${scriptPath}" '${features}'`, (error, stdout, stderr) => {
-      if (error) {
-        return res.status(500).json({ message: 'ML prediction failed.', error: stderr });
-      }
-      try {
-        const result = JSON.parse(stdout.trim());
-        res.json(result);
-      } catch {
-        res.status(500).json({ message: 'Failed to parse ML output.' });
-      }
-    });
+    if (![annualRevenue, estimatedBudget, sectorCode].every((value) => Number.isFinite(value) && value >= 0)) {
+      return res.status(400).json({ message: 'Invalid input. Provide annual_revenue, estimated_budget, and sector_code as non-negative numbers.' });
+    }
+
+    const scriptPath = resolveMlScriptPath();
+    const modelPath = resolveMlModelPath();
+
+    if (!fs.existsSync(scriptPath)) {
+      return res.status(500).json({ message: 'ML script not found. Verify the ml/predict.py path.' });
+    }
+
+    if (!fs.existsSync(modelPath)) {
+      return res.status(500).json({ message: 'Risk model not found. Train the model before running predictions.' });
+    }
+
+    const pythonBin = resolvePythonBin();
+    const features = JSON.stringify([annualRevenue, estimatedBudget, sectorCode]);
+
+    const { stdout } = await execFileAsync(
+      pythonBin,
+      [scriptPath, features],
+      {
+        windowsHide: true,
+        timeout: 30000,
+        maxBuffer: 1024 * 1024,
+      },
+    );
+
+    try {
+      const result = JSON.parse(stdout.trim());
+      res.json(result);
+    } catch {
+      res.status(500).json({ message: 'Failed to parse ML output.' });
+    }
   } catch (error) {
-    next(error);
+    if (error && error.code === 'ENOENT') {
+      return next(toHttpError(500, 'Python runtime not found. Configure PYTHON_BIN in backend/.env or install Python.'));
+    }
+
+    const stderr = typeof error?.stderr === 'string' ? error.stderr : '';
+    if (/ModuleNotFoundError|No module named/i.test(stderr)) {
+      return next(toHttpError(500, 'Python dependencies missing. Install ML requirements in the configured Python environment.'));
+    }
+
+    if (error?.killed || error?.signal === 'SIGTERM') {
+      return next(toHttpError(500, 'ML prediction timed out. Please retry.'));
+    }
+
+    next(toHttpError(500, 'ML prediction failed. Verify the ML setup and try again.'));
   }
 };
 
