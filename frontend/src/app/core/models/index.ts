@@ -151,10 +151,19 @@ export interface RiskPredictionRequest {
   duration_months?: number;
   complexity_score?: number;
   stakeholder_count?: number;
+  past_similar_projects?: number;
   success_rate?: number;
   budget_utilization?: number;
+  change_request_frequency?: number;
+  team_turnover_rate?: number;
+  vendor_reliability?: number;
+  schedule_pressure?: number;
+  resource_availability?: number;
+  technical_debt?: number;
   team_experience?: number;
   requirement_stability?: number;
+  risk_management_maturity?: number;
+  documentation_quality?: number;
   external_dependencies?: number;
 }
 
@@ -165,6 +174,11 @@ export interface RiskPredictionResponse {
     low: number;
     medium: number;
     high: number;
+  };
+  model?: {
+    algorithm?: string;
+    accuracy?: number;
+    selected_features?: string[];
   };
 }
 

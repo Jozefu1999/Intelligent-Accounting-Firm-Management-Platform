@@ -1,5 +1,5 @@
 const OpenAI = require('openai');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const { AiBusinessPlan, Project, Client } = require('../models');
@@ -434,10 +434,19 @@ const predictRisk = async (req, res, next) => {
       duration_months,
       complexity_score,
       stakeholder_count,
+      past_similar_projects,
       success_rate,
       budget_utilization,
+      change_request_frequency,
+      team_turnover_rate,
+      vendor_reliability,
+      schedule_pressure,
+      resource_availability,
+      technical_debt,
       team_experience,
       requirement_stability,
+      risk_management_maturity,
+      documentation_quality,
       external_dependencies,
     } = req.body;
 
@@ -451,10 +460,19 @@ const predictRisk = async (req, res, next) => {
       ...(duration_months       != null && { duration_months }),
       ...(complexity_score      != null && { complexity_score }),
       ...(stakeholder_count     != null && { stakeholder_count }),
+      ...(past_similar_projects != null && { past_similar_projects }),
       ...(success_rate          != null && { success_rate }),
       ...(budget_utilization    != null && { budget_utilization }),
+      ...(change_request_frequency != null && { change_request_frequency }),
+      ...(team_turnover_rate    != null && { team_turnover_rate }),
+      ...(vendor_reliability    != null && { vendor_reliability }),
+      ...(schedule_pressure     != null && { schedule_pressure }),
+      ...(resource_availability != null && { resource_availability }),
+      ...(technical_debt        != null && { technical_debt }),
       ...(team_experience       != null && { team_experience }),
       ...(requirement_stability != null && { requirement_stability }),
+      ...(risk_management_maturity != null && { risk_management_maturity }),
+      ...(documentation_quality != null && { documentation_quality }),
       ...(external_dependencies != null && { external_dependencies }),
     };
 
@@ -462,7 +480,7 @@ const predictRisk = async (req, res, next) => {
     const scriptPath = path.join(__dirname, '../../../ml/predict.py');
     const python = process.env.PYTHON_EXECUTABLE || 'python';
 
-    exec(`"${python}" "${scriptPath}" "${features.replace(/"/g, '\\"')}"`, (error, stdout, stderr) => {
+    execFile(python, [scriptPath, features], (error, stdout, stderr) => {
       if (error) {
         return res.status(500).json({ message: 'ML risk prediction failed.', error: stderr });
       }
@@ -508,7 +526,7 @@ const classifyProject = async (req, res, next) => {
     const scriptPath = path.join(__dirname, '../../../ml/classify_project.py');
     const python = process.env.PYTHON_EXECUTABLE || 'python';
 
-    exec(`"${python}" "${scriptPath}" "${features.replace(/"/g, '\\"')}"`, (error, stdout, stderr) => {
+    execFile(python, [scriptPath, features], (error, stdout, stderr) => {
       if (error) {
         return res.status(500).json({ message: 'ML project classification failed.', error: stderr });
       }

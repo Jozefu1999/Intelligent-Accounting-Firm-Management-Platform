@@ -21,6 +21,19 @@ export const STABILITY_OPTIONS = [
   { label: 'Stable',    value: 2 },
 ];
 
+export const RISK_MATURITY_OPTIONS = [
+  { label: 'Basic',    value: 0 },
+  { label: 'Formal',   value: 1 },
+  { label: 'Advanced', value: 2 },
+];
+
+export const DOCUMENTATION_OPTIONS = [
+  { label: 'Poor',      value: 0 },
+  { label: 'Basic',     value: 1 },
+  { label: 'Good',      value: 2 },
+  { label: 'Excellent', value: 3 },
+];
+
 export const COMPLEXITY_OPTIONS = [
   { label: '1 – Very simple',  value: 2  },
   { label: '2 – Simple',       value: 4  },
@@ -43,6 +56,8 @@ export class RiskPrediction {
 
   readonly experienceOptions = EXPERIENCE_OPTIONS;
   readonly stabilityOptions  = STABILITY_OPTIONS;
+  readonly riskMaturityOptions = RISK_MATURITY_OPTIONS;
+  readonly documentationOptions = DOCUMENTATION_OPTIONS;
   readonly complexityOptions = COMPLEXITY_OPTIONS;
   readonly probabilityLevels: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
 
@@ -58,11 +73,21 @@ export class RiskPrediction {
     teamSize:             [8,        [Validators.required, Validators.min(1), Validators.max(50)]],
     complexityScore:      [6,        [Validators.required]],
     stakeholderCount:     [8,        [Validators.required, Validators.min(1), Validators.max(30)]],
+    pastSimilarProjects:  [2,        [Validators.required, Validators.min(0), Validators.max(10)]],
     externalDependencies: [2,        [Validators.required, Validators.min(0), Validators.max(10)]],
     // Team & History
     teamExperience:       [1,        [Validators.required]],
     requirementStability: [1,        [Validators.required]],
+    riskManagementMaturity: [1,      [Validators.required]],
+    documentationQuality: [1,        [Validators.required]],
     successRate:          [75,       [Validators.required, Validators.min(0), Validators.max(100)]],
+    // Operational risk factors
+    changeRequestFrequency: [1.4,    [Validators.required, Validators.min(0), Validators.max(9)]],
+    teamTurnoverRate:     [27,       [Validators.required, Validators.min(0), Validators.max(85)]],
+    vendorReliability:    [73,       [Validators.required, Validators.min(0), Validators.max(100)]],
+    schedulePressure:     [5,        [Validators.required, Validators.min(0), Validators.max(60)]],
+    resourceAvailability: [65,       [Validators.required, Validators.min(0), Validators.max(100)]],
+    technicalDebt:        [0,        [Validators.required, Validators.min(0), Validators.max(100)]],
   });
 
   constructor(private aiService: AiService, private cdr: ChangeDetectorRef) {}
@@ -81,10 +106,19 @@ export class RiskPrediction {
       duration_months:       v.durationMonths,
       complexity_score:      v.complexityScore,
       stakeholder_count:     v.stakeholderCount,
+      past_similar_projects: v.pastSimilarProjects,
       success_rate:          v.successRate / 100,
       budget_utilization:    v.budgetUtilization / 100,
+      change_request_frequency: v.changeRequestFrequency,
+      team_turnover_rate:    v.teamTurnoverRate / 100,
+      vendor_reliability:    v.vendorReliability / 100,
+      schedule_pressure:     v.schedulePressure / 100,
+      resource_availability: v.resourceAvailability / 100,
+      technical_debt:        v.technicalDebt / 100,
       team_experience:       v.teamExperience,
       requirement_stability: v.requirementStability,
+      risk_management_maturity: v.riskManagementMaturity,
+      documentation_quality: v.documentationQuality,
       external_dependencies: v.externalDependencies,
     };
 
@@ -158,6 +192,14 @@ export class RiskPrediction {
     return this.stabilityOptions.find(o => o.value === value)?.label ?? String(value);
   }
 
+  getRiskMaturityLabel(value: number): string {
+    return this.riskMaturityOptions.find(o => o.value === value)?.label ?? String(value);
+  }
+
+  getDocumentationLabel(value: number): string {
+    return this.documentationOptions.find(o => o.value === value)?.label ?? String(value);
+  }
+
   private normalizePrediction(response: RiskPredictionResponse | null | undefined): RiskPredictionResponse {
     const fallback: RiskPredictionResponse = {
       risk_level: 'unknown', score: 0, probabilities: { low: 0, medium: 0, high: 0 },
@@ -171,6 +213,7 @@ export class RiskPrediction {
         medium: this.normalizeProbability(response.probabilities?.medium),
         high:   this.normalizeProbability(response.probabilities?.high),
       },
+      model: response.model,
     };
   }
 

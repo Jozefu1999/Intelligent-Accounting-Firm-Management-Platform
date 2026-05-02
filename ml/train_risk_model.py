@@ -1,457 +1,660 @@
 """
-Train the project risk prediction model.
+Train the project risk prediction model from the real CSV dataset.
 
-ML Workflow
------------
-1.  Load real CSV dataset (project_risk_raw_dataset.csv, 4 000 rows, 51 cols)
-2.  Select 10 domain features; encode categoricals
-3.  Merge 'Critical' label into 'High' → 3-class model (Low / Medium / High)
-4.  Add 3 engineered features → 13 total:
-      budget_per_person  = budget_usd / team_size
-      timeline_pressure  = complexity_score / duration_months
-      team_effectiveness = team_experience × success_rate
-5.  Stratified 80 / 20 train-test split (random_state=42)
-6.  Train five models with RandomizedSearchCV (n_iter=25, cv=5):
-      RandomForestClassifier, ExtraTreesClassifier, GradientBoostingClassifier,
-      XGBoostClassifier, (LightGBMClassifier if installed)
-7.  Build Soft Voting ensemble from top 3 tuned models
-8.  Evaluate all on held-out test set; pick the winner by accuracy
-9.  Save best model + scaler + metadata; write ML_REPORT.md
+Workflow implemented for the PFE risk-prediction module:
+1. Exploratory Data Analysis (EDA)
+2. Preprocessing and feature engineering
+3. Baseline modelling with exactly 5 models:
+   - K-Nearest Neighbors (KNN)
+   - Logistic Regression
+   - Decision Tree, with a saved tree visualization
+   - Random Forest, with saved feature importance
+   - XGBoost
+4. Feature selection with SelectKBest
+5. Fine-tuning with GridSearchCV
+6. Final model selection on a held-out test split
+7. Save the final inference pipeline and write ML_REPORT.md
 
-Base features (10):
-  team_size, budget_usd, duration_months, complexity_score,
-  stakeholder_count, success_rate, budget_utilization,
-  team_experience, requirement_stability, external_dependencies
-
-Labels: 0=Low, 1=Medium, 2=High  (Critical merged into High)
-
-Usage:
-    python train_risk_model.py
+The model intentionally uses a selected set of direct project-risk drivers from the
+dataset, not all CSV columns. The frontend provides these inputs; three engineered
+features are computed automatically during training and prediction.
 """
 
+from __future__ import annotations
+
 import json
-import os
 import sys
 import warnings
+from collections import OrderedDict
+from pathlib import Path
 
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.base     import clone
-from sklearn.ensemble import (RandomForestClassifier, ExtraTreesClassifier,
-                               GradientBoostingClassifier, VotingClassifier)
+from sklearn.base import clone
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics  import accuracy_score, classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from scipy.stats      import randint, uniform
-from xgboost          import XGBClassifier
+from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 
 try:
-    from lightgbm import LGBMClassifier
-    LGBM_AVAILABLE = True
+    import matplotlib.pyplot as plt
+    from sklearn.metrics import ConfusionMatrixDisplay
+    from sklearn.tree import plot_tree
+    PLOTS_AVAILABLE = True
 except ImportError:
-    LGBM_AVAILABLE = False
+    PLOTS_AVAILABLE = False
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'project_risk_raw_dataset.csv')
+BASE_DIR = Path(__file__).resolve().parent
+CSV_PATH = BASE_DIR / "project_risk_raw_dataset.csv"
+MODEL_DIR = BASE_DIR / "models"
+OUTPUT_DIR = BASE_DIR / "outputs"
+REPORT_PATH = BASE_DIR / "ML_REPORT.md"
 
-FEATURES_BASE = [
-    'team_size',
-    'budget_usd',
-    'duration_months',
-    'complexity_score',
-    'stakeholder_count',
-    'success_rate',
-    'budget_utilization',
-    'team_experience',
-    'requirement_stability',
-    'external_dependencies',
+MODEL_DIR.mkdir(exist_ok=True)
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+RANDOM_STATE = 42
+TEST_SIZE = 0.2
+CV = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
+
+RISK_LABELS = {0: "low", 1: "medium", 2: "high"}
+LABEL_MAP = {"Low": 0, "Medium": 1, "High": 2, "Critical": 2}
+
+CSV_COL_MAP = OrderedDict([
+    ("Team_Size", "team_size"),
+    ("Project_Budget_USD", "budget_usd"),
+    ("Estimated_Timeline_Months", "duration_months"),
+    ("Complexity_Score", "complexity_score"),
+    ("Stakeholder_Count", "stakeholder_count"),
+    ("Past_Similar_Projects", "past_similar_projects"),
+    ("External_Dependencies_Count", "external_dependencies"),
+    ("Change_Request_Frequency", "change_request_frequency"),
+    ("Team_Turnover_Rate", "team_turnover_rate"),
+    ("Vendor_Reliability_Score", "vendor_reliability"),
+    ("Schedule_Pressure", "schedule_pressure"),
+    ("Budget_Utilization_Rate", "budget_utilization"),
+    ("Resource_Availability", "resource_availability"),
+    ("Previous_Delivery_Success_Rate", "success_rate"),
+    ("Technical_Debt_Level", "technical_debt"),
+    ("Team_Experience_Level", "team_experience"),
+    ("Requirement_Stability", "requirement_stability"),
+    ("Risk_Management_Maturity", "risk_management_maturity"),
+    ("Documentation_Quality", "documentation_quality"),
+])
+
+BASE_FEATURES = list(CSV_COL_MAP.values())
+ENGINEERED_FEATURES = [
+    "budget_per_person",
+    "timeline_pressure",
+    "team_effectiveness",
 ]
-FEATURES_ENG = FEATURES_BASE + ['budget_per_person', 'timeline_pressure', 'team_effectiveness']
+MODEL_INPUT_FEATURES = BASE_FEATURES + ENGINEERED_FEATURES
 
-# CSV column name → feature name mapping
-CSV_COL_MAP = {
-    'Team_Size':                      'team_size',
-    'Project_Budget_USD':             'budget_usd',
-    'Estimated_Timeline_Months':      'duration_months',
-    'Complexity_Score':               'complexity_score',
-    'Stakeholder_Count':              'stakeholder_count',
-    'Previous_Delivery_Success_Rate': 'success_rate',
-    'Budget_Utilization_Rate':        'budget_utilization',
-    'Team_Experience_Level':          'team_experience',
-    'Requirement_Stability':          'requirement_stability',
-    'External_Dependencies_Count':    'external_dependencies',
+ENCODING_MAPS = {
+    "team_experience": {"Junior": 0, "Mixed": 1, "Senior": 2, "Expert": 3},
+    "requirement_stability": {"Volatile": 0, "Moderate": 1, "Stable": 2},
+    "risk_management_maturity": {"Basic": 0, "Formal": 1, "Advanced": 2},
+    "documentation_quality": {"Poor": 0, "Basic": 1, "Good": 2, "Excellent": 3},
 }
 
-EXPERIENCE_MAP  = {'Junior': 0, 'Mixed': 1, 'Senior': 2, 'Expert': 3}
-STABILITY_MAP   = {'Volatile': 0, 'Moderate': 1, 'Stable': 2}
-LABEL_MAP       = {'Low': 0, 'Medium': 1, 'High': 2, 'Critical': 2}
-RISK_LABELS     = {0: 'low', 1: 'medium', 2: 'high'}
+FEATURE_DESCRIPTIONS = OrderedDict([
+    ("team_size", ("Team_Size", "Number of people on the project.")),
+    ("budget_usd", ("Project_Budget_USD", "Project budget amount.")),
+    ("duration_months", ("Estimated_Timeline_Months", "Planned duration in months.")),
+    ("complexity_score", ("Complexity_Score", "Project complexity on a 1-10 scale.")),
+    ("stakeholder_count", ("Stakeholder_Count", "Number of stakeholders involved.")),
+    ("past_similar_projects", ("Past_Similar_Projects", "Team/company experience with similar work.")),
+    ("external_dependencies", ("External_Dependencies_Count", "Number of outside vendors/systems.")),
+    ("change_request_frequency", ("Change_Request_Frequency", "Expected/observed change request rate.")),
+    ("team_turnover_rate", ("Team_Turnover_Rate", "Share of team turnover, 0.0-1.0.")),
+    ("vendor_reliability", ("Vendor_Reliability_Score", "Vendor reliability, 0.0-1.0.")),
+    ("schedule_pressure", ("Schedule_Pressure", "Schedule compression pressure, 0.0-1.0.")),
+    ("budget_utilization", ("Budget_Utilization_Rate", "Actual/planned spend ratio.")),
+    ("resource_availability", ("Resource_Availability", "Resource availability, 0.0-1.0.")),
+    ("success_rate", ("Previous_Delivery_Success_Rate", "Previous delivery success rate, 0.0-1.0.")),
+    ("technical_debt", ("Technical_Debt_Level", "Technical debt level, 0.0-1.0.")),
+    ("team_experience", ("Team_Experience_Level", "Ordinal: Junior=0, Mixed=1, Senior=2, Expert=3.")),
+    ("requirement_stability", ("Requirement_Stability", "Ordinal: Volatile=0, Moderate=1, Stable=2.")),
+    ("risk_management_maturity", ("Risk_Management_Maturity", "Ordinal: Basic=0, Formal=1, Advanced=2.")),
+    ("documentation_quality", ("Documentation_Quality", "Ordinal: Poor=0, Basic=1, Good=2, Excellent=3.")),
+    ("budget_per_person", ("budget_usd / team_size", "Engineered: resource capacity per person.")),
+    ("timeline_pressure", ("complexity_score / duration_months", "Engineered: complexity per time unit.")),
+    ("team_effectiveness", ("team_experience * success_rate", "Engineered: team maturity combined with track record.")),
+])
 
-CV5 = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+def pct(value: float) -> str:
+    return f"{value * 100:.2f}%"
 
 
-# ── Data loading ──────────────────────────────────────────────────────────────
-def load_and_clean() -> pd.DataFrame:
+def load_raw_dataset() -> pd.DataFrame:
+    if not CSV_PATH.exists():
+        print(f"[ERROR] CSV not found: {CSV_PATH}", file=sys.stderr)
+        sys.exit(1)
     df = pd.read_csv(CSV_PATH)
-    print(f"[DATA] Loaded {len(df)} rows, {len(df.columns)} columns.")
-
-    needed = list(CSV_COL_MAP.keys()) + ['Risk_Level']
-    df = df[needed].copy()
-    df.rename(columns=CSV_COL_MAP, inplace=True)
-
-    # Encode categoricals
-    df['team_experience']       = df['team_experience'].map(EXPERIENCE_MAP)
-    df['requirement_stability'] = df['requirement_stability'].map(STABILITY_MAP)
-    df['risk']                  = df['Risk_Level'].map(LABEL_MAP)
-
-    # Feature engineering — 3 interaction features (computed from existing inputs)
-    df['budget_per_person']  = df['budget_usd'] / df['team_size'].clip(lower=1)
-    df['timeline_pressure']  = df['complexity_score'] / df['duration_months'].clip(lower=1)
-    df['team_effectiveness'] = df['team_experience'] * df['success_rate']
-
-    before = len(df)
-    df.dropna(inplace=True)
-    if before != len(df):
-        print(f"[DATA] Dropped {before - len(df)} rows with nulls.")
-
-    dist = df['risk'].value_counts().sort_index().to_dict()
-    print(f"[DATA] Clean dataset: {len(df)} rows | "
-          + " | ".join(f"{RISK_LABELS[k]}={v}" for k, v in dist.items()))
+    print(f"[EDA] Loaded {len(df)} rows, {len(df.columns)} columns.")
     return df
 
 
-# ── Training ──────────────────────────────────────────────────────────────────
-def train_and_evaluate(df: pd.DataFrame):
-    X = df[FEATURES].values
-    y = df['risk'].values.astype(int)
+def preprocess(raw_df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    required = list(CSV_COL_MAP.keys()) + ["Risk_Level"]
+    missing = [col for col in required if col not in raw_df.columns]
+    if missing:
+        raise ValueError(f"Missing required CSV columns: {missing}")
 
-    # Stratified 80/20 split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
-    )
-    print(f"[SPLIT] Train={len(X_train)}  Test={len(X_test)}")
+    df = raw_df[required].copy().rename(columns=CSV_COL_MAP)
 
-    scaler = StandardScaler()
-    Xs_train = scaler.fit_transform(X_train)
-    Xs_test  = scaler.transform(X_test)
+    for feature, mapping in ENCODING_MAPS.items():
+        df[feature] = df[feature].map(mapping)
 
-    results = {}
+    df["risk"] = df["Risk_Level"].map(LABEL_MAP)
+    df["budget_per_person"] = df["budget_usd"] / df["team_size"].clip(lower=1)
+    df["timeline_pressure"] = df["complexity_score"] / df["duration_months"].clip(lower=1)
+    df["team_effectiveness"] = df["team_experience"] * df["success_rate"]
 
-    # ── Model A: Random Forest ───────────────────────────────────────────────
+    before = len(df)
+    df = df.dropna(subset=MODEL_INPUT_FEATURES + ["risk"]).copy()
+    dropped = before - len(df)
 
-# ── Training ──────────────────────────────────────────────────────────────────
-def train_and_evaluate(df: pd.DataFrame):
-    indices = np.arange(len(df))
-    y       = df['risk'].values.astype(int)
-
-    tr_idx, te_idx = train_test_split(indices, test_size=0.2, random_state=42, stratify=y)
-
-    X_eng  = df[FEATURES_ENG].values
-    y_tr, y_te = y[tr_idx], y[te_idx]
-
-    scaler = StandardScaler().fit(X_eng[tr_idx])
-    Xs_tr  = scaler.transform(X_eng[tr_idx])
-    Xs_te  = scaler.transform(X_eng[te_idx])
-
-    print(f"[SPLIT] Train={len(y_tr)}  Test={len(y_te)}  Features={X_eng.shape[1]}")
-
-    # ── Hyperparameter search spaces ─────────────────────────────────────────
-    param_spaces = {
-        'RandomForest': {
-            'estimator': RandomForestClassifier(class_weight='balanced',
-                                                random_state=42, n_jobs=-1),
-            'params': {
-                'n_estimators'     : randint(200, 600),
-                'max_depth'        : [None, 8, 12, 16, 20],
-                'min_samples_split': randint(2, 10),
-                'min_samples_leaf' : randint(1, 6),
-                'max_features'     : ['sqrt', 'log2', 0.5, 0.7],
-            }
-        },
-        'ExtraTrees': {
-            'estimator': ExtraTreesClassifier(class_weight='balanced',
-                                              random_state=42, n_jobs=-1),
-            'params': {
-                'n_estimators'     : randint(200, 600),
-                'max_depth'        : [None, 8, 12, 16],
-                'min_samples_split': randint(2, 10),
-                'min_samples_leaf' : randint(1, 6),
-                'max_features'     : ['sqrt', 'log2', 0.6],
-            }
-        },
-        'GradBoost': {
-            'estimator': GradientBoostingClassifier(random_state=42),
-            'params': {
-                'n_estimators'     : randint(200, 500),
-                'max_depth'        : randint(3, 7),
-                'learning_rate'    : uniform(0.03, 0.15),
-                'subsample'        : uniform(0.6, 0.4),
-                'min_samples_split': randint(2, 10),
-                'max_features'     : ['sqrt', 'log2', 0.5],
-            }
-        },
-        'XGBoost': {
-            'estimator': XGBClassifier(eval_metric='mlogloss', random_state=42,
-                                       n_jobs=-1, verbosity=0),
-            'params': {
-                'n_estimators'    : randint(300, 700),
-                'max_depth'       : randint(3, 9),
-                'learning_rate'   : uniform(0.01, 0.15),
-                'subsample'       : uniform(0.6, 0.4),
-                'colsample_bytree': uniform(0.5, 0.5),
-                'min_child_weight': randint(1, 6),
-                'gamma'           : uniform(0, 0.3),
-            }
-        },
+    class_counts = df["risk"].value_counts().sort_index().to_dict()
+    eda = {
+        "raw_rows": int(len(raw_df)),
+        "raw_columns": int(len(raw_df.columns)),
+        "clean_rows": int(len(df)),
+        "dropped_rows": int(dropped),
+        "raw_label_counts": raw_df["Risk_Level"].value_counts().to_dict(),
+        "merged_label_counts": {RISK_LABELS[k]: int(v) for k, v in class_counts.items()},
+        "missing_selected_values": raw_df[list(CSV_COL_MAP.keys())].isna().sum().to_dict(),
     }
-    if LGBM_AVAILABLE:
-        param_spaces['LightGBM'] = {
-            'estimator': LGBMClassifier(class_weight='balanced', random_state=42,
-                                        n_jobs=-1, verbose=-1),
-            'params': {
-                'n_estimators'    : randint(300, 700),
-                'max_depth'       : randint(3, 9),
-                'learning_rate'   : uniform(0.02, 0.13),
-                'num_leaves'      : randint(20, 80),
-                'subsample'       : uniform(0.6, 0.4),
-                'colsample_bytree': uniform(0.5, 0.5),
-                'reg_alpha'       : uniform(0, 1),
-                'reg_lambda'      : uniform(0, 1),
-            }
-        }
 
-    # ── Tune each model ───────────────────────────────────────────────────────
-    tuned = {}
-    for name, cfg in param_spaces.items():
-        print(f"[TUNE] {name}...", end=' ', flush=True)
-        search = RandomizedSearchCV(
-            cfg['estimator'], cfg['params'],
-            n_iter=25, cv=CV5, scoring='accuracy',
-            random_state=42, n_jobs=-1, verbose=0,
+    print(
+        "[PREPROCESS] Clean dataset: "
+        + f"{len(df)} rows | "
+        + " | ".join(f"{RISK_LABELS[k]}={v}" for k, v in class_counts.items())
+    )
+    return df, eda
+
+
+def make_baseline_models() -> OrderedDict[str, object]:
+    return OrderedDict([
+        ("KNN", KNeighborsClassifier(n_neighbors=11)),
+        ("LogisticRegression", LogisticRegression(max_iter=2000, class_weight="balanced", random_state=RANDOM_STATE)),
+        ("DecisionTree", DecisionTreeClassifier(max_depth=8, class_weight="balanced", random_state=RANDOM_STATE)),
+        ("RandomForest", RandomForestClassifier(n_estimators=400, class_weight="balanced", random_state=RANDOM_STATE, n_jobs=-1)),
+        ("XGBoost", XGBClassifier(
+            n_estimators=500,
+            max_depth=4,
+            learning_rate=0.05,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            eval_metric="mlogloss",
+            random_state=RANDOM_STATE,
+            n_jobs=-1,
+            verbosity=0,
+        )),
+    ])
+
+
+def make_baseline_pipeline(model: object) -> Pipeline:
+    return Pipeline([
+        ("scaler", StandardScaler()),
+        ("select", SelectKBest(score_func=f_classif, k="all")),
+        ("model", model),
+    ])
+
+
+def make_grid_spaces() -> OrderedDict[str, tuple[object, dict]]:
+    k_values = [10, 12, 15, "all"]
+    return OrderedDict([
+        ("KNN", (
+            KNeighborsClassifier(),
+            {
+                "select__k": k_values,
+                "model__n_neighbors": [7, 11, 15],
+                "model__weights": ["uniform", "distance"],
+            },
+        )),
+        ("LogisticRegression", (
+            LogisticRegression(max_iter=2500, random_state=RANDOM_STATE),
+            {
+                "select__k": k_values,
+                "model__C": [0.1, 1.0, 3.0],
+                "model__class_weight": [None, "balanced"],
+            },
+        )),
+        ("DecisionTree", (
+            DecisionTreeClassifier(class_weight="balanced", random_state=RANDOM_STATE),
+            {
+                "select__k": k_values,
+                "model__max_depth": [4, 6, 8, 10],
+                "model__min_samples_leaf": [1, 3, 5],
+            },
+        )),
+        ("RandomForest", (
+            RandomForestClassifier(n_estimators=400, class_weight="balanced", random_state=RANDOM_STATE, n_jobs=-1),
+            {
+                "select__k": k_values,
+                "model__max_depth": [None, 12, 18],
+                "model__min_samples_leaf": [1, 3, 5],
+                "model__max_features": ["sqrt", 0.7],
+            },
+        )),
+        ("XGBoost", (
+            XGBClassifier(eval_metric="mlogloss", random_state=RANDOM_STATE, n_jobs=-1, verbosity=0),
+            {
+                "select__k": k_values,
+                "model__n_estimators": [300, 500],
+                "model__max_depth": [3, 4],
+                "model__learning_rate": [0.03, 0.05],
+                "model__subsample": [0.8, 1.0],
+                "model__colsample_bytree": [0.8],
+            },
+        )),
+    ])
+
+
+def selected_features_from_pipeline(pipeline: Pipeline) -> list[str]:
+    selector = pipeline.named_steps["select"]
+    mask = selector.get_support()
+    return [feature for feature, selected in zip(MODEL_INPUT_FEATURES, mask) if selected]
+
+
+def evaluate_pipeline(name: str, pipeline: Pipeline, X_test, y_test) -> dict:
+    y_pred = pipeline.predict(X_test)
+    return {
+        "name": name,
+        "pipeline": pipeline,
+        "accuracy": accuracy_score(y_test, y_pred),
+        "predictions": y_pred,
+        "report": classification_report(y_test, y_pred, target_names=["low", "medium", "high"], output_dict=True),
+        "cm": confusion_matrix(y_test, y_pred),
+        "selected_features": selected_features_from_pipeline(pipeline),
+    }
+
+
+def run_baselines(X_train, X_test, y_train, y_test) -> OrderedDict[str, dict]:
+    results = OrderedDict()
+    print("[BASELINE] Training 5 baseline models...")
+    for name, model in make_baseline_models().items():
+        pipeline = make_baseline_pipeline(clone(model))
+        pipeline.fit(X_train, y_train)
+        result = evaluate_pipeline(name, pipeline, X_test, y_test)
+        results[name] = result
+        print(f"[BASELINE] {name}: {pct(result['accuracy'])}")
+    return results
+
+
+def run_grid_search(X_train, X_test, y_train, y_test) -> OrderedDict[str, dict]:
+    results = OrderedDict()
+    print("[GRID] Fine-tuning 5 models with GridSearchCV + SelectKBest...")
+    for name, (model, param_grid) in make_grid_spaces().items():
+        pipeline = make_baseline_pipeline(model)
+        search = GridSearchCV(
+            estimator=pipeline,
+            param_grid=param_grid,
+            scoring="accuracy",
+            cv=CV,
+            n_jobs=-1,
+            refit=True,
+            verbose=0,
         )
-        search.fit(Xs_tr, y_tr)
-        best_model = search.best_estimator_
-        test_acc   = accuracy_score(y_te, best_model.predict(Xs_te))
-        tuned[name] = {
-            'model'      : best_model,
-            'accuracy'   : test_acc,
-            'cv_score'   : search.best_score_,
-            'predictions': best_model.predict(Xs_te),
-            'report'     : classification_report(y_te, best_model.predict(Xs_te),
-                               target_names=['low', 'medium', 'high'], output_dict=True),
-            'cm'         : confusion_matrix(y_te, best_model.predict(Xs_te)),
-        }
-        print(f"CV={search.best_score_*100:.2f}%  Test={test_acc*100:.2f}%")
-
-    # ── Voting ensemble (top 3) ───────────────────────────────────────────────
-    top3 = sorted(tuned.items(), key=lambda x: x[1]['accuracy'], reverse=True)[:3]
-    print(f"[VOTE] Building ensemble from: {[n for n, _ in top3]}")
-    voting = VotingClassifier(
-        estimators=[(n, r['model']) for n, r in top3],
-        voting='soft', n_jobs=-1,
-    )
-    voting.fit(Xs_tr, y_tr)
-    vote_pred = voting.predict(Xs_te)
-    vote_acc  = accuracy_score(y_te, vote_pred)
-    tuned['VotingEnsemble'] = {
-        'model'      : voting,
-        'accuracy'   : vote_acc,
-        'cv_score'   : None,
-        'predictions': vote_pred,
-        'report'     : classification_report(y_te, vote_pred,
-                           target_names=['low', 'medium', 'high'], output_dict=True),
-        'cm'         : confusion_matrix(y_te, vote_pred),
-    }
-    print(f"[VOTE] Accuracy: {vote_acc*100:.2f}%")
-
-    best_name = max(tuned, key=lambda k: tuned[k]['accuracy'])
-    print(f"[BEST] Winner: {best_name} ({tuned[best_name]['accuracy']*100:.2f}%)")
-    return scaler, tuned, best_name, y_te
+        print(f"[GRID] {name}...", end=" ", flush=True)
+        search.fit(X_train, y_train)
+        result = evaluate_pipeline(name, search.best_estimator_, X_test, y_test)
+        result["cv_score"] = float(search.best_score_)
+        result["best_params"] = search.best_params_
+        results[name] = result
+        print(f"CV={pct(search.best_score_)} Test={pct(result['accuracy'])}")
+    return results
 
 
-# ── Persistence ───────────────────────────────────────────────────────────────
-def save_models(scaler, best_model, best_name: str, best_acc: float, n_tr: int, n_te: int):
-    os.makedirs('models', exist_ok=True)
-    joblib.dump(best_model, 'models/risk_model.pkl')
-    joblib.dump(scaler,     'models/risk_scaler.pkl')
-    meta = {
-        'algorithm'          : best_name,
-        'test_accuracy_pct'  : round(best_acc * 100, 2),
-        'features'           : FEATURES_ENG,
-        'n_features'         : len(FEATURES_ENG),
-        'engineered_features': ['budget_per_person', 'timeline_pressure', 'team_effectiveness'],
-        'training_rows'      : n_tr,
-        'test_rows'          : n_te,
-    }
-    with open('models/risk_meta.json', 'w') as f:
-        json.dump(meta, f, indent=2)
-    print(f"[SAVE] Saved to models/risk_model.pkl + risk_scaler.pkl + risk_meta.json")
+def feature_score_table(X_train, y_train) -> pd.DataFrame:
+    selector = SelectKBest(score_func=f_classif, k="all")
+    selector.fit(X_train, y_train)
+    scores = pd.DataFrame({
+        "feature": MODEL_INPUT_FEATURES,
+        "score": selector.scores_,
+        "p_value": selector.pvalues_,
+    }).sort_values("score", ascending=False)
+    scores["rank"] = np.arange(1, len(scores) + 1)
+    return scores[["rank", "feature", "score", "p_value"]]
 
 
-# ── Markdown report ───────────────────────────────────────────────────────────
-def write_report(results: dict, best_name: str, y_test, n_total: int):
-    winner = results[best_name]
+def save_plots(best_result: dict, tuned_results: OrderedDict[str, dict], feature_scores: pd.DataFrame) -> dict:
+    paths = {}
+    if not PLOTS_AVAILABLE:
+        print("[PLOTS] matplotlib unavailable; skipping plot generation.")
+        return paths
 
-    def fmt_report(r):
-        lines = []
-        for label in ['low', 'medium', 'high']:
-            m = r['report'].get(label, {})
-            lines.append(
-                f"| {label.capitalize():8} | {m.get('precision', 0):.3f}     "
-                f"| {m.get('recall', 0):.3f}  | {m.get('f1-score', 0):.3f} "
-                f"| {int(m.get('support', 0)):7} |"
-            )
-        acc = r['accuracy'] * 100
-        lines.append(f"| **Overall** | —         | —      | —    | **Acc: {acc:.2f}%** |")
-        return "\n".join(lines)
+    fig, ax = plt.subplots(figsize=(10, 8))
+    top_scores = feature_scores.head(18).sort_values("score")
+    ax.barh(top_scores["feature"], top_scores["score"], color="#2563eb")
+    ax.set_title("SelectKBest ANOVA F-score (top features)")
+    ax.set_xlabel("F-score")
+    fig.tight_layout()
+    out = OUTPUT_DIR / "selectkbest_scores.png"
+    fig.savefig(out, dpi=160)
+    plt.close(fig)
+    paths["selectkbest_scores"] = str(out.relative_to(BASE_DIR))
 
-    def fmt_cm(cm):
-        header = "| Actual \\ Predicted | Low | Medium | High |"
-        sep    = "|---|---|---|---|"
-        rows = []
-        for i, label in enumerate(['Low', 'Medium', 'High']):
-            row = cm[i] if i < len(cm) else [0, 0, 0]
-            rows.append(f"| **{label}** | {row[0]} | {row[1]} | {row[2]} |")
-        return "\n".join([header, sep] + rows)
+    tree_pipeline = tuned_results.get("DecisionTree", {}).get("pipeline")
+    if tree_pipeline is not None:
+        selected = selected_features_from_pipeline(tree_pipeline)
+        tree = tree_pipeline.named_steps["model"]
+        fig, ax = plt.subplots(figsize=(20, 10))
+        plot_tree(
+            tree,
+            feature_names=selected,
+            class_names=["low", "medium", "high"],
+            filled=True,
+            rounded=True,
+            max_depth=3,
+            fontsize=8,
+            ax=ax,
+        )
+        ax.set_title("Decision Tree visualization (first 3 levels)")
+        fig.tight_layout()
+        out = OUTPUT_DIR / "decision_tree_visualization.png"
+        fig.savefig(out, dpi=160)
+        plt.close(fig)
+        paths["decision_tree"] = str(out.relative_to(BASE_DIR))
 
-    label_dist = {RISK_LABELS[i]: int(np.sum(y_test == i)) for i in range(3)}
+    rf_pipeline = tuned_results.get("RandomForest", {}).get("pipeline")
+    if rf_pipeline is not None:
+        selected = selected_features_from_pipeline(rf_pipeline)
+        rf = rf_pipeline.named_steps["model"]
+        importances = pd.DataFrame({
+            "feature": selected,
+            "importance": rf.feature_importances_,
+        }).sort_values("importance", ascending=False)
+        importances.to_csv(OUTPUT_DIR / "random_forest_feature_importance.csv", index=False)
 
-    # Build comparison table rows outside the f-string to avoid nested-quote issues
-    cmp_rows = "\n".join(
-        f"| {n} | {r['accuracy']*100:.2f}% | "
-        + (f"{r['cv_score']*100:.2f}%" if r['cv_score'] is not None else "N/A")
-        + " |"
-        for n, r in results.items()
-    )
+        fig, ax = plt.subplots(figsize=(10, 8))
+        top_importance = importances.head(18).sort_values("importance")
+        ax.barh(top_importance["feature"], top_importance["importance"], color="#16a34a")
+        ax.set_title("Random Forest feature importance")
+        ax.set_xlabel("Importance")
+        fig.tight_layout()
+        out = OUTPUT_DIR / "random_forest_feature_importance.png"
+        fig.savefig(out, dpi=160)
+        plt.close(fig)
+        paths["random_forest_importance"] = str(out.relative_to(BASE_DIR))
 
-    report_md = f"""# ML Risk Prediction — Model Report
+    fig, ax = plt.subplots(figsize=(7, 6))
+    ConfusionMatrixDisplay(
+        confusion_matrix=best_result["cm"],
+        display_labels=["low", "medium", "high"],
+    ).plot(ax=ax, cmap="Blues", colorbar=False)
+    ax.set_title(f"Final confusion matrix - {best_result['name']}")
+    fig.tight_layout()
+    out = OUTPUT_DIR / "final_confusion_matrix.png"
+    fig.savefig(out, dpi=160)
+    plt.close(fig)
+    paths["final_confusion_matrix"] = str(out.relative_to(BASE_DIR))
+
+    return paths
+
+
+def markdown_table(rows: list[list[object]], headers: list[str]) -> str:
+    table = ["| " + " | ".join(headers) + " |", "|" + "|".join(["---"] * len(headers)) + "|"]
+    for row in rows:
+        table.append("| " + " | ".join(str(value) for value in row) + " |")
+    return "\n".join(table)
+
+
+def format_report(result: dict) -> str:
+    rows = []
+    for label in ["low", "medium", "high"]:
+        metrics = result["report"].get(label, {})
+        rows.append([
+            label.capitalize(),
+            f"{metrics.get('precision', 0):.3f}",
+            f"{metrics.get('recall', 0):.3f}",
+            f"{metrics.get('f1-score', 0):.3f}",
+            int(metrics.get("support", 0)),
+        ])
+    rows.append(["Overall", "-", "-", "-", f"Acc: {pct(result['accuracy'])}"])
+    return markdown_table(rows, ["Class", "Precision", "Recall", "F1", "Support"])
+
+
+def format_cm(result: dict) -> str:
+    cm = result["cm"]
+    rows = []
+    for i, label in enumerate(["Low", "Medium", "High"]):
+        row = cm[i] if i < len(cm) else [0, 0, 0]
+        rows.append([f"**{label}**", int(row[0]), int(row[1]), int(row[2])])
+    return markdown_table(rows, ["Actual \\ Predicted", "Low", "Medium", "High"])
+
+
+def write_report(
+    eda: dict,
+    feature_scores: pd.DataFrame,
+    baseline_results: OrderedDict[str, dict],
+    tuned_results: OrderedDict[str, dict],
+    best_result: dict,
+    plots: dict,
+    train_size: int,
+    test_size: int,
+) -> None:
+    feature_rows = [[feature, source, note] for feature, (source, note) in FEATURE_DESCRIPTIONS.items()]
+    baseline_rows = [[name, pct(result["accuracy"])] for name, result in baseline_results.items()]
+    tuned_rows = [
+        [name, pct(result["accuracy"]), pct(result.get("cv_score", 0)), ", ".join(result["selected_features"])]
+        for name, result in tuned_results.items()
+    ]
+    score_rows = [
+        [int(row.rank), row.feature, f"{row.score:.3f}", f"{row.p_value:.3g}"]
+        for row in feature_scores.head(15).itertuples(index=False)
+    ]
+
+    plot_lines = [f"- `{path}` ({label.replace('_', ' ')})" for label, path in plots.items()]
+    if not plot_lines:
+        plot_lines.append("- Plot generation skipped because matplotlib is not installed.")
+
+    report = f"""# ML Risk Prediction - Model Report
 
 Generated automatically by `train_risk_model.py`.
 
 ---
 
-## 1. Dataset
+## 1. Goal
+
+Predict the risk level of a project using a supervised classification model trained on the real CSV dataset. The target is `Risk_Level`. The original labels `High` and `Critical` are merged into one `high` class so the application predicts the three levels used in the UI: `low`, `medium`, `high`.
+
+---
+
+## 2. Exploratory Data Analysis (EDA)
 
 | Property | Value |
 |---|---|
-| Source | `project_risk_raw_dataset.csv` (real project data) |
-| Total rows | {n_total} |
-| Features used | 13 (10 base + 3 engineered) |
-| Label column | `Risk_Level` (Critical merged → High) |
-| Classes | Low / Medium / High |
+| Dataset | `project_risk_raw_dataset.csv` |
+| Raw rows | {eda['raw_rows']} |
+| Raw columns | {eda['raw_columns']} |
+| Clean rows used | {eda['clean_rows']} |
+| Dropped rows | {eda['dropped_rows']} |
+| Candidate input features | {len(MODEL_INPUT_FEATURES)} |
+| Train split | {train_size} rows ({int((1 - TEST_SIZE) * 100)}%) |
+| Test split | {test_size} rows ({int(TEST_SIZE * 100)}%) |
 
-### Feature Engineering
+### Raw Target Distribution
 
-| Feature | Source / Formula | Notes |
-|---|---|---|
-| `team_size` | `Team_Size` | Direct numeric |
-| `budget_usd` | `Project_Budget_USD` | Direct numeric (USD) |
-| `duration_months` | `Estimated_Timeline_Months` | Direct numeric |
-| `complexity_score` | `Complexity_Score` | Continuous 1–10 |
-| `stakeholder_count` | `Stakeholder_Count` | Direct numeric |
-| `success_rate` | `Previous_Delivery_Success_Rate` | 0.0–1.0 |
-| `budget_utilization` | `Budget_Utilization_Rate` | 0.6–1.3 (actual/planned) |
-| `team_experience` | `Team_Experience_Level` | Ordinal: Junior=0, Mixed=1, Senior=2, Expert=3 |
-| `requirement_stability` | `Requirement_Stability` | Ordinal: Volatile=0, Moderate=1, Stable=2 |
-| `external_dependencies` | `External_Dependencies_Count` | Direct numeric |
-| `budget_per_person` | `budget_usd / team_size` | Resource adequacy per member |
-| `timeline_pressure` | `complexity_score / duration_months` | Complexity rate per time unit |
-| `team_effectiveness` | `team_experience × success_rate` | Combined quality × track record |
+{markdown_table([[k, v] for k, v in eda['raw_label_counts'].items()], ['Original Risk_Level', 'Rows'])}
+
+### Final Target Distribution
+
+{markdown_table([[k, v] for k, v in eda['merged_label_counts'].items()], ['Model class', 'Rows'])}
 
 ---
 
-## 2. ML Workflow
+## 3. Preprocessing
 
+1. Selected direct project-risk columns from the CSV instead of using all 51 columns.
+2. Encoded ordinal categorical fields:
+   - `Team_Experience_Level`: Junior=0, Mixed=1, Senior=2, Expert=3
+   - `Requirement_Stability`: Volatile=0, Moderate=1, Stable=2
+   - `Risk_Management_Maturity`: Basic=0, Formal=1, Advanced=2
+   - `Documentation_Quality`: Poor=0, Basic=1, Good=2, Excellent=3
+3. Merged `Critical` into `High` for the application-level three-class target.
+4. Added three engineered interaction features.
+5. Performed a stratified 80/20 train-test split.
+6. StandardScaler is fitted only inside the training pipeline to avoid data leakage.
+
+### Candidate Features
+
+{markdown_table(feature_rows, ['Feature', 'Source / Formula', 'Why it matters'])}
+
+---
+
+## 4. Feature Selection - SelectKBest
+
+`SelectKBest(f_classif)` is used inside GridSearchCV. The grid tests different values of `k` (`10`, `12`, `15`, and `all`) so each model can choose how many features it needs.
+
+### Top SelectKBest Scores
+
+{markdown_table(score_rows, ['Rank', 'Feature', 'F-score', 'p-value'])}
+
+---
+
+## 5. Baseline Modelling (5 Models)
+
+The baseline step trains the required five models using all candidate features without tuning.
+
+{markdown_table(baseline_rows, ['Baseline model', 'Held-out test accuracy'])}
+
+---
+
+## 6. Fine-Tuning with GridSearchCV
+
+Each model is tuned with `GridSearchCV` using 5-fold stratified cross-validation. The pipeline is:
+
+```text
+StandardScaler -> SelectKBest -> Model
 ```
-Raw CSV (4 000 rows, 51 cols)
-  → Select 10 feature columns + encode categoricals
-  → Merge Critical → High (3-class problem)
-  → Add 3 engineered interaction features → 13 total
-  → Stratified 80/20 train-test split (random_state=42)
-  → StandardScaler (fit on train ONLY — no data leakage)
-  → RandomizedSearchCV (n_iter=25, cv=5) for each model
-  → Voting ensemble from top 3 tuned models
-  → Save winner
-```
 
-### Train / Test Split
+{markdown_table(tuned_rows, ['Tuned model', 'Test accuracy', 'Best CV score', 'Selected features'])}
 
-| Set | Rows |
+---
+
+## 7. Decision Tree Visualization and Random Forest Importance
+
+The training script generated these interpretation artifacts:
+
+{chr(10).join(plot_lines)}
+
+The Decision Tree image shows the first three levels of the tuned tree. The Random Forest image ranks the selected features by importance.
+
+---
+
+## 8. Final Selected Model
+
+| Property | Value |
 |---|---|
-| Training (80%) | ~3 200 |
-| Test (20%) | ~800 |
-
-Both sets are **stratified** to preserve the original class ratios.
-
----
-
-## 3. Model Comparison
-
-| Model | Test Accuracy | CV Score |
-|---|---|---|
-{cmp_rows}
-
----
-
-## 4. Winner — {best_name}
-
-**Accuracy: {winner['accuracy']*100:.2f}%**
+| Best model | {best_result['name']} |
+| Test accuracy | {pct(best_result['accuracy'])} |
+| Selected feature count | {len(best_result['selected_features'])} |
+| Selected features | {', '.join(best_result['selected_features'])} |
 
 ### Classification Report
 
-| Class    | Precision | Recall | F1   | Support |
-|---|---|---|---|---|
-{fmt_report(winner)}
+{format_report(best_result)}
 
 ### Confusion Matrix
 
-{fmt_cm(winner['cm'])}
+{format_cm(best_result)}
 
 ---
 
-## 5. Notes on Accuracy
+## 9. Result and Conclusion
 
-| Benchmark | Accuracy |
-|---|---|
-| Majority-class guess (always High) | ~44.95% |
-| Previous model (RF, 10 features, no tuning) | 54.50% |
-| **This model ({best_name})** | **{winner['accuracy']*100:.2f}%** |
+The final model is selected only after comparing the five required baseline models, applying SelectKBest feature selection, and running GridSearchCV fine-tuning. The saved artifact is a full sklearn pipeline, so production inference applies the same scaler, selected feature subset, and classifier learned during training.
 
-With only 10 user-inputtable features the theoretical ceiling is ~65–70%.
-Academic literature reports 50–70% for project-risk classification with similar feature sets.
-Using all 48 CSV features (RF) reaches ~66.5% — but those require a full professional assessment form.
+This approach improves the earlier limited 10-input model by adding direct project-risk drivers such as change request frequency, team turnover, vendor reliability, schedule pressure, resource availability, technical debt, risk management maturity, and documentation quality. These inputs have a direct operational relationship with project risk and are more relevant than unrelated financial/client columns.
+
+To retrain:
+
+```bash
+cd ml
+python train_risk_model.py
+```
 """
 
-    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ML_REPORT.md')
-    with open(out_path, 'w', encoding='utf-8') as f:
-        f.write(report_md)
-    print(f"[REPORT] Written to {out_path}")
+    REPORT_PATH.write_text(report, encoding="utf-8")
+    print(f"[REPORT] Written to {REPORT_PATH}")
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
-def main():
-    if not os.path.exists(CSV_PATH):
-        print(f"[ERROR] CSV not found: {CSV_PATH}", file=sys.stderr)
-        sys.exit(1)
+def save_final_model(best_result: dict, df: pd.DataFrame, train_size: int, test_size: int) -> None:
+    feature_defaults = {
+        feature: float(df[feature].median())
+        for feature in MODEL_INPUT_FEATURES
+        if feature in df.columns
+    }
+    meta = {
+        "model_artifact": "pipeline",
+        "algorithm": best_result["name"],
+        "test_accuracy_pct": round(best_result["accuracy"] * 100, 2),
+        "features": MODEL_INPUT_FEATURES,
+        "base_features": BASE_FEATURES,
+        "engineered_features": ENGINEERED_FEATURES,
+        "selected_features": best_result["selected_features"],
+        "n_features": len(MODEL_INPUT_FEATURES),
+        "selected_feature_count": len(best_result["selected_features"]),
+        "feature_defaults": feature_defaults,
+        "encoding_maps": ENCODING_MAPS,
+        "training_rows": train_size,
+        "test_rows": test_size,
+        "target_labels": RISK_LABELS,
+    }
 
-    df = load_and_clean()
-    scaler, results, best_name, y_test = train_and_evaluate(df)
+    joblib.dump(best_result["pipeline"], MODEL_DIR / "risk_model.pkl")
+    joblib.dump(best_result["pipeline"].named_steps["scaler"], MODEL_DIR / "risk_scaler.pkl")
+    (MODEL_DIR / "risk_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    print("[SAVE] Saved models/risk_model.pkl, risk_scaler.pkl, risk_meta.json")
 
-    best  = results[best_name]
-    n_te  = len(y_test)
-    n_tr  = len(df) - n_te
-    save_models(scaler, best['model'], best_name, best['accuracy'], n_tr, n_te)
-    write_report(results, best_name, y_test, len(df))
 
-    acc = round(best['accuracy'] * 100, 2)
-    print(f"ACCURACY:{acc}")
-    print(f"DATA_SOURCE:csv")
+def main() -> None:
+    raw_df = load_raw_dataset()
+    df, eda = preprocess(raw_df)
+
+    X = df[MODEL_INPUT_FEATURES].values
+    y = df["risk"].values.astype(int)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=TEST_SIZE,
+        random_state=RANDOM_STATE,
+        stratify=y,
+    )
+    print(f"[SPLIT] Train={len(y_train)} Test={len(y_test)} Features={X.shape[1]}")
+
+    feature_scores = feature_score_table(X_train, y_train)
+    feature_scores.to_csv(OUTPUT_DIR / "selectkbest_scores.csv", index=False)
+
+    baseline_results = run_baselines(X_train, X_test, y_train, y_test)
+    tuned_results = run_grid_search(X_train, X_test, y_train, y_test)
+
+    best_name = max(tuned_results, key=lambda name: tuned_results[name]["accuracy"])
+    best_result = tuned_results[best_name]
+    print(f"[BEST] Winner: {best_name} ({pct(best_result['accuracy'])})")
+
+    plots = save_plots(best_result, tuned_results, feature_scores)
+    save_final_model(best_result, df, len(y_train), len(y_test))
+    write_report(eda, feature_scores, baseline_results, tuned_results, best_result, plots, len(y_train), len(y_test))
+
+    print(f"ACCURACY:{round(best_result['accuracy'] * 100, 2)}")
+    print("DATA_SOURCE:csv")
     print(f"ALGORITHM:{best_name}")
+    print(f"SELECTED_FEATURES:{','.join(best_result['selected_features'])}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

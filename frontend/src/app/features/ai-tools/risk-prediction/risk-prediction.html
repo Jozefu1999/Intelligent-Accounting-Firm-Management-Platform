@@ -2,14 +2,14 @@
 	<header class="ai-header">
 		<p class="ai-eyebrow">AI TOOLS</p>
 		<h1>Risk Prediction</h1>
-		<p>Evaluate project risk using 10 real-world indicators trained on 4 000 project records.</p>
+		<p>Evaluate project risk using 19 direct project indicators trained on 4 000 project records.</p>
 	</header>
 
 	<div class="ai-grid">
 		<!-- ====== FORM ====== -->
 		<article class="ai-card ai-form-card">
 			<h2>Project Parameters</h2>
-			<p>Fill all fields for best accuracy. Optional fields use safe defaults.</p>
+			<p>Fill the project, team, governance, and operational factors used by the ML model.</p>
 
 			<form [formGroup]="form" (ngSubmit)="predictRisk()" class="ai-form-stack">
 
@@ -69,12 +69,17 @@
 						<input id="externalDependencies" type="number" min="0" max="10" formControlName="externalDependencies" placeholder="e.g. 2" />
 						<span class="field-hint">Number of external systems / vendors relied on</span>
 					</div>
+					<div class="form-col">
+						<label for="pastSimilarProjects">Past Similar Projects</label>
+						<input id="pastSimilarProjects" type="number" min="0" max="10" formControlName="pastSimilarProjects" placeholder="e.g. 2" />
+						<span class="field-hint">Previous comparable projects delivered</span>
+					</div>
 				</div>
 
-				<!-- SECTION: Team & History -->
+				<!-- SECTION: Team & Governance -->
 				<p class="form-section-title">
 					<mat-icon>groups</mat-icon>
-					Team &amp; History
+					Team &amp; Governance
 				</p>
 
 				<div class="form-row">
@@ -98,9 +103,73 @@
 
 				<div class="form-row">
 					<div class="form-col">
+						<label for="riskManagementMaturity">Risk Management Maturity</label>
+						<select id="riskManagementMaturity" formControlName="riskManagementMaturity">
+							@for (opt of riskMaturityOptions; track opt.value) {
+								<option [value]="opt.value">{{ opt.label }}</option>
+							}
+						</select>
+					</div>
+					<div class="form-col">
+						<label for="documentationQuality">Documentation Quality</label>
+						<select id="documentationQuality" formControlName="documentationQuality">
+							@for (opt of documentationOptions; track opt.value) {
+								<option [value]="opt.value">{{ opt.label }}</option>
+							}
+						</select>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col">
 						<label for="successRate">Past Success Rate (%)</label>
 						<input id="successRate" type="number" min="0" max="100" formControlName="successRate" placeholder="e.g. 75" />
 						<span class="field-hint">Historical project delivery success</span>
+					</div>
+				</div>
+
+				<!-- SECTION: Operational Risk -->
+				<p class="form-section-title">
+					<mat-icon>monitoring</mat-icon>
+					Operational Risk Factors
+				</p>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="changeRequestFrequency">Change Request Frequency</label>
+						<input id="changeRequestFrequency" type="number" min="0" max="9" step="0.1" formControlName="changeRequestFrequency" placeholder="e.g. 1.4" />
+						<span class="field-hint">Higher values mean more scope volatility</span>
+					</div>
+					<div class="form-col">
+						<label for="teamTurnoverRate">Team Turnover (%)</label>
+						<input id="teamTurnoverRate" type="number" min="0" max="85" formControlName="teamTurnoverRate" placeholder="e.g. 27" />
+						<span class="field-hint">Percent of team expected to change</span>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="vendorReliability">Vendor Reliability (%)</label>
+						<input id="vendorReliability" type="number" min="0" max="100" formControlName="vendorReliability" placeholder="e.g. 73" />
+						<span class="field-hint">Reliability of external providers</span>
+					</div>
+					<div class="form-col">
+						<label for="schedulePressure">Schedule Pressure (%)</label>
+						<input id="schedulePressure" type="number" min="0" max="60" formControlName="schedulePressure" placeholder="e.g. 5" />
+						<span class="field-hint">Compression/pressure on delivery schedule</span>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col">
+						<label for="resourceAvailability">Resource Availability (%)</label>
+						<input id="resourceAvailability" type="number" min="0" max="100" formControlName="resourceAvailability" placeholder="e.g. 65" />
+						<span class="field-hint">How available required resources are</span>
+					</div>
+					<div class="form-col">
+						<label for="technicalDebt">Technical Debt (%)</label>
+						<input id="technicalDebt" type="number" min="0" max="100" formControlName="technicalDebt" placeholder="e.g. 0" />
+						<span class="field-hint">Existing debt/legacy burden</span>
 					</div>
 				</div>
 
@@ -136,6 +205,18 @@
 					<h2>Prediction Result</h2>
 					<p>Model confidence: {{ toPercent(result.score) }}%</p>
 				</header>
+
+				@if (result.model?.algorithm) {
+					<div class="input-summary">
+						<p class="input-summary-title">Model</p>
+						<div class="input-grid">
+							<span class="input-key">Algorithm</span>
+							<span class="input-val">{{ result.model?.algorithm }}</span>
+							<span class="input-key">Test accuracy</span>
+							<span class="input-val">{{ result.model?.accuracy }}%</span>
+						</div>
+					</div>
+				}
 
 				<div class="risk-summary" [class]="'risk-summary risk-summary--' + result.risk_level">
 					<mat-icon class="risk-icon">{{ getRiskIcon(result.risk_level) }}</mat-icon>
@@ -182,14 +263,32 @@
 						<span class="input-val">{{ getComplexityLabel(form.value.complexityScore ?? 6) }}</span>
 						<span class="input-key">Stakeholders</span>
 						<span class="input-val">{{ form.value.stakeholderCount }}</span>
+						<span class="input-key">Similar projects</span>
+						<span class="input-val">{{ form.value.pastSimilarProjects }}</span>
 						<span class="input-key">Ext. dependencies</span>
 						<span class="input-val">{{ form.value.externalDependencies }}</span>
 						<span class="input-key">Experience</span>
 						<span class="input-val">{{ getExperienceLabel(form.value.teamExperience ?? 1) }}</span>
 						<span class="input-key">Req. stability</span>
 						<span class="input-val">{{ getStabilityLabel(form.value.requirementStability ?? 1) }}</span>
+						<span class="input-key">Risk maturity</span>
+						<span class="input-val">{{ getRiskMaturityLabel(form.value.riskManagementMaturity ?? 1) }}</span>
+						<span class="input-key">Documentation</span>
+						<span class="input-val">{{ getDocumentationLabel(form.value.documentationQuality ?? 1) }}</span>
 						<span class="input-key">Success rate</span>
 						<span class="input-val">{{ form.value.successRate }}%</span>
+						<span class="input-key">Change frequency</span>
+						<span class="input-val">{{ form.value.changeRequestFrequency }}</span>
+						<span class="input-key">Team turnover</span>
+						<span class="input-val">{{ form.value.teamTurnoverRate }}%</span>
+						<span class="input-key">Vendor reliability</span>
+						<span class="input-val">{{ form.value.vendorReliability }}%</span>
+						<span class="input-key">Schedule pressure</span>
+						<span class="input-val">{{ form.value.schedulePressure }}%</span>
+						<span class="input-key">Resources</span>
+						<span class="input-val">{{ form.value.resourceAvailability }}%</span>
+						<span class="input-key">Technical debt</span>
+						<span class="input-val">{{ form.value.technicalDebt }}%</span>
 					</div>
 				</div>
 			} @else {
