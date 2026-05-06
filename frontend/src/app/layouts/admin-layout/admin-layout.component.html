@@ -1,88 +1,102 @@
 ﻿<div class="admin-shell">
-  <aside class="admin-sidebar">
-    <div class="admin-brand">
-      <div class="admin-logo">PC</div>
+  <div class="ambient-shape ambient-shape--one" aria-hidden="true"></div>
+  <div class="ambient-shape ambient-shape--two" aria-hidden="true"></div>
+
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    [class.visible]="isSidebarOpen"
+    aria-label="Close menu"
+    (click)="closeSidebar()"
+  ></button>
+
+  <aside class="admin-sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-brand">
+      <div class="brand-mark">AF</div>
       <div>
-        <p class="admin-brand-title">Accounting Platform</p>
-        <p class="admin-brand-subtitle">ADMIN CONSOLE</p>
+        <p class="brand-eyebrow">Workspace</p>
+        <h2 class="brand-title">Admin Hub</h2>
       </div>
     </div>
 
-    <nav class="admin-nav">
+    <section class="identity-card">
+      <p class="identity-label">Signed in as</p>
+      <p class="identity-name">{{ userDisplayName }}</p>
+      <p class="identity-date">{{ todayLabel }}</p>
+    </section>
+
+    <nav class="nav-menu">
       <a
         routerLink="/admin/dashboard"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="admin-nav-item"
+        class="nav-item"
+        (click)="closeSidebar()"
       >
-        <mat-icon>space_dashboard</mat-icon>
-        <span>Dashboard</span>
+        <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
+        <span class="nav-label">Dashboard</span>
       </a>
 
       <a
         routerLink="/admin/users"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="admin-nav-item"
+        class="nav-item"
+        (click)="closeSidebar()"
       >
-        <mat-icon>manage_accounts</mat-icon>
-        <span>Users</span>
+        <span class="nav-icon"><mat-icon>manage_accounts</mat-icon></span>
+        <span class="nav-label">Users</span>
       </a>
 
       <a
         routerLink="/admin/statistics"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="admin-nav-item"
+        class="nav-item"
+        (click)="closeSidebar()"
       >
-        <mat-icon>bar_chart</mat-icon>
-        <span>Statistics</span>
+        <span class="nav-icon"><mat-icon>bar_chart</mat-icon></span>
+        <span class="nav-label">Statistics</span>
       </a>
 
       <a
         routerLink="/admin/ml"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="admin-nav-item"
+        class="nav-item"
+        (click)="closeSidebar()"
       >
-        <mat-icon>model_training</mat-icon>
-        <span>ML Model</span>
+        <span class="nav-icon"><mat-icon>model_training</mat-icon></span>
+        <span class="nav-label">ML Model</span>
       </a>
     </nav>
 
-    <div class="admin-sidebar-footer">
-      <div class="admin-user-chip">
-        <div class="admin-user-avatar">{{ initials }}</div>
-        <div>
-          <p class="admin-user-name">{{ fullName || 'Administrator' }}</p>
-          <span class="admin-user-role">Administrator</span>
-        </div>
-      </div>
-
-      <a routerLink="/login" class="admin-logout" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Log out</span>
-      </a>
-    </div>
+    <button type="button" class="sidebar-logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Log out</span>
+    </button>
   </aside>
 
-  <section class="admin-content-wrap">
-    <header class="admin-topbar">
-      <h1 class="admin-topbar-title">{{ pageTitle }}</h1>
-
-      <div class="admin-topbar-right">
-        <button type="button" class="admin-bell" aria-label="Notifications">
-          <mat-icon>notifications</mat-icon>
+  <section class="admin-workspace">
+    <header class="workspace-header">
+      <div class="header-left">
+        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
+          <mat-icon>menu</mat-icon>
         </button>
 
-        <div class="admin-topbar-user">
-          <p class="admin-topbar-name">{{ fullName || 'Administrator' }}</p>
-          <div class="admin-topbar-avatar">{{ initials }}</div>
+        <div>
+          <p class="workspace-eyebrow">Admin Interface</p>
+          <h1 class="workspace-title">Platform supervision</h1>
         </div>
       </div>
+
+      <button type="button" class="header-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Log out</span>
+      </button>
     </header>
 
-    <main class="admin-page-content">
+    <main class="workspace-content">
       <router-outlet></router-outlet>
     </main>
   </section>

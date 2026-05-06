@@ -73,13 +73,44 @@ const isAssistantUser = (user) => normalizeRole(user?.role) === 'assistant';
 
 const isAssistantOwner = (client, userId) => Number(client?.assigned_expert_id) === Number(userId);
 
+const normalizeClientStatusFilter = (rawStatus) => {
+  if (typeof rawStatus !== 'string') {
+    return null;
+  }
+
+  const status = rawStatus.trim().toLowerCase();
+  if (!status) {
+    return null;
+  }
+
+  if (status === 'actif') {
+    return 'active';
+  }
+
+  if (status === 'inactif') {
+    return 'inactive';
+  }
+
+  if (['active', 'inactive', 'prospect'].includes(status)) {
+    return status;
+  }
+
+  return null;
+};
+
 const getAll = async (req, res, next) => {
   try {
-    const where = isAssistantUser(req.user)
-      ? { assigned_expert_id: req.user.id }
-      : undefined;
+    const requestedStatus = normalizeClientStatusFilter(req.query?.status);
+    const where = {};
 
-    const clients = await Client.findAll({ where, include: clientInclude });
+    if (requestedStatus) {
+      where.status = requestedStatus;
+    }
+
+    const clients = await Client.findAll({
+      where: Object.keys(where).length > 0 ? where : undefined,
+      include: clientInclude,
+    });
     res.json(clients);
   } catch (error) {
     next(error);

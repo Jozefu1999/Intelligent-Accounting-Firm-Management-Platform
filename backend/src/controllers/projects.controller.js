@@ -3,7 +3,6 @@ const { Project, Client } = require('../models');
 const { normalizeRole } = require('../utils/roles');
 const {
   resolveClientIdsForUser,
-  resolveAssistantClientIds,
 } = require('../utils/client-scope');
 
 const parseNumericId = (value) => {
@@ -19,26 +18,7 @@ const getAll = async (req, res, next) => {
     const normalizedRole = normalizeRole(req.user.role);
     const where = {};
 
-    if (normalizedRole === 'assistant') {
-      const assistantClientIds = await resolveAssistantClientIds(req.user);
-
-      if (!assistantClientIds.length) {
-        return res.json([]);
-      }
-
-      if (requestedClientId && requestedClientId !== 'me') {
-        const parsedClientId = parseNumericId(requestedClientId);
-        if (!parsedClientId || !hasClientAccess(assistantClientIds, parsedClientId)) {
-          return res.status(403).json({ message: 'Forbidden. You can only access projects linked to your account.' });
-        }
-
-        where.client_id = parsedClientId;
-      } else {
-        where.client_id = {
-          [Op.in]: assistantClientIds,
-        };
-      }
-    } else if (normalizedRole === 'visiteur') {
+    if (normalizedRole === 'visiteur') {
       const ownedClientIds = await resolveClientIdsForUser(req.user);
 
       if (!ownedClientIds.length) {
@@ -90,14 +70,6 @@ const getById = async (req, res, next) => {
 
     const normalizedRole = normalizeRole(req.user.role);
 
-    if (normalizedRole === 'assistant') {
-      const assistantClientIds = await resolveAssistantClientIds(req.user);
-
-      if (!hasClientAccess(assistantClientIds, project.client_id)) {
-        return res.status(403).json({ message: 'Forbidden. You can only access projects linked to your account.' });
-      }
-    }
-
     if (normalizedRole === 'visiteur') {
       const ownedClientIds = await resolveClientIdsForUser(req.user);
 
@@ -120,19 +92,6 @@ const create = async (req, res, next) => {
       return res.status(403).json({ message: 'Forbidden. Client role has read-only access to projects.' });
     }
 
-    if (normalizedRole === 'assistant') {
-      const assistantClientIds = await resolveAssistantClientIds(req.user);
-      const requestedClientId = parseNumericId(req.body.client_id);
-
-      if (!requestedClientId) {
-        return res.status(400).json({ message: 'Invalid client_id value.' });
-      }
-
-      if (!hasClientAccess(assistantClientIds, requestedClientId)) {
-        return res.status(403).json({ message: 'Forbidden. You can only create projects for clients linked to your account.' });
-      }
-    }
-
     const project = await Project.create(req.body);
     res.status(201).json(project);
   } catch (error) {
@@ -153,26 +112,6 @@ const update = async (req, res, next) => {
       return res.status(404).json({ message: 'Project not found.' });
     }
 
-    if (normalizedRole === 'assistant') {
-      const assistantClientIds = await resolveAssistantClientIds(req.user);
-
-      if (!hasClientAccess(assistantClientIds, project.client_id)) {
-        return res.status(403).json({ message: 'Forbidden. You can only update projects linked to your account.' });
-      }
-
-      if (req.body.client_id !== undefined) {
-        const nextClientId = parseNumericId(req.body.client_id);
-
-        if (!nextClientId) {
-          return res.status(400).json({ message: 'Invalid client_id value.' });
-        }
-
-        if (!hasClientAccess(assistantClientIds, nextClientId)) {
-          return res.status(403).json({ message: 'Forbidden. You can only reassign to clients linked to your account.' });
-        }
-      }
-    }
-
     await project.update(req.body);
     res.json(project);
   } catch (error) {
@@ -191,14 +130,6 @@ const remove = async (req, res, next) => {
     const project = await Project.findByPk(req.params.id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found.' });
-    }
-
-    if (normalizedRole === 'assistant') {
-      const assistantClientIds = await resolveAssistantClientIds(req.user);
-
-      if (!hasClientAccess(assistantClientIds, project.client_id)) {
-        return res.status(403).json({ message: 'Forbidden. You can only delete projects linked to your account.' });
-      }
     }
 
     await project.destroy();

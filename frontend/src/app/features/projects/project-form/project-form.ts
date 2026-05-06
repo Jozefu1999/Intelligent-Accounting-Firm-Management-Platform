@@ -141,11 +141,20 @@ export class ProjectForm implements OnInit {
   }
 
   private loadClients(): void {
-    this.clientService.getAll()
+    const clientsRequest = this.clientService.getAll();
+
+    clientsRequest
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (clients) => {
           this.clients = clients ?? [];
+
+          if (this.clients.length === 0) {
+            this.errorMessage = this.isAssistantContext
+              ? 'No client account is available for project assignment.'
+              : 'No client account is available for project assignment.';
+          }
+
           this.cdr.detectChanges();
         },
         error: (error) => {
