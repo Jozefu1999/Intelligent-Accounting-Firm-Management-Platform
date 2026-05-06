@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { UserRole } from '../models';
+import { UserRole, MlStatusResponse, MlRetrainRequest, MlRetrainResponse } from '../models';
 
 export interface AdminUser {
   id: number;
@@ -68,6 +68,7 @@ export interface AdminActivityItem {
 export class AdminService {
   private readonly baseUrl = `${environment.apiUrl}/admin`;
   private readonly usersApiUrl = `${this.baseUrl}/users`;
+  private readonly mlApiUrl = `${this.baseUrl}/ml`;
 
   constructor(private http: HttpClient) {}
 
@@ -93,5 +94,13 @@ export class AdminService {
 
   deleteUser(id: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.usersApiUrl}/${id}`);
+  }
+
+  getMlStatus(): Observable<MlStatusResponse> {
+    return this.http.get<MlStatusResponse>(`${this.mlApiUrl}/status`);
+  }
+
+  retrainModel(body: MlRetrainRequest): Observable<MlRetrainResponse> {
+    return this.http.post<MlRetrainResponse>(`${this.mlApiUrl}/retrain`, body);
   }
 }

@@ -146,9 +146,25 @@ export interface AiRecommendationsResponse {
 }
 
 export interface RiskPredictionRequest {
-  annual_revenue: number;
-  estimated_budget: number;
-  sector_code: number;
+  team_size: number;
+  budget_usd: number;
+  duration_months?: number;
+  complexity_score?: number;
+  stakeholder_count?: number;
+  past_similar_projects?: number;
+  success_rate?: number;
+  budget_utilization?: number;
+  change_request_frequency?: number;
+  team_turnover_rate?: number;
+  vendor_reliability?: number;
+  schedule_pressure?: number;
+  resource_availability?: number;
+  technical_debt?: number;
+  team_experience?: number;
+  requirement_stability?: number;
+  risk_management_maturity?: number;
+  documentation_quality?: number;
+  external_dependencies?: number;
 }
 
 export interface RiskPredictionResponse {
@@ -159,4 +175,57 @@ export interface RiskPredictionResponse {
     medium: number;
     high: number;
   };
+  model?: {
+    algorithm?: string;
+    accuracy?: number;
+    selected_features?: string[];
+  };
+}
+
+export type ProjectType = 'creation' | 'development' | 'audit' | 'consulting' | 'other';
+
+export interface ProjectClassificationRequest {
+  annual_revenue: number;
+  estimated_budget: number;
+  sector_code: number | string;
+  priority?: 'low' | 'medium' | 'high';
+  duration_days?: number;
+}
+
+export interface ProjectClassificationResult {
+  type: ProjectType;
+  probability: number;
+}
+
+export interface ProjectClassificationResponse {
+  predicted_type: ProjectType;
+  confidence: number;
+  sector_code?: number;
+  probabilities: Record<ProjectType, number>;
+  ranking: ProjectClassificationResult[];
+}
+
+export interface MlModelInfo {
+  model: string;
+  exists: boolean;
+  lastModified: string | null;
+  running: boolean;
+  lastRun: string | null;
+  accuracy: number | null;
+  dataSource: string | null;
+  error: string | null;
+}
+
+export interface MlStatusResponse {
+  models: Record<string, MlModelInfo>;
+}
+
+export interface MlRetrainRequest {
+  model: 'risk' | 'classification' | 'all';
+}
+
+export interface MlRetrainResponse {
+  message: string;
+  models: string[];
+  startedAt: string;
 }

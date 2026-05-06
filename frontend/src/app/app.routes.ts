@@ -83,6 +83,10 @@ export const routes: Routes = [
         path: 'ai-tools/risk-prediction',
         loadComponent: () => import('./features/ai-tools/risk-prediction/risk-prediction').then(m => m.RiskPrediction),
       },
+      {
+        path: 'ai-tools/project-classification',
+        loadComponent: () => import('./features/ai-tools/project-classification/project-classification').then(m => m.ProjectClassification),
+      },
     ],
   },
   {

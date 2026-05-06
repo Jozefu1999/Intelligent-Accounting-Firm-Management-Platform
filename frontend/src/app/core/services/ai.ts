@@ -7,6 +7,8 @@ import {
   AiRecommendationsResponse,
   RiskPredictionRequest,
   RiskPredictionResponse,
+  ProjectClassificationRequest,
+  ProjectClassificationResponse,
 } from '../models';
 
 @Injectable({
@@ -27,5 +29,9 @@ export class AiService {
 
   predictRisk(data: RiskPredictionRequest): Observable<RiskPredictionResponse> {
     return this.http.post<RiskPredictionResponse>(`${this.apiUrl}/predict-risk`, data);
+  }
+
+  classifyProject(data: ProjectClassificationRequest): Observable<ProjectClassificationResponse> {
+    return this.http.post<ProjectClassificationResponse>(`${this.apiUrl}/classify-project`, data);
   }
 }

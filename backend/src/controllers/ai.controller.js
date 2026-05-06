@@ -1,5 +1,5 @@
 const OpenAI = require('openai');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const { AiBusinessPlan, Project, Client } = require('../models');
@@ -428,17 +428,67 @@ const getRecommendations = async (req, res, next) => {
 
 const predictRisk = async (req, res, next) => {
   try {
-    const { annual_revenue, estimated_budget, sector_code } = req.body;
+    const {
+      team_size,
+      budget_usd,
+      duration_months,
+      complexity_score,
+      stakeholder_count,
+      past_similar_projects,
+      success_rate,
+      budget_utilization,
+      change_request_frequency,
+      team_turnover_rate,
+      vendor_reliability,
+      schedule_pressure,
+      resource_availability,
+      technical_debt,
+      team_experience,
+      requirement_stability,
+      risk_management_maturity,
+      documentation_quality,
+      external_dependencies,
+    } = req.body;
 
-    const features = JSON.stringify([annual_revenue, estimated_budget, sector_code]);
-    const scriptPath = path.join(__dirname, '../../ml/predict.py');
+    if (team_size == null || budget_usd == null) {
+      return res.status(400).json({ message: 'team_size and budget_usd are required.' });
+    }
 
-    exec(`python "${scriptPath}" '${features}'`, (error, stdout, stderr) => {
+    const payload = {
+      team_size,
+      budget_usd,
+      ...(duration_months       != null && { duration_months }),
+      ...(complexity_score      != null && { complexity_score }),
+      ...(stakeholder_count     != null && { stakeholder_count }),
+      ...(past_similar_projects != null && { past_similar_projects }),
+      ...(success_rate          != null && { success_rate }),
+      ...(budget_utilization    != null && { budget_utilization }),
+      ...(change_request_frequency != null && { change_request_frequency }),
+      ...(team_turnover_rate    != null && { team_turnover_rate }),
+      ...(vendor_reliability    != null && { vendor_reliability }),
+      ...(schedule_pressure     != null && { schedule_pressure }),
+      ...(resource_availability != null && { resource_availability }),
+      ...(technical_debt        != null && { technical_debt }),
+      ...(team_experience       != null && { team_experience }),
+      ...(requirement_stability != null && { requirement_stability }),
+      ...(risk_management_maturity != null && { risk_management_maturity }),
+      ...(documentation_quality != null && { documentation_quality }),
+      ...(external_dependencies != null && { external_dependencies }),
+    };
+
+    const features = JSON.stringify(payload);
+    const scriptPath = path.join(__dirname, '../../../ml/predict.py');
+    const python = process.env.PYTHON_EXECUTABLE || 'python';
+
+    execFile(python, [scriptPath, features], (error, stdout, stderr) => {
       if (error) {
-        return res.status(500).json({ message: 'ML prediction failed.', error: stderr });
+        return res.status(500).json({ message: 'ML risk prediction failed.', error: stderr });
       }
       try {
         const result = JSON.parse(stdout.trim());
+        if (result.error) {
+          return res.status(500).json({ message: result.error });
+        }
         res.json(result);
       } catch {
         res.status(500).json({ message: 'Failed to parse ML output.' });
@@ -449,4 +499,50 @@ const predictRisk = async (req, res, next) => {
   }
 };
 
-module.exports = { generateBusinessPlan, getRecommendations, predictRisk };
+const classifyProject = async (req, res, next) => {
+  try {
+    const {
+      annual_revenue,
+      estimated_budget,
+      sector_code,
+      sector,
+      priority = 'medium',
+      duration_days = 90,
+    } = req.body;
+
+    if (annual_revenue == null || estimated_budget == null) {
+      return res.status(400).json({ message: 'annual_revenue and estimated_budget are required.' });
+    }
+
+    const payload = {
+      annual_revenue,
+      estimated_budget,
+      sector_code: sector_code ?? sector ?? 5,
+      priority,
+      duration_days,
+    };
+
+    const features = JSON.stringify(payload);
+    const scriptPath = path.join(__dirname, '../../../ml/classify_project.py');
+    const python = process.env.PYTHON_EXECUTABLE || 'python';
+
+    execFile(python, [scriptPath, features], (error, stdout, stderr) => {
+      if (error) {
+        return res.status(500).json({ message: 'ML project classification failed.', error: stderr });
+      }
+      try {
+        const result = JSON.parse(stdout.trim());
+        if (result.error) {
+          return res.status(500).json({ message: result.error });
+        }
+        res.json(result);
+      } catch {
+        res.status(500).json({ message: 'Failed to parse ML classification output.' });
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { generateBusinessPlan, getRecommendations, predictRisk, classifyProject };

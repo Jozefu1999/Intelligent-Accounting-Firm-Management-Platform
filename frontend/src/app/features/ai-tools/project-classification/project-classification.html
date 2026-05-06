@@ -1,0 +1,145 @@
+<section class="ai-page">
+	<header class="ai-header">
+		<p class="ai-eyebrow">AI TOOLS — ML</p>
+		<h1>Project Classification</h1>
+		<p>Predict the most likely type of a project based on financial indicators, sector, priority and duration.</p>
+	</header>
+
+	<div class="ai-grid">
+		<!-- Form -->
+		<article class="ai-card ai-form-card">
+			<h2>Model Inputs</h2>
+			<p>Provide project and client details to classify the project type.</p>
+
+			<form [formGroup]="form" (ngSubmit)="classify()" class="ai-form-stack">
+
+				<label for="annualRevenue">Annual revenue (EUR)</label>
+				<input
+					id="annualRevenue"
+					type="number"
+					min="0"
+					formControlName="annualRevenue"
+					[attr.disabled]="isClassifying || null"
+				/>
+
+				<label for="estimatedBudget">Estimated project budget (EUR)</label>
+				<input
+					id="estimatedBudget"
+					type="number"
+					min="0"
+					formControlName="estimatedBudget"
+					[attr.disabled]="isClassifying || null"
+				/>
+
+				<label for="sectorCode">Sector</label>
+				<select
+					id="sectorCode"
+					formControlName="sectorCode"
+					[attr.disabled]="isClassifying || null"
+				>
+					@for (sector of sectorOptions; track sector.code) {
+						<option [value]="sector.code">{{ sector.label }}</option>
+					}
+				</select>
+
+				<label for="priority">Priority</label>
+				<select
+					id="priority"
+					formControlName="priority"
+					[attr.disabled]="isClassifying || null"
+				>
+					<option value="low">Low</option>
+					<option value="medium">Medium</option>
+					<option value="high">High</option>
+				</select>
+
+				<label for="durationDays">Expected duration (days)</label>
+				<input
+					id="durationDays"
+					type="number"
+					min="1"
+					formControlName="durationDays"
+					[attr.disabled]="isClassifying || null"
+				/>
+
+				<button type="submit" class="primary-btn" [disabled]="isClassifying">
+					@if (isClassifying) {
+						<mat-icon class="spin">autorenew</mat-icon>
+						<span>Classifying...</span>
+					} @else {
+						<mat-icon>category</mat-icon>
+						<span>Classify Project</span>
+					}
+				</button>
+			</form>
+
+			@if (errorMessage) {
+				<div class="alert alert-error">
+					<mat-icon>error</mat-icon>
+					<span>{{ errorMessage }}</span>
+				</div>
+			}
+
+			@if (successMessage) {
+				<div class="alert alert-success">
+					<mat-icon>check_circle</mat-icon>
+					<span>{{ successMessage }}</span>
+				</div>
+			}
+		</article>
+
+		<!-- Results -->
+		<article class="ai-card ai-result-card">
+			@if (result; as res) {
+				<header class="result-header">
+					<h2>Classification Result</h2>
+					<p>Confidence: {{ toPercent(res.confidence) }}%</p>
+				</header>
+
+				<div class="predicted-type">
+					<div class="type-icon-wrap">
+						<mat-icon>{{ getTypeIcon(res.predicted_type) }}</mat-icon>
+					</div>
+					<div>
+						<p class="type-label-small">Predicted project type</p>
+						<p class="type-label-main">{{ getTypeLabel(res.predicted_type) }}</p>
+					</div>
+				</div>
+
+				<h3 class="ranking-title">Probability breakdown</h3>
+				<div class="ranking-list">
+					@for (row of getRankingRows(); track row.type) {
+						<div class="ranking-row" [class.ranking-row-top]="row.type === res.predicted_type">
+							<div class="ranking-meta">
+								<span class="ranking-icon-wrap">
+									<mat-icon>{{ getTypeIcon(row.type) }}</mat-icon>
+								</span>
+								<span class="ranking-type-label">{{ getTypeLabel(row.type) }}</span>
+								<span class="ranking-pct">{{ toPercent(row.probability) }}%</span>
+							</div>
+							<div class="probability-track">
+								<div
+									class="probability-bar"
+									[class]="getBarClass(row.type, res.predicted_type)"
+									[style.width]="getBarWidth(row.probability)"
+								></div>
+							</div>
+						</div>
+					}
+				</div>
+
+				@if (result.sector_code !== undefined) {
+					<p class="sector-note">
+						<mat-icon>info</mat-icon>
+						Sector used: {{ getSectorLabel(result.sector_code) }}
+					</p>
+				}
+			} @else {
+				<div class="result-placeholder">
+					<mat-icon>category</mat-icon>
+					<p>Run the model to see the predicted project type and probability breakdown.</p>
+				</div>
+			}
+		</article>
+	</div>
+</section>

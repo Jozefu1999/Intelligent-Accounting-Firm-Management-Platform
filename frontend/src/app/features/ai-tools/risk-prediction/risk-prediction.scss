@@ -294,13 +294,134 @@
 }
 
 @keyframes rotate {
-	from {
-		transform: rotate(0);
-	}
+	from { transform: rotate(0); }
+	to { transform: rotate(360deg); }
+}
 
-	to {
-		transform: rotate(360deg);
+/* ---- Form sections ---- */
+.form-section-title {
+	margin: 0.7rem 0 0;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.78rem;
+	font-weight: 800;
+	letter-spacing: 0.06em;
+	color: #2563eb;
+	text-transform: uppercase;
+
+	mat-icon {
+		font-size: 1rem;
+		width: 1rem;
+		height: 1rem;
 	}
+}
+
+.form-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.5rem;
+}
+
+.form-col {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+}
+
+.field-hint {
+	font-size: 0.72rem;
+	color: #94a3b8;
+	margin-top: 0.1rem;
+}
+
+.ai-form-stack select {
+	border: 1px solid #cbd5e1;
+	border-radius: 0.7rem;
+	min-height: 42px;
+	padding: 0 0.8rem;
+	font-size: 0.9rem;
+	color: #0f172a;
+	background: #ffffff;
+	appearance: auto;
+	cursor: pointer;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+	&:focus {
+		outline: none;
+		border-color: #2563eb;
+		box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+	}
+}
+
+/* ---- Risk summary variants ---- */
+.risk-summary {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.risk-summary--high { border-color: #fecaca; background: #fff1f2; }
+.risk-summary--medium { border-color: #fcd34d; background: #fefce8; }
+.risk-summary--low { border-color: #bbf7d0; background: #f0fdf4; }
+
+.risk-icon {
+	font-size: 2rem;
+	width: 2rem;
+	height: 2rem;
+}
+.risk-summary--high .risk-icon { color: #dc2626; }
+.risk-summary--medium .risk-icon { color: #ca8a04; }
+.risk-summary--low .risk-icon { color: #16a34a; }
+
+/* ---- Probability section ---- */
+.probability-title {
+	margin: 0.85rem 0 0.4rem;
+	font-size: 0.76rem;
+	font-weight: 800;
+	letter-spacing: 0.06em;
+	color: #64748b;
+	text-transform: uppercase;
+}
+
+.probability-pct {
+	font-weight: 800;
+}
+
+/* ---- Input summary ---- */
+.input-summary {
+	margin-top: 1rem;
+	border: 1px solid #e2e8f0;
+	border-radius: 0.8rem;
+	background: #f8fafc;
+	padding: 0.75rem;
+}
+
+.input-summary-title {
+	margin: 0 0 0.6rem;
+	font-size: 0.76rem;
+	font-weight: 800;
+	letter-spacing: 0.06em;
+	color: #64748b;
+	text-transform: uppercase;
+}
+
+.input-grid {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.25rem 0.75rem;
+}
+
+.input-key {
+	font-size: 0.78rem;
+	color: #64748b;
+	white-space: nowrap;
+}
+
+.input-val {
+	font-size: 0.78rem;
+	font-weight: 700;
+	color: #0f172a;
 }
 
 @media (max-width: 1080px) {
@@ -312,3 +433,4 @@
 		min-height: 260px;
 	}
 }
+

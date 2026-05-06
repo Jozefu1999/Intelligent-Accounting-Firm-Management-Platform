@@ -91,6 +91,17 @@
         <span class="nav-icon"><mat-icon>warning</mat-icon></span>
         <span class="nav-label">Risk Prediction</span>
       </a>
+
+      <a
+        routerLink="/expert/ai-tools/project-classification"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        (click)="closeSidebar()"
+      >
+        <span class="nav-icon"><mat-icon>category</mat-icon></span>
+        <span class="nav-label">Project Classification</span>
+      </a>
     </nav>
 
     <button type="button" class="sidebar-logout" (click)="logout()">
