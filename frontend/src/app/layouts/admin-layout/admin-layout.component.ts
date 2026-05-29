@@ -2,7 +2,6 @@
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
-import { User } from '../../core/models';
 import { AuthService } from '../../core/services/auth';
 
 @Component({
@@ -19,9 +18,7 @@ export class AdminLayoutComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {
-    this.currentUser = this.authService.getCurrentUser();
-  }
+  ) {}
 
   get fullName(): string {
     const firstName = this.currentUser?.prenom || this.currentUser?.first_name || '';
@@ -40,15 +37,30 @@ export class AdminLayoutComponent {
       return 'User Management';
     }
 
-    if (currentUrl.includes('/admin/statistics')) {
-      return 'Global Statistics';
-    }
+    try {
+      const user = JSON.parse(rawUser) as {
+        first_name?: string;
+        last_name?: string;
+        prenom?: string;
+        nom?: string;
+      };
 
-    if (currentUrl.includes('/admin/ml')) {
-      return 'ML Model';
-    }
+      const firstName = user.prenom || user.first_name || '';
+      const lastName = user.nom || user.last_name || '';
+      const fullName = `${firstName} ${lastName}`.trim();
 
-    return 'Dashboard';
+      return fullName || 'Administrator';
+    } catch {
+      return 'Administrator';
+    }
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
   }
 
   toggleSidebar(): void {
@@ -61,7 +73,7 @@ export class AdminLayoutComponent {
 
   logout(): void {
     this.authService.logout();
-    localStorage.clear();
+    this.closeSidebar();
     void this.router.navigate(['/login']);
   }
 }
