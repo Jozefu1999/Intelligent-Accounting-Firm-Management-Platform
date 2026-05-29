@@ -37,7 +37,7 @@ export class AdminMlComponent implements OnInit {
     });
   }
 
-  retrain(model: 'risk' | 'classification' | 'all'): void {
+  retrain(model: 'risk' | 'all'): void {
     if (this.retrainingModel) return;
 
     this.retrainingModel = model;

@@ -1,60 +1,73 @@
 ﻿<div class="projects-workspace">
   @if (errorMessage) {
     <div class="alert alert-error">
+      <mat-icon class="alert-icon">error_outline</mat-icon>
       {{ errorMessage }}
     </div>
   }
 
-  <section class="hero-panel">
-    <div>
-      <p class="hero-eyebrow">Expert workspace</p>
-      <h1 class="hero-title">Project Management</h1>
-      <p class="hero-subtitle">Manage all missions, track progress, and quickly access key actions.</p>
+  <header class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-title">Projects</h1>
+      <div class="page-stats">
+        <span class="stat">
+          <span class="stat__value">{{ totalProjectsCount }}</span>
+          <span class="stat__label">Total</span>
+        </span>
+        <span class="stat-divider"></span>
+        <span class="stat">
+          <span class="stat__value stat__value--active">{{ inProgressProjectsCount }}</span>
+          <span class="stat__label">In progress</span>
+        </span>
+        <span class="stat-divider"></span>
+        <span class="stat">
+          <span class="stat__value stat__value--done">{{ completedProjectsCount }}</span>
+          <span class="stat__label">Completed</span>
+        </span>
+      </div>
     </div>
 
-    <div class="hero-actions">
-      <button type="button" class="action-button action-button--secondary" (click)="loadProjects()">
+    <div class="header-actions">
+      <button type="button" class="btn btn--ghost" (click)="loadProjects()" aria-label="Refresh">
         <mat-icon>refresh</mat-icon>
-        <span>Refresh</span>
       </button>
 
-      <a routerLink="/projects/new" class="action-button action-button--primary">
-        <mat-icon>add_circle</mat-icon>
+      <a routerLink="new" class="btn btn--primary">
+        <mat-icon>add</mat-icon>
         <span>New project</span>
       </a>
     </div>
-  </section>
-
-  <section class="metrics-grid">
-    <article class="metric-card">
-      <p class="metric-label">Total projects</p>
-      <p class="metric-value">{{ totalProjectsCount }}</p>
-      <p class="metric-hint">Overall portfolio</p>
-    </article>
-
-    <article class="metric-card">
-      <p class="metric-label">In progress</p>
-      <p class="metric-value">{{ inProgressProjectsCount }}</p>
-      <p class="metric-hint">Active execution</p>
-    </article>
-
-    <article class="metric-card">
-      <p class="metric-label">Completed</p>
-      <p class="metric-value">{{ completedProjectsCount }}</p>
-      <p class="metric-hint">Completed missions</p>
-    </article>
-
-    <article class="metric-card metric-card--accent">
-      <p class="metric-label">Progress</p>
-      <p class="metric-value">{{ completionRate }}%</p>
-      <p class="metric-hint">{{ cancelledProjectsCount }} cancelled</p>
-    </article>
-  </section>
+  </header>
 
   <section class="table-panel">
     @if (isLoading) {
-      <div class="table-loader">
-        <div class="spinner"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Client</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Updated</th>
+              <th class="th-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of [1,2,3,4,5,6]; track row) {
+              <tr>
+                <td><div class="skeleton-cell skeleton-w-lg"></div></td>
+                <td><div class="skeleton-cell skeleton-w-md"></div></td>
+                <td><div class="skeleton-cell skeleton-w-sm"></div></td>
+                <td><div class="skeleton-cell skeleton-w-sm skeleton-pill"></div></td>
+                <td><div class="skeleton-cell skeleton-w-sm skeleton-pill"></div></td>
+                <td><div class="skeleton-cell skeleton-w-md"></div></td>
+                <td><div class="skeleton-cell skeleton-w-xs"></div></td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     } @else {
       <div class="table-wrap">
@@ -66,20 +79,25 @@
               <th>Type</th>
               <th>Status</th>
               <th>Priority</th>
-              <th>Update</th>
-              <th>Actions</th>
+              <th>Updated</th>
+              <th class="th-actions">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             @for (project of projects; track trackByProjectId($index, project)) {
-              <tr>
+              <tr [routerLink]="[project.id]" class="clickable-row">
                 <td>
-                  <p class="project-name">{{ project.name }}</p>
+                  <span class="project-name">{{ project.name }}</span>
                 </td>
 
-                <td class="project-client">{{ project.client?.company_name || 'N/A' }}</td>
-                <td>{{ getTypeLabel(project.type) }}</td>
+                <td>
+                  <span class="project-client">{{ project.client?.company_name || '—' }}</span>
+                </td>
+
+                <td>
+                  <span class="type-label">{{ getTypeLabel(project.type) }}</span>
+                </td>
 
                 <td>
                   <span [class]="getStatusPillClass(project.status)">
@@ -93,15 +111,17 @@
                   </span>
                 </td>
 
-                <td>{{ getMostRecentDate(project) }}</td>
-
                 <td>
+                  <span class="cell-date">{{ getMostRecentDate(project) }}</span>
+                </td>
+
+                <td (click)="$event.stopPropagation()">
                   <div class="actions-cell">
-                    <a [routerLink]="['/projects', project.id]" class="row-action row-action--view" aria-label="View project">
+                    <a [routerLink]="[project.id]" class="row-action row-action--view" aria-label="View project">
                       <mat-icon>visibility</mat-icon>
                     </a>
 
-                    <a [routerLink]="['/projects', project.id, 'edit']" class="row-action row-action--edit" aria-label="Edit project">
+                    <a [routerLink]="[project.id, 'edit']" class="row-action row-action--edit" aria-label="Edit project">
                       <mat-icon>edit</mat-icon>
                     </a>
 
@@ -113,7 +133,11 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">No project available at the moment.</td>
+                <td colspan="7" class="empty-state">
+                  <mat-icon class="empty-state__icon">folder_open</mat-icon>
+                  <span class="empty-state__text">No projects yet</span>
+                  <a routerLink="new" class="empty-state__action">Create your first project</a>
+                </td>
               </tr>
             }
           </tbody>

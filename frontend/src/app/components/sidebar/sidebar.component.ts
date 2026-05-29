@@ -23,7 +23,7 @@ interface SidebarItem {
   styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
-  @Input() role = 'visiteur';
+  @Input() role = 'client';
 
   private readonly aiToolPaths = new Set([
     '/ai-tools/business-plan',
@@ -51,11 +51,9 @@ export class SidebarComponent {
       { label: 'Statistics', subtitle: 'System activity', icon: 'bar_chart', path: '/admin/statistics', exact: true },
       { label: 'ML Model', subtitle: 'Retrain and monitoring', icon: 'model_training', path: '/admin/ml', exact: true },
     ],
-    visiteur: [
+    client: [
       { label: 'Dashboard', subtitle: 'My client space', icon: 'dashboard', path: '/client/dashboard', exact: true },
-      { label: 'My Projects', subtitle: 'Case tracking', icon: 'work', path: '/client/projects', exact: true },
-      { label: 'My Profile', subtitle: 'Personal information', icon: 'person', path: '/client/profile', exact: true },
-      { label: 'Contact', subtitle: 'Messages to the firm', icon: 'mail', path: '/client/contact', exact: true },
+      { label: 'Contact', subtitle: 'Contact administration', icon: 'mail', path: '/client/contact', exact: true },
     ],
   };
 

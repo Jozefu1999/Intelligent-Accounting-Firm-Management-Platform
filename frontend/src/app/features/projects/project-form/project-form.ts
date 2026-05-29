@@ -6,8 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { finalize, timeout } from 'rxjs';
-import { Client, Project } from '../../../core/models';
-import { ClientService } from '../../../core/services/client';
+import { Project } from '../../../core/models';
 import { ProjectService } from '../../../core/services/project';
 
 @Component({
@@ -17,12 +16,9 @@ import { ProjectService } from '../../../core/services/project';
   styleUrl: './project-form.scss',
 })
 export class ProjectForm implements OnInit {
-  clients: Client[] = [];
-
   listRoute = '/projects';
   isAssistantContext = false;
 
-  selectedClientId = '';
   name = '';
   description = '';
   type: Project['type'] = 'creation';
@@ -41,7 +37,6 @@ export class ProjectForm implements OnInit {
 
   constructor(
     private readonly projectService: ProjectService,
-    private readonly clientService: ClientService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly cdr: ChangeDetectorRef,
@@ -49,9 +44,7 @@ export class ProjectForm implements OnInit {
 
   ngOnInit(): void {
     this.isAssistantContext = this.router.url.startsWith('/assistant/');
-    this.listRoute = this.isAssistantContext ? '/assistant/projets' : '/projects';
-
-    this.loadClients();
+    this.listRoute = this.isAssistantContext ? '/assistant/projets' : '/expert/projects';
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (!idParam) {
@@ -82,7 +75,6 @@ export class ProjectForm implements OnInit {
     }
 
     const payload: Partial<Project> = {
-      client_id: Number(this.selectedClientId),
       name: this.name.trim(),
       description: this.description.trim() || undefined,
       type: this.type,
@@ -140,21 +132,6 @@ export class ProjectForm implements OnInit {
       });
   }
 
-  private loadClients(): void {
-    this.clientService.getAll()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (clients) => {
-          this.clients = clients ?? [];
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          this.errorMessage = this.extractErrorMessage(error, 'Unable to load clients for project assignment.');
-          this.cdr.detectChanges();
-        },
-      });
-  }
-
   private loadProject(id: number): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -169,7 +146,6 @@ export class ProjectForm implements OnInit {
       )
       .subscribe({
         next: (project) => {
-          this.selectedClientId = String(project.client_id);
           this.name = project.name ?? '';
           this.description = project.description ?? '';
           this.type = project.type ?? 'creation';
@@ -187,10 +163,6 @@ export class ProjectForm implements OnInit {
   }
 
   private getValidationError(): string {
-    if (!this.selectedClientId) {
-      return 'Please select a client.';
-    }
-
     if (!this.name.trim()) {
       return 'Project name is required.';
     }

@@ -1,98 +1,107 @@
-<section class="ai-page">
-	<header class="ai-header">
-		<p class="ai-eyebrow">AI TOOLS</p>
-		<h1>Smart Recommendations</h1>
-		<p>Generate actionable recommendations tailored to each client profile.</p>
-	</header>
-
-	<div class="ai-grid">
-		<article class="ai-card ai-form-card">
-			<h2>Generate Recommendations</h2>
-			<p>Choose a client and request 3 to 5 prioritized actions.</p>
-
-			<form [formGroup]="form" (ngSubmit)="generateRecommendations()" class="ai-form-stack">
-				<label for="clientId">Client</label>
-				<select
-					id="clientId"
-					formControlName="clientId"
-					[disabled]="isClientsLoading || isGenerating"
-				>
-					<option [ngValue]="0">Select a client</option>
+<section class="reco-page">
+	<header class="reco-header">
+		<div class="header-left">
+			<div class="header-icon">
+				<mat-icon>tips_and_updates</mat-icon>
+			</div>
+			<div>
+				<h1>Smart Recommendations</h1>
+				<p>AI-powered strategic advice tailored to each client's profile and projects.</p>
+			</div>
+		</div>
+		<div class="header-form">
+			<form [formGroup]="form" (ngSubmit)="generateRecommendations()">
+				<select formControlName="clientId" class="client-select" [disabled]="isClientsLoading || isGenerating">
+					<option [ngValue]="0">Select a client...</option>
 					@for (client of clients; track client.id) {
-						<option [ngValue]="client.id">
-							{{ client.company_name }}
-						</option>
+						<option [ngValue]="client.id">{{ client.company_name }}</option>
 					}
 				</select>
-
-				@if (selectedClient) {
-					<div class="client-preview">
-						<p class="client-preview-title">Selected client</p>
-						<p class="client-preview-name">{{ selectedClient.company_name }}</p>
-						<p class="client-preview-meta">
-							Revenue: {{ selectedClient.annual_revenue || 0 | number }} EUR
-							| Current risk: {{ selectedClient.risk_level || 'n/a' }}
-						</p>
-					</div>
-				}
-
-				<button
-					type="submit"
-					class="primary-btn"
-					[disabled]="isGenerating || isClientsLoading || clients.length === 0"
-				>
+				<button type="submit" class="generate-btn" [disabled]="isGenerating || isClientsLoading || form.invalid || form.controls.clientId.value === 0">
 					@if (isGenerating) {
-						<mat-icon class="spin">autorenew</mat-icon>
-						<span>Generating...</span>
+						<span class="spinner"></span>
+						<span>Analyzing...</span>
 					} @else {
-						<mat-icon>lightbulb</mat-icon>
-						<span>Generate Recommendations</span>
+						<mat-icon>auto_awesome</mat-icon>
+						<span>Generate</span>
 					}
 				</button>
 			</form>
+		</div>
+	</header>
 
-			@if (errorMessage) {
-				<div class="alert alert-error">
-					<mat-icon>error</mat-icon>
-					<span>{{ errorMessage }}</span>
-				</div>
-			}
+	@if (errorMessage) {
+		<div class="alert alert-error">
+			<mat-icon>error_outline</mat-icon>
+			<span>{{ errorMessage }}</span>
+			<button class="alert-close" (click)="errorMessage = ''"><mat-icon>close</mat-icon></button>
+		</div>
+	}
 
-			@if (successMessage) {
-				<div class="alert alert-success">
-					<mat-icon>check_circle</mat-icon>
-					<span>{{ successMessage }}</span>
-				</div>
-			}
-		</article>
+	@if (successMessage && recommendations.length > 0) {
+		<div class="alert alert-success">
+			<mat-icon>check_circle</mat-icon>
+			<span>{{ successMessage }}</span>
+			<button class="alert-close" (click)="successMessage = ''"><mat-icon>close</mat-icon></button>
+		</div>
+	}
 
-		<article class="ai-card ai-result-card">
-			@if (recommendations.length > 0) {
-				<header class="result-header">
-					<h2>Recommended Actions</h2>
-					<p>{{ recommendations.length }} recommendation(s) generated.</p>
-				</header>
+	@if (selectedClient && !isGenerating) {
+		<div class="client-context">
+			<div class="context-item">
+				<mat-icon>business</mat-icon>
+				<span>{{ selectedClient.company_name }}</span>
+			</div>
+			<div class="context-item">
+				<mat-icon>category</mat-icon>
+				<span>{{ selectedClient.sector || 'No sector' }}</span>
+			</div>
+			<div class="context-item">
+				<mat-icon>payments</mat-icon>
+				<span>{{ selectedClient.annual_revenue || 0 | number }} TND</span>
+			</div>
+			<div class="context-item" [class]="'context-item risk-' + (selectedClient.risk_level || 'unknown')">
+				<mat-icon>shield</mat-icon>
+				<span>Risk: {{ selectedClient.risk_level || 'N/A' }}</span>
+			</div>
+		</div>
+	}
 
-				<div class="recommendation-list">
-					@for (recommendation of recommendations; track recommendation.title + recommendation.description) {
-						<article class="recommendation-card">
-							<div class="recommendation-head">
-								<h3>{{ recommendation.title }}</h3>
-								<span class="priority-chip" [class]="'priority-chip ' + getPriorityClass(recommendation.priority)">
-									{{ getPriorityLabel(recommendation.priority) }}
+	@if (isGenerating) {
+		<div class="generating-state">
+			<div class="generating-spinner"></div>
+			<h3>Analyzing client profile...</h3>
+			<p>Generating strategic recommendations based on financial data and project portfolio.</p>
+		</div>
+	} @else if (recommendations.length > 0) {
+		<div class="reco-grid">
+			@for (recommendation of recommendations; track recommendation.title; let i = $index) {
+				<article class="reco-card">
+					<div class="reco-card-top">
+						<div class="reco-number">{{ i + 1 }}</div>
+						<div class="reco-badges">
+							@if (recommendation.category) {
+								<span class="category-badge" [class]="'category-badge cat-' + recommendation.category">
+									{{ getCategoryLabel(recommendation.category) }}
 								</span>
-							</div>
-							<p>{{ recommendation.description }}</p>
-						</article>
-					}
-				</div>
-			} @else {
-				<div class="result-placeholder">
-					<mat-icon>tips_and_updates</mat-icon>
-					<h2>No recommendations yet</h2>
-					<p>Run generation to receive strategic suggestions for the selected client.</p>
-				</div>
+							}
+							<span class="priority-badge" [class]="'priority-badge ' + getPriorityClass(recommendation.priority)">
+								{{ getPriorityLabel(recommendation.priority) }}
+							</span>
+						</div>
+					</div>
+					<h3 class="reco-title">{{ recommendation.title }}</h3>
+					<p class="reco-desc">{{ recommendation.description }}</p>
+				</article>
 			}
-		</article>
-	</div>
+		</div>
+	} @else {
+		<div class="empty-state">
+			<div class="empty-icon">
+				<mat-icon>lightbulb</mat-icon>
+			</div>
+			<h3>No recommendations yet</h3>
+			<p>Select a client and generate to receive personalized strategic advice.</p>
+		</div>
+	}
 </section>

@@ -27,4 +27,4 @@ const createRoleGuard = (expectedRole: UserRole): CanActivateFn => {
 export const ExpertGuard = createRoleGuard('expert_comptable');
 export const AssistantGuard = createRoleGuard('assistant');
 export const AdminGuard = createRoleGuard('administrateur');
-export const ClientGuard = createRoleGuard('visiteur');
+export const ClientGuard = createRoleGuard('client');

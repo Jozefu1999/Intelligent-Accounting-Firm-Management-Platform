@@ -1,0 +1,239 @@
+<div>
+  <header class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-[1.5rem] font-bold tracking-tight text-[#0f172a]">My Assistants</h1>
+      <p class="mt-1 text-[0.82rem] text-[#64748b]">{{ filteredAssistants.length }} of {{ assistants.length }} assistants</p>
+    </div>
+  </header>
+
+  @if (successMessage) {
+    <div class="mb-4 flex items-center justify-between gap-4 rounded-[0.7rem] border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-[0.82rem] text-emerald-700">
+      <div class="flex items-center gap-2">
+        <mat-icon class="text-base">check_circle</mat-icon>
+        <span>{{ successMessage }}</span>
+      </div>
+      <button type="button" (click)="clearSuccessMessage()" class="inline-flex h-6 w-6 items-center justify-center rounded-full text-emerald-700 hover:bg-emerald-100" aria-label="Close">
+        <mat-icon class="text-base">close</mat-icon>
+      </button>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="mb-4 rounded-[0.7rem] border border-red-200 bg-red-50 px-4 py-2.5 text-[0.82rem] text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Search Bar -->
+  <div class="mb-4 flex flex-wrap items-center gap-3">
+    <div class="relative flex-1 min-w-[200px]">
+      <mat-icon class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#94a3b8]">search</mat-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by name or email..."
+        class="w-full rounded-[0.7rem] border border-[#e2e8f0] bg-white py-2.5 pl-10 pr-4 text-[0.82rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.12)]"
+      />
+    </div>
+
+    @if (searchQuery) {
+      <button type="button" (click)="clearFilters()" class="inline-flex items-center gap-1 rounded-[0.7rem] border border-[#e2e8f0] bg-white px-3 py-2.5 text-[0.82rem] text-[#64748b] hover:bg-[#f1f5f9]">
+        <mat-icon class="text-[16px]">clear</mat-icon> Clear
+      </button>
+    }
+  </div>
+
+  <!-- Assistant Cards -->
+  @if (isLoading) {
+    <div class="rounded-xl border border-[#e2e8f0] bg-white px-5 py-10 text-center text-[0.82rem] text-[#94a3b8]">
+      Loading assistants...
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (assistant of filteredAssistants; track assistant.id) {
+        <div class="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white transition-shadow hover:shadow-sm">
+          <!-- Assistant Row -->
+          <div class="flex items-center gap-4 px-5 py-4 cursor-pointer" (click)="toggleExpand(assistant)">
+            <!-- Avatar -->
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] text-[0.75rem] font-bold text-[#16a34a]">
+              {{ assistant.first_name.charAt(0) }}{{ assistant.last_name.charAt(0) }}
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-[0.88rem] font-semibold text-[#0f172a] truncate">{{ assistant.first_name }} {{ assistant.last_name }}</span>
+                <span class="inline-flex items-center rounded-full bg-[#f0fdf4] border border-[#bbf7d0] px-2 py-0.5 text-[0.68rem] font-semibold text-[#16a34a]">
+                  Assistant
+                </span>
+              </div>
+              <p class="mt-0.5 text-[0.78rem] text-[#64748b] truncate">{{ assistant.email }}</p>
+            </div>
+
+            <!-- Projects Count Badge -->
+            <div class="hidden sm:flex items-center gap-2">
+              @if (assistant.projects.length > 0) {
+                <span class="inline-flex items-center gap-1 rounded-full bg-[#eff6ff] px-2.5 py-1 text-[0.75rem] font-medium text-[#2563eb]">
+                  <mat-icon class="text-[14px]">folder</mat-icon>
+                  {{ assistant.projects.length }} project{{ assistant.projects.length > 1 ? 's' : '' }}
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-1 rounded-full bg-[#f8fafc] px-2.5 py-1 text-[0.75rem] text-[#94a3b8]">
+                  <mat-icon class="text-[14px]">folder_open</mat-icon>
+                  No projects
+                </span>
+              }
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                (click)="openAssignModal(assistant); $event.stopPropagation()"
+                class="inline-flex items-center gap-1 rounded-lg bg-[#2563eb] px-3 py-1.5 text-[0.75rem] font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+              >
+                <mat-icon class="text-[14px]">add</mat-icon>
+                Assign
+              </button>
+              <button
+                type="button"
+                (click)="toggleExpand(assistant); $event.stopPropagation()"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-[#64748b] hover:bg-[#f1f5f9] transition-colors"
+              >
+                <mat-icon class="text-[18px] transition-transform" [class.rotate-180]="expandedAssistantId === assistant.id">expand_more</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded Projects Panel -->
+          @if (expandedAssistantId === assistant.id) {
+            <div class="border-t border-[#f1f5f9] bg-[#fafbfc] px-5 py-4">
+              @if (assistant.projects.length > 0) {
+                <div class="mb-2 flex items-center justify-between">
+                  <h3 class="text-[0.78rem] font-semibold uppercase tracking-wider text-[#94a3b8]">Assigned Projects</h3>
+                </div>
+                <div class="space-y-2">
+                  @for (project of assistant.projects; track project.id) {
+                    <div class="flex items-center justify-between rounded-lg border border-[#e2e8f0] bg-white px-4 py-3 transition-colors hover:border-[#cbd5e1]">
+                      <div class="flex items-center gap-3 min-w-0">
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#f1f5f9]">
+                          <mat-icon class="text-[16px] text-[#64748b]">description</mat-icon>
+                        </div>
+                        <div class="min-w-0">
+                          <p class="text-[0.82rem] font-medium text-[#0f172a] truncate">{{ project.name }}</p>
+                          <div class="mt-0.5 flex items-center gap-2">
+                            @if (project.type) {
+                              <span class="text-[0.7rem] text-[#94a3b8]">{{ project.type }}</span>
+                              <span class="text-[0.6rem] text-[#e2e8f0]">&#8226;</span>
+                            }
+                            <span class="inline-flex rounded px-1.5 py-0.5 text-[0.68rem] font-medium border" [class]="getPriorityClass(project.priority)">
+                              {{ project.priority }}
+                            </span>
+                            <span class="text-[0.7rem] text-[#94a3b8]">{{ project.status }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        (click)="unassignProject(assistant, project.id, project.name)"
+                        [disabled]="unassigningProjectId === project.id"
+                        class="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2.5 py-1.5 text-[0.72rem] font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                      >
+                        @if (unassigningProjectId === project.id) {
+                          <mat-icon class="animate-spin text-[14px]">refresh</mat-icon>
+                        } @else {
+                          <mat-icon class="text-[14px]">remove_circle_outline</mat-icon>
+                        }
+                        Remove
+                      </button>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="flex flex-col items-center py-6 text-center">
+                  <mat-icon class="mb-2 text-[32px] text-[#cbd5e1]">folder_off</mat-icon>
+                  <p class="text-[0.82rem] text-[#94a3b8]">No projects assigned yet</p>
+                  <button
+                    type="button"
+                    (click)="openAssignModal(assistant)"
+                    class="mt-3 inline-flex items-center gap-1 rounded-lg bg-[#2563eb] px-3 py-1.5 text-[0.75rem] font-semibold text-white hover:bg-[#1d4ed8]"
+                  >
+                    <mat-icon class="text-[14px]">add</mat-icon>
+                    Assign a project
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="rounded-xl border border-[#e2e8f0] bg-white px-4 py-10 text-center text-[0.82rem] text-[#94a3b8]">
+          @if (searchQuery) {
+            No assistants match your search.
+          } @else {
+            No assistants are assigned to you yet.
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Assign Project Modal -->
+@if (showAssignModal && assignTarget) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" (click)="closeAssignModal()">
+    <div class="w-full max-w-md rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="mb-5 flex items-center justify-between">
+        <div>
+          <h2 class="text-[1.1rem] font-bold text-[#0f172a]">Assign Project</h2>
+          <p class="mt-0.5 text-[0.82rem] text-[#64748b]">To {{ assignTarget.first_name }} {{ assignTarget.last_name }}</p>
+        </div>
+        <button type="button" (click)="closeAssignModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#64748b] hover:bg-[#f1f5f9]">
+          <mat-icon class="text-[18px]">close</mat-icon>
+        </button>
+      </div>
+
+      @if (assignError) {
+        <div class="mb-4 rounded-[0.7rem] border border-red-200 bg-red-50 px-3 py-2 text-[0.82rem] text-red-700">
+          {{ assignError }}
+        </div>
+      }
+
+      <form (ngSubmit)="submitAssignProject()" class="space-y-4">
+        <div>
+          <label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Select a Project *</label>
+          <select
+            [(ngModel)]="selectedProjectId"
+            name="project_id"
+            required
+            class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
+          >
+            <option [ngValue]="null" disabled>-- Choose a project --</option>
+            @for (project of availableProjects; track project.id) {
+              <option [ngValue]="project.id">{{ project.name }} ({{ project.type || 'other' }} &middot; {{ project.status }})</option>
+            }
+          </select>
+          @if (availableProjects.length === 0) {
+            <p class="mt-1.5 text-[0.75rem] text-[#94a3b8]">No projects available to assign.</p>
+          }
+        </div>
+
+        <div class="flex items-center justify-end gap-3 border-t border-[#f1f5f9] pt-4">
+          <button type="button" (click)="closeAssignModal()" class="rounded-[0.7rem] px-4 py-2 text-[0.82rem] font-semibold text-[#64748b] hover:bg-[#f1f5f9]">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="isAssigning || !selectedProjectId" class="inline-flex items-center gap-1.5 rounded-[0.7rem] bg-[#2563eb] px-4 py-2.5 text-[0.82rem] font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-55">
+            @if (isAssigning) {
+              <mat-icon class="animate-spin text-[16px]">refresh</mat-icon>
+              Assigning...
+            } @else {
+              <mat-icon class="text-[16px]">assignment_turned_in</mat-icon>
+              Assign Project
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

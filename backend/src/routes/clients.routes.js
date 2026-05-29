@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const { getAll, getById, create, update, remove } = require('../controllers/clients.controller');
+const { getAll, getById, create, update, remove, getMyPlatformClients, assignProject, unassignProject, getMyClientProfile, updateMyClientProfile } = require('../controllers/clients.controller');
 const { authMiddleware } = require('../middleware/auth.middleware');
 
 const normalizeEmailValue = (value) => {
@@ -103,6 +103,11 @@ const createClientValidation = [
 
 router.use(authMiddleware);
 
+router.get('/me', getMyClientProfile);
+router.put('/me', updateMyClientProfile);
+router.get('/platform', getMyPlatformClients);
+router.post('/assign-project', assignProject);
+router.post('/unassign-project', unassignProject);
 router.get('/', getAll);
 router.get('/:id', getById);
 router.post('/', createClientValidation, create);

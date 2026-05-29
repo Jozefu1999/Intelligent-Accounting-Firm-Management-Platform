@@ -1,6 +1,8 @@
 ﻿<aside class="expert-sidebar">
   <div class="expert-brand">
-    <div class="expert-logo">PC</div>
+    <div class="expert-logo">
+      <mat-icon class="text-[16px]">account_balance</mat-icon>
+    </div>
     <div>
       <p class="expert-brand-title">Accounting Platform</p>
       <p class="expert-brand-subtitle">{{ workspaceLabel }}</p>
@@ -8,7 +10,7 @@
   </div>
 
   <div class="expert-nav-wrap">
-    <nav class="expert-nav" aria-label="Navigation principale">
+    <nav class="expert-nav" aria-label="Main navigation">
       @for (item of primaryNavItems; track trackByPath($index, item)) {
         <a
           [routerLink]="item.path"
@@ -18,10 +20,7 @@
           class="expert-nav-item"
         >
           <mat-icon>{{ item.icon }}</mat-icon>
-          <div>
-            <p class="expert-nav-title">{{ item.label }}</p>
-            <p class="expert-nav-subtitle">{{ item.subtitle }}</p>
-          </div>
+          <span>{{ item.label }}</span>
         </a>
       }
     </nav>
@@ -29,7 +28,7 @@
     @if (aiNavItems.length > 0) {
       <p class="expert-nav-group-label">AI TOOLS</p>
 
-      <nav class="expert-nav expert-nav-ai" aria-label="Outils IA">
+      <nav class="expert-nav expert-nav-ai" aria-label="AI tools">
         @for (item of aiNavItems; track trackByPath($index, item)) {
           <a
             [routerLink]="item.path"
@@ -39,10 +38,7 @@
             class="expert-nav-item"
           >
             <mat-icon>{{ item.icon }}</mat-icon>
-            <div>
-              <p class="expert-nav-title">{{ item.label }}</p>
-              <p class="expert-nav-subtitle">{{ item.subtitle }}</p>
-            </div>
+            <span>{{ item.label }}</span>
           </a>
         }
       </nav>

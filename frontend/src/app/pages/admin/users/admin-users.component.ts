@@ -42,13 +42,13 @@ export class AdminUsersComponent implements OnInit {
   deleteModalUser: AdminUser | null = null;
   deleteModalOpen = false;
 
-  readonly roles: UserRole[] = ['visiteur', 'expert_comptable', 'assistant', 'administrateur'];
+  readonly roles: UserRole[] = ['client', 'expert_comptable', 'assistant', 'administrateur'];
   readonly roleOptions: RoleOption[] = [
     { value: '', label: 'All' },
     { value: 'expert_comptable', label: 'expert_comptable' },
     { value: 'assistant', label: 'assistant' },
     { value: 'administrateur', label: 'administrateur' },
-    { value: 'visiteur', label: 'visiteur' },
+    { value: 'client', label: 'client' },
   ];
 
   constructor(private adminService: AdminService) {}
@@ -84,7 +84,7 @@ export class AdminUsersComponent implements OnInit {
   }
 
   get visitorsCount(): number {
-    return this.countByRole('visiteur');
+    return this.countByRole('client');
   }
 
   loadUsers(): void {

@@ -1,4 +1,4 @@
-export type UserRole = 'expert_comptable' | 'assistant' | 'administrateur' | 'visiteur';
+export type UserRole = 'expert_comptable' | 'assistant' | 'administrateur' | 'client';
 
 export interface User {
   id: number;
@@ -117,11 +117,40 @@ export interface DashboardStats {
   clientsByRisk: { risk_level: string; count: number }[];
 }
 
+export interface PlanPhase {
+  name: string;
+  duration: string;
+  tasks: string[];
+  deliverables: string[];
+}
+
+export interface PlanMilestone {
+  name: string;
+  target_date: string;
+  criteria: string;
+}
+
+export interface PlanRisk {
+  risk: string;
+  impact: 'high' | 'medium' | 'low' | string;
+  mitigation: string;
+}
+
+export interface BudgetAllocation {
+  category: string;
+  percentage: number;
+  description: string;
+}
+
 export interface BusinessPlanContent {
-  executive_summary?: string;
-  market_analysis?: string;
-  financial_projections?: string;
-  risks?: string;
+  overview?: string;
+  objectives?: string[];
+  phases?: PlanPhase[];
+  milestones?: PlanMilestone[];
+  resources?: string[];
+  risks?: PlanRisk[];
+  budget_allocation?: BudgetAllocation[];
+  success_criteria?: string[];
   recommendations?: string;
   [key: string]: unknown;
 }
@@ -139,6 +168,7 @@ export interface AiRecommendation {
   title: string;
   description: string;
   priority: 'high' | 'medium' | 'low' | string;
+  category?: 'fiscal' | 'financial' | 'compliance' | 'strategy' | 'operations' | string;
 }
 
 export interface AiRecommendationsResponse {
@@ -182,29 +212,6 @@ export interface RiskPredictionResponse {
   };
 }
 
-export type ProjectType = 'creation' | 'development' | 'audit' | 'consulting' | 'other';
-
-export interface ProjectClassificationRequest {
-  annual_revenue: number;
-  estimated_budget: number;
-  sector_code: number | string;
-  priority?: 'low' | 'medium' | 'high';
-  duration_days?: number;
-}
-
-export interface ProjectClassificationResult {
-  type: ProjectType;
-  probability: number;
-}
-
-export interface ProjectClassificationResponse {
-  predicted_type: ProjectType;
-  confidence: number;
-  sector_code?: number;
-  probabilities: Record<ProjectType, number>;
-  ranking: ProjectClassificationResult[];
-}
-
 export interface MlModelInfo {
   model: string;
   exists: boolean;
@@ -221,7 +228,7 @@ export interface MlStatusResponse {
 }
 
 export interface MlRetrainRequest {
-  model: 'risk' | 'classification' | 'all';
+  model: 'risk' | 'all';
 }
 
 export interface MlRetrainResponse {

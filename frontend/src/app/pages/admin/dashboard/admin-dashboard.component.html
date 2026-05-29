@@ -4,14 +4,12 @@
   </div>
 }
 
-<section class="admin-card welcome-card">
-  <div class="welcome-left">
-    <p class="welcome-title">Hello, {{ fullName || 'Administrator' }}</p>
-    <p class="welcome-subtitle">Overview of platform activity</p>
-    <span class="role-chip">Administrator</span>
+<header class="page-header">
+  <div>
+    <h1 class="welcome-title">Hello, {{ fullName || 'Administrator' }}</h1>
+    <p class="welcome-subtitle">Overview of platform activity — {{ todayLabel }}</p>
   </div>
-  <div class="welcome-date">{{ todayLabel }}</div>
-</section>
+</header>
 
 <section class="kpi-grid">
   @if (isLoading) {

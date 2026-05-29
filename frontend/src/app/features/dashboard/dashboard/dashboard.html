@@ -1,174 +1,156 @@
-﻿<div class="dashboard-wrapper">
-  <div *ngIf="isLoading" class="loading-state">Loading...</div>
+<div class="dashboard-wrapper">
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="skeleton-header">
+      <div class="skeleton-line skeleton-title"></div>
+      <div class="skeleton-line skeleton-subtitle"></div>
+    </div>
+    <div class="skeleton-metrics">
+      <div class="skeleton-metric" *ngFor="let i of [1,2,3,4]; trackBy: trackByIndex"></div>
+    </div>
+    <div class="skeleton-grid skeleton-two-col">
+      <div class="skeleton-section"></div>
+      <div class="skeleton-section"></div>
+    </div>
+  </div>
 
   <ng-container *ngIf="!isLoading">
-    <div class="dashboard-header">
+    <header class="dashboard-header">
       <div>
         <h1>Dashboard</h1>
-        <p>
-          Welcome, {{ currentUser?.prenom }} {{ currentUser?.nom }} -
-          <span class="role-badge">{{ currentUser?.role }}</span>
-        </p>
+        <p class="header-subtitle">{{ today | date:'EEEE, MMMM d, yyyy' : '' : 'en-US' }}</p>
       </div>
-      <div class="header-date">
-        {{ today | date:'EEEE, MMMM d, yyyy' : '' : 'en-US' }}
-      </div>
-    </div>
+    </header>
 
-    <div class="stats-grid">
-      <a class="stat-card" routerLink="/clients">
-        <div class="stat-icon icon-blue">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M16 11c1.66 0 3-1.57 3-3.5S17.66 4 16 4s-3 1.57-3 3.5 1.34 3.5 3 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 12c2.21 0 4-2.01 4-4.5S10.21 3 8 3 4 5.01 4 7.5 5.79 12 8 12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 14c-3.31 0-6 2.01-6 4.5V20h12v-1.5C14 16.01 11.31 14 8 14Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M16 13c2.76 0 5 1.68 5 3.75V20h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="stat-number">{{ stats.totalClients }}</div>
-        <div class="stat-label">Active clients</div>
+    <div class="metrics-strip">
+      <a class="metric" routerLink="/clients">
+        <span class="metric-value">{{ stats.totalClients }}</span>
+        <span class="metric-label">Clients</span>
       </a>
-
-      <a class="stat-card" routerLink="/projects">
-        <div class="stat-icon icon-teal">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h5l1.5 2h8A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="stat-number">{{ stats.totalProjects }}</div>
-        <div class="stat-label">Total projects</div>
+      <div class="metric-divider"></div>
+      <a class="metric" routerLink="/projects">
+        <span class="metric-value">{{ stats.totalProjects }}</span>
+        <span class="metric-label">Projects</span>
       </a>
-
-      <div class="stat-card">
-        <div class="stat-icon icon-amber">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M12 8v4l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="stat-number">{{ stats.activeProjects }}</div>
-        <div class="stat-label">Projects in progress</div>
+      <div class="metric-divider"></div>
+      <div class="metric">
+        <span class="metric-value metric-value--active">{{ stats.activeProjects }}</span>
+        <span class="metric-label">In progress</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-icon icon-red">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 3.5 21 19H3l9-15.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="M12 9v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="12" cy="16.5" r=".9" fill="currentColor"/>
-          </svg>
-        </div>
-        <div class="stat-number">{{ stats.highRiskProjects }}</div>
-        <div class="stat-label">High-risk projects</div>
+      <div class="metric-divider"></div>
+      <div class="metric">
+        <span class="metric-value metric-value--risk">{{ stats.highRiskProjects }}</span>
+        <span class="metric-label">High risk</span>
       </div>
     </div>
 
     <div class="two-col-grid">
-      <div class="section-card">
+      <section class="section-card">
         <div class="section-card-header">
           <h3>Recent projects</h3>
-          <a class="see-all" routerLink="/projects">View all -&gt;</a>
+          <a class="see-all" routerLink="/projects">View all</a>
         </div>
 
         <table class="mini-table" *ngIf="recentProjects.length > 0; else emptyProjectsTpl">
           <thead>
             <tr>
-              <th>PROJECT</th>
-              <th>CLIENT</th>
-              <th>STATUS</th>
-              <th>RISK</th>
-              <th>DATE</th>
+              <th>Project</th>
+              <th>Client</th>
+              <th>Status</th>
+              <th>Risk</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let project of recentProjects">
-              <td>{{ project.titre }}</td>
+            <tr *ngFor="let project of recentProjects; trackBy: trackByIndex">
+              <td class="cell-primary">{{ project.titre }}</td>
               <td>{{ project.client_nom }}</td>
               <td>
-                <span [class]="getStatusClass(project.statut)">
+                <span [class]="'badge ' + getStatusClass(project.statut)">
                   {{ getStatusLabel(project.statut) }}
                 </span>
               </td>
               <td>
-                <span [class]="getRiskClass(project.niveau_risque)">
-                  {{ getRiskLabel(project.niveau_risque) }}
+                <span [class]="'badge ' + getRiskClass(project.niveau_risque || '')">
+                  {{ getRiskLabel(project.niveau_risque || '') }}
                 </span>
               </td>
-              <td>{{ project.created_at | date:'mediumDate' }}</td>
+              <td class="cell-muted">{{ project.created_at | date:'MMM d' }}</td>
             </tr>
           </tbody>
         </table>
         <ng-template #emptyProjectsTpl>
-          <div class="empty-state">No recent project</div>
+          <div class="empty-state">
+            <p>No recent projects</p>
+          </div>
         </ng-template>
-      </div>
+      </section>
 
-      <div class="section-card">
+      <section class="section-card">
         <div class="section-card-header">
           <h3>Recent clients</h3>
-          <a class="see-all" routerLink="/clients">View all -&gt;</a>
+          <a class="see-all" routerLink="/clients">View all</a>
         </div>
 
-        <ng-container *ngIf="recentClients.length > 0; else emptyClientsTpl">
-          <div class="client-card" *ngFor="let client of recentClients">
+        <div class="client-list" *ngIf="recentClients.length > 0; else emptyClientsTpl">
+          <div class="client-row" *ngFor="let client of recentClients; trackBy: trackByIndex">
             <div class="client-avatar">
               {{ getClientInitial(client.nom) }}
             </div>
             <div class="client-info">
               <span class="client-name">{{ client.nom }}</span>
-              <span class="client-sector">{{ client.secteur || 'Not specified' }}</span>
+              <span class="client-meta">{{ client.secteur || 'Not specified' }}</span>
             </div>
-            <span [class]="'status-dot ' + client.statut">
-              {{ getClientStatusLabel(client.statut) }}
+            <span [class]="'status-pill status-pill--' + (client.statut || 'actif')">
+              {{ getClientStatusLabel(client.statut || '') }}
             </span>
           </div>
-        </ng-container>
+        </div>
         <ng-template #emptyClientsTpl>
-          <div class="empty-state">No recent client</div>
+          <div class="empty-state">
+            <p>No recent clients</p>
+          </div>
         </ng-template>
-      </div>
+      </section>
     </div>
 
     <div class="two-col-grid">
-      <div class="section-card">
+      <section class="section-card">
         <div class="section-card-header">
-          <h3>Distribution by status</h3>
+          <h3>By status</h3>
         </div>
-
-        <div class="progress-row" *ngFor="let item of projectsByStatus">
-          <div class="progress-label">
-            <span>{{ getStatusLabel(item.statut) }}</span>
-            <span>{{ item.count }}</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div
-              class="progress-bar"
-              [style.width]="getProgressWidth(item.count, stats.totalProjects)"
-              [class]="getStatusClass(item.statut)"
-            ></div>
+        <div class="bar-chart">
+          <div class="bar-row" *ngFor="let item of projectsByStatus; trackBy: trackByIndex">
+            <span class="bar-label">{{ getStatusLabel(item.statut) }}</span>
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                [style.width]="getProgressWidth(item.count, stats.totalProjects)"
+                [class]="'bar-fill--' + getStatusClass(item.statut)"
+              ></div>
+            </div>
+            <span class="bar-count">{{ item.count }}</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="section-card">
+      <section class="section-card">
         <div class="section-card-header">
-          <h3>Distribution by risk level</h3>
+          <h3>By risk level</h3>
         </div>
-
-        <div class="progress-row" *ngFor="let item of projectsByRisk">
-          <div class="progress-label">
-            <span>{{ getRiskLabel(item.niveau_risque) }}</span>
-            <span>{{ item.count }}</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div
-              class="progress-bar"
-              [style.width]="getProgressWidth(item.count, stats.totalProjects)"
-              [class]="getRiskClass(item.niveau_risque)"
-            ></div>
+        <div class="bar-chart">
+          <div class="bar-row" *ngFor="let item of projectsByRisk; trackBy: trackByIndex">
+            <span class="bar-label">{{ getRiskLabel(item.niveau_risque) }}</span>
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                [style.width]="getProgressWidth(item.count, stats.totalProjects)"
+                [class]="'bar-fill--' + getRiskClass(item.niveau_risque)"
+              ></div>
+            </div>
+            <span class="bar-count">{{ item.count }}</span>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   </ng-container>
 </div>

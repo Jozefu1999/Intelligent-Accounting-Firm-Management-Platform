@@ -84,7 +84,7 @@ const getAiModelConfig = () => {
       provider,
       primary,
       models: dedupeNonEmpty([primary, ...fallbackModels]),
-      maxOutputTokens: parseInteger(readEnv('AI_MAX_OUTPUT_TOKENS') || readEnv('GEMINI_MAX_OUTPUT_TOKENS'), 650),
+      maxOutputTokens: parseInteger(readEnv('AI_MAX_OUTPUT_TOKENS') || readEnv('GEMINI_MAX_OUTPUT_TOKENS'), 4096),
     };
   }
 
@@ -96,7 +96,7 @@ const getAiModelConfig = () => {
     provider,
     primary,
     models: dedupeNonEmpty([primary, ...fallbackModels]),
-    maxOutputTokens: parseInteger(readEnv('AI_MAX_OUTPUT_TOKENS') || readEnv('XAI_MAX_OUTPUT_TOKENS'), 850),
+    maxOutputTokens: parseInteger(readEnv('AI_MAX_OUTPUT_TOKENS') || readEnv('XAI_MAX_OUTPUT_TOKENS'), 4096),
   };
 };
 
@@ -130,8 +130,15 @@ const toHttpError = (statusCode, message) => {
 
 const unwrapFence = (value) => value
   .replace(/^```(?:json)?\s*/i, '')
-  .replace(/\s*```$/, '')
+  .replace(/\s*```\s*$/i, '')
   .trim();
+
+const sanitizeJsonString = (value) => value
+  // Remove trailing commas before } or ]
+  .replace(/,\s*([\]}])/g, '$1')
+  // Remove control characters except newline/tab
+  // eslint-disable-next-line no-control-regex
+  .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '');
 
 const parseJsonFromAiMessage = (value) => {
   if (typeof value !== 'string') {
@@ -158,7 +165,12 @@ const parseJsonFromAiMessage = (value) => {
     try {
       return JSON.parse(candidate);
     } catch {
-      // Try next candidate.
+      // Try sanitized version (trailing commas, control chars)
+      try {
+        return JSON.parse(sanitizeJsonString(candidate));
+      } catch {
+        // Try next candidate.
+      }
     }
   }
 
@@ -194,6 +206,7 @@ const createGeminiNativeCompletion = async ({ prompt, temperature, modelConfig }
           generationConfig: {
             temperature,
             maxOutputTokens: modelConfig.maxOutputTokens,
+            responseMimeType: 'application/json',
           },
         }),
       });
@@ -358,20 +371,57 @@ const generateBusinessPlan = async (req, res, next) => {
       return res.status(404).json({ message: 'Project not found.' });
     }
 
+    const clientName = project.client?.company_name || project.client?.name || 'Unknown';
+    const sector = project.client?.sector || 'General';
+    const budget = project.estimated_budget || 'Not specified';
+    const status = project.status || 'draft';
+    const priority = project.priority || 'medium';
+    const description = project.description || 'No description provided';
+    const startDate = project.start_date || project.created_at || 'Not defined';
+    const deadline = project.deadline || project.end_date || 'Not defined';
+
     const prompt = [
-      'Return ONLY valid JSON (no markdown).',
-      'Required keys: executive_summary, market_analysis, financial_projections, risks, recommendations.',
-      'Each value must be concise text under 80 words.',
-      `company: ${project.client.company_name}`,
-      `sector: ${project.client.sector || 'N/A'}`,
-      `project: ${project.name}`,
-      `description: ${project.description || 'N/A'}`,
-      `budget_eur: ${project.estimated_budget || 'N/A'}`,
+      'You are a professional project planner for an accounting firm. Generate a complete project plan.',
+      'Return ONLY valid JSON (no markdown fences, no extra text).',
+      '',
+      'Required JSON structure with these exact keys:',
+      '{',
+      '  "overview": "Brief project summary (2-3 sentences)",',
+      '  "objectives": ["objective 1", "objective 2", "objective 3"],',
+      '  "phases": [',
+      '    { "name": "Phase name", "duration": "estimated duration", "tasks": ["task 1", "task 2"], "deliverables": ["deliverable 1"] }',
+      '  ],',
+      '  "milestones": [',
+      '    { "name": "Milestone name", "target_date": "relative timing", "criteria": "completion criteria" }',
+      '  ],',
+      '  "resources": ["resource or skill needed 1", "resource 2"],',
+      '  "risks": [',
+      '    { "risk": "risk description", "impact": "high/medium/low", "mitigation": "how to mitigate" }',
+      '  ],',
+      '  "budget_allocation": [',
+      '    { "category": "category name", "percentage": 30, "description": "what it covers" }',
+      '  ],',
+      '  "success_criteria": ["criterion 1", "criterion 2"],',
+      '  "recommendations": "Final strategic recommendations (2-3 sentences)"',
+      '}',
+      '',
+      'Generate the plan based on this project information:',
+      `- Client: ${clientName}`,
+      `- Sector: ${sector}`,
+      `- Project name: ${project.name}`,
+      `- Description: ${description}`,
+      `- Budget: ${budget} EUR`,
+      `- Status: ${status}`,
+      `- Priority: ${priority}`,
+      `- Start date: ${startDate}`,
+      `- Deadline: ${deadline}`,
+      '',
+      'Make the plan realistic and actionable. Include 3-5 phases, 3-4 milestones, and 3-5 risks.',
     ].join('\n');
 
     const response = await createAiCompletion({
       prompt,
-      temperature: 0.2,
+      temperature: 0.3,
     });
 
     const content = parseJsonFromAiMessage(response?.choices?.[0]?.message?.content);
@@ -399,21 +449,39 @@ const getRecommendations = async (req, res, next) => {
       return res.status(404).json({ message: 'Client not found.' });
     }
 
-    const prompt = [
-      'Return ONLY valid JSON array (no markdown).',
-      'Provide up to 4 actionable recommendations.',
-      'Each item keys: title, description, priority (high|medium|low).',
-      'Each description must be under 30 words.',
-      `company: ${client.company_name}`,
-      `sector: ${client.sector || 'N/A'}`,
-      `annual_revenue_eur: ${client.annual_revenue || 'N/A'}`,
-      `risk_level: ${client.risk_level}`,
-      `active_projects: ${client.projects.length}`,
-    ].join('\n');
+    const projects = client.projects || [];
+    const projectSummary = projects.length > 0
+      ? projects.map(p => `- "${p.name}" (status: ${p.status || 'unknown'}, budget: ${p.budget || 'N/A'} EUR, priority: ${p.priority || 'N/A'})`).join('\n')
+      : '- No active projects';
+
+    const prompt = `You are a senior financial advisor and business consultant working for an accounting firm.
+Analyze the following client profile and provide exactly 5 strategic, specific, and actionable recommendations.
+
+CLIENT PROFILE:
+- Company: ${client.company_name}
+- Sector: ${client.sector || 'Not specified'}
+- Annual Revenue: ${client.annual_revenue ? client.annual_revenue + ' EUR' : 'Not declared'}
+- Risk Level: ${client.risk_level || 'Not assessed'}
+- Contact: ${client.first_name || ''} ${client.last_name || ''}
+- Active Projects (${projects.length}):
+${projectSummary}
+
+INSTRUCTIONS:
+- Each recommendation must be specific to THIS client's situation (sector, revenue, risk level, projects).
+- Do NOT give generic advice like "increase revenue" or "review projects".
+- Focus on: tax optimization, cash flow management, compliance, growth strategy, risk mitigation, operational efficiency.
+- Each description should be 2-3 sentences explaining WHY and HOW.
+- Assign priority based on urgency and impact.
+
+Return ONLY a valid JSON array (no markdown, no explanation). Each object must have:
+- "title": concise action title (5-8 words)
+- "description": specific explanation with concrete steps (2-3 sentences, 40-60 words)
+- "priority": "high" | "medium" | "low"
+- "category": one of "fiscal", "financial", "compliance", "strategy", "operations"`;
 
     const response = await createAiCompletion({
       prompt,
-      temperature: 0.2,
+      temperature: 0.4,
     });
 
     const recommendations = parseJsonFromAiMessage(response?.choices?.[0]?.message?.content);
@@ -499,50 +567,4 @@ const predictRisk = async (req, res, next) => {
   }
 };
 
-const classifyProject = async (req, res, next) => {
-  try {
-    const {
-      annual_revenue,
-      estimated_budget,
-      sector_code,
-      sector,
-      priority = 'medium',
-      duration_days = 90,
-    } = req.body;
-
-    if (annual_revenue == null || estimated_budget == null) {
-      return res.status(400).json({ message: 'annual_revenue and estimated_budget are required.' });
-    }
-
-    const payload = {
-      annual_revenue,
-      estimated_budget,
-      sector_code: sector_code ?? sector ?? 5,
-      priority,
-      duration_days,
-    };
-
-    const features = JSON.stringify(payload);
-    const scriptPath = path.join(__dirname, '../../../ml/classify_project.py');
-    const python = process.env.PYTHON_EXECUTABLE || 'python';
-
-    execFile(python, [scriptPath, features], (error, stdout, stderr) => {
-      if (error) {
-        return res.status(500).json({ message: 'ML project classification failed.', error: stderr });
-      }
-      try {
-        const result = JSON.parse(stdout.trim());
-        if (result.error) {
-          return res.status(500).json({ message: result.error });
-        }
-        res.json(result);
-      } catch {
-        res.status(500).json({ message: 'Failed to parse ML classification output.' });
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-module.exports = { generateBusinessPlan, getRecommendations, predictRisk, classifyProject };
+module.exports = { generateBusinessPlan, getRecommendations, predictRisk };

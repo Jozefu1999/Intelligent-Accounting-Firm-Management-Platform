@@ -1,53 +1,59 @@
-﻿<div class="dashboard-page">
-  <section class="hero-card client-fade-up">
-    <div class="hero-content">
+<div class="dashboard-page">
+  <header class="page-header">
+    <div class="header-left">
       <div class="hero-avatar">{{ avatarInitials }}</div>
       <div>
-        <p class="hero-eyebrow">Client Space</p>
-        <h1 class="hero-title">Hello {{ fullName }}</h1>
-        <p class="hero-subtitle">Here is an overview of your active cases</p>
+        <h1 class="page-title">Hello {{ fullName }}</h1>
+        <p class="page-date">{{ todayLabel }}</p>
       </div>
     </div>
+  </header>
 
-    <div class="hero-date-block">
-      <p>Today</p>
-      <strong>{{ todayLabel }}</strong>
-    </div>
-  </section>
-
-  <section class="kpi-grid">
-    <article class="kpi-card client-fade-up">
-      <p class="kpi-label">My active projects</p>
-      <p class="kpi-value">{{ activeProjectsCount }}</p>
-      <p class="kpi-meta">Active cases</p>
-    </article>
-
-    <article class="kpi-card client-fade-up">
-      <p class="kpi-label">My documents</p>
-      <p class="kpi-value">{{ documentsCount }}</p>
-      <p class="kpi-meta">Available files</p>
-    </article>
-
-    <article class="kpi-card client-fade-up">
-      <p class="kpi-label">Last contact</p>
-      <p class="kpi-value kpi-value-sm">{{ lastContactDate }}</p>
-      <p class="kpi-meta">Firm follow-up</p>
-    </article>
-  </section>
-
-  <section class="dashboard-grid">
-    <article class="panel client-fade-up">
-      <div class="panel-head">
-        <h2>My recent projects</h2>
-        <a routerLink="/client/projects" class="panel-link">View all my projects</a>
+  @if (isLoading) {
+    <section class="metrics-strip">
+      <div class="metric"><span class="metric-value">—</span><span class="metric-label">Loading</span></div>
+    </section>
+  } @else if (!hasProjects) {
+    <section class="waiting-state">
+      <div class="waiting-card">
+        <div class="waiting-icon">?</div>
+        <h2 class="waiting-title">Waiting for project assignment</h2>
+        <p class="waiting-text">
+          Your account has been created successfully. Your expert comptable will assign a project to you shortly.
+          Once a project is assigned, you'll be able to see your project dashboard here.
+        </p>
+        <p class="waiting-hint">You will receive access to your project details as soon as your expert sets it up.</p>
       </div>
+    </section>
+  } @else {
+    <section class="metrics-strip">
+      <div class="metric">
+        <span class="metric-value metric-value--primary">{{ activeProjectsCount }}</span>
+        <span class="metric-label">Active projects</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric">
+        <span class="metric-value">{{ documentsCount }}</span>
+        <span class="metric-label">Documents</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric">
+        <span class="metric-value metric-value--muted">{{ lastContactDate }}</span>
+        <span class="metric-label">Last contact</span>
+      </div>
+    </section>
 
-      @if (isLoading) {
-        <p class="panel-info">Loading projects...</p>
-      } @else if (recentProjects.length === 0) {
-        <div class="panel-empty">No active projects at the moment.</div>
-      } @else {
-        <div class="table-wrap">
+    <section class="dashboard-grid">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>My recent projects</h2>
+          <a routerLink="/client/projects" class="panel-link">View all my projects</a>
+        </div>
+
+        @if (recentProjects.length === 0) {
+          <div class="panel-empty">No active projects at the moment.</div>
+        } @else {
+          <div class="table-wrap">
           <table class="modern-table">
             <thead>
               <tr>
@@ -78,7 +84,7 @@
       }
     </article>
 
-    <article class="contact-panel client-fade-up">
+    <article class="contact-panel">
       <p class="contact-kicker">Direct contact</p>
       <h2>Contact the firm</h2>
       <p>Have a question about your case? Send a message to your accounting expert.</p>
@@ -88,11 +94,12 @@
       </button>
     </article>
   </section>
+  }
 </div>
 
 @if (isContactModalOpen) {
   <div class="modal-backdrop">
-    <div class="modal-card client-fade-up">
+    <div class="modal-card">
       <div class="modal-head">
         <h3>Contact the firm</h3>
         <button type="button" class="ghost-btn" (click)="closeContactModal()">Close</button>
@@ -141,4 +148,3 @@
     </div>
   </div>
 }
-

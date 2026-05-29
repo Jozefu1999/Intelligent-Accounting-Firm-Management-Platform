@@ -1,17 +1,17 @@
-﻿<div class="contact-page">
-  <section class="contact-hero client-fade-up">
+<div class="contact-page">
+  <section class="contact-hero">
     <h1>Contact the firm</h1>
     <p>Send a message to your accounting expert</p>
   </section>
 
-  <section class="contact-form-panel client-fade-up">
+  <section class="contact-form-panel">
     @if (errorMessage) {
       <div class="alert-error">{{ errorMessage }}</div>
     }
 
     @if (isSuccessState) {
       <div class="success-card">
-        <div class="success-icon">✓</div>
+        <div class="success-icon">?</div>
         <p class="success-title">Message sent successfully!</p>
         <p class="success-text">Our team will get back to you as soon as possible.</p>
         <button type="button" class="primary-btn success-btn" (click)="sendAnotherMessage()">
@@ -67,7 +67,7 @@
     }
   </section>
 
-  <section class="history-panel client-fade-up">
+  <section class="history-panel">
     <h2>My sent messages</h2>
 
     @if (messages.length === 0) {

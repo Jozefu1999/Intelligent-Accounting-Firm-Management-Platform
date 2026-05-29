@@ -77,7 +77,7 @@ export class AuthService {
       return null;
     }
 
-    const role = this.getRoleFromToken(token) ?? 'visiteur';
+    const role = this.getRoleFromToken(token) ?? 'client';
     const idCandidate = payload['id'];
     const emailCandidate = payload['email'];
 
@@ -142,12 +142,32 @@ export class AuthService {
     );
   }
 
-  register(data: { email: string; password: string; first_name: string; last_name: string; role: UserRole }): Observable<AuthResponse> {
+  register(data: { email: string; password: string; first_name: string; last_name: string; role: UserRole; assigned_expert_id?: number }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data).pipe(
       tap((res) => {
         this.setSession(res.token, res.user);
       })
     );
+  }
+
+  getExperts(): Observable<{ id: number; first_name: string; last_name: string; email: string }[]> {
+    return this.http.get<{ id: number; first_name: string; last_name: string; email: string }[]>(`${this.apiUrl}/experts`);
+  }
+
+  googleLogin(credential: string, role?: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/google`, { credential, role }).pipe(
+      tap((res) => {
+        this.setSession(res.token, res.user);
+      })
+    );
+  }
+
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, email: string, password: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/reset-password`, { token, email, password });
   }
 
   updateProfile(data: {

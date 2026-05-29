@@ -9,9 +9,17 @@ const Project = sequelize.define('Project', {
   },
   client_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'clients',
+      key: 'id',
+    },
+  },
+  assigned_to: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'users',
       key: 'id',
     },
   },

@@ -14,6 +14,7 @@ import { AuthService } from '../../core/services/auth';
 })
 export class AdminLayoutComponent {
   currentUser: User | null = null;
+  isSidebarOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -28,11 +29,8 @@ export class AdminLayoutComponent {
     return `${firstName} ${lastName}`.trim();
   }
 
-  get initials(): string {
-    const firstNameInitial = (this.currentUser?.prenom || this.currentUser?.first_name || '').charAt(0);
-    const lastNameInitial = (this.currentUser?.nom || this.currentUser?.last_name || '').charAt(0);
-    const combined = `${firstNameInitial}${lastNameInitial}`.trim();
-    return combined ? combined.toUpperCase() : 'AD';
+  get todayLabel(): string {
+    return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
   }
 
   get pageTitle(): string {
@@ -51,6 +49,14 @@ export class AdminLayoutComponent {
     }
 
     return 'Dashboard';
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
   }
 
   logout(): void {

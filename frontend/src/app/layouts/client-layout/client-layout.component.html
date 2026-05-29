@@ -1,51 +1,59 @@
-﻿<div class="client-layout">
-  <div class="ambient-glow ambient-glow-left"></div>
-  <div class="ambient-glow ambient-glow-right"></div>
+﻿<div class="shell">
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    [class.visible]="isSidebarOpen"
+    aria-label="Close menu"
+    (click)="closeSidebar()"
+  ></button>
 
-  <aside class="client-sidebar">
-    <div class="sidebar-profile">
-      <p class="sidebar-eyebrow">Accounting Platform</p>
-      <div class="profile-chip">
-        <div class="avatar">{{ initials }}</div>
-        <div>
-          <p class="profile-name">{{ displayName }}</p>
-          <p class="profile-role">Client Space</p>
-        </div>
-      </div>
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">EC</span>
+      <span class="sidebar-title">ExpertCompta</span>
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/client/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+      <a routerLink="/client/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
       </a>
-
-      <a routerLink="/client/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+      <a routerLink="/client/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
         <mat-icon>work</mat-icon>
         <span>My Projects</span>
       </a>
-
-      <a routerLink="/client/profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+      <a routerLink="/client/profile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
         <mat-icon>person</mat-icon>
         <span>My Profile</span>
       </a>
-
-      <a routerLink="/client/contact" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+      <a routerLink="/client/contact" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
         <mat-icon>mail</mat-icon>
         <span>Contact</span>
       </a>
-
-      <button type="button" class="nav-link nav-link-logout" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Log out</span>
-      </button>
     </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <span class="user-name">{{ displayName }}</span>
+        <span class="user-role">Client</span>
+      </div>
+      <button type="button" class="sidebar-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
   </aside>
 
-  <main class="client-main">
-    <div class="client-shell">
+  <div class="main-area">
+    <header class="topbar">
+      <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="topbar-date">{{ todayLabel }}</span>
+    </header>
+
+    <main class="content">
       <router-outlet></router-outlet>
-    </div>
-  </main>
+    </main>
+  </div>
 </div>
 

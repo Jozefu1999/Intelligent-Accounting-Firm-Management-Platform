@@ -1,9 +1,8 @@
-﻿<div class="projects-page">
-  <section class="projects-hero client-fade-up">
+<div class="projects-page">
+  <header class="page-header">
     <div>
-      <p class="hero-eyebrow">Case tracking</p>
-      <h1>My Projects</h1>
-      <p>Track the progress of your missions and access details for each case.</p>
+      <h1 class="page-title">My Projects</h1>
+      <p class="page-subtitle">Track the progress of your missions and access details for each case.</p>
     </div>
 
     <div class="hero-filters">
@@ -21,9 +20,9 @@
         <option value="suspendu">Suspended</option>
       </select>
     </div>
-  </section>
+  </header>
 
-  <section class="projects-panel client-fade-up">
+  <section class="projects-panel">
     @if (isLoading) {
       <p class="panel-info">Loading projects...</p>
     } @else if (filteredProjects.length === 0) {
@@ -69,7 +68,7 @@
 
 @if (selectedProject) {
   <div class="modal-backdrop">
-    <div class="modal-card client-fade-up">
+    <div class="modal-card">
       <div class="modal-head">
         <h2>{{ selectedProject.name }}</h2>
         <button type="button" class="ghost-btn" (click)="closeDetails()">Close</button>

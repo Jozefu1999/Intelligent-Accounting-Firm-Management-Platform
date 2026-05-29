@@ -9,30 +9,28 @@
 }
 
 .ai-header {
-	border: 1px solid #e2e8f0;
-	border-radius: 1rem;
-	background: #ffffff;
-	padding: 1.1rem 1.25rem;
-	box-shadow: 0 8px 24px -22px rgba(15, 23, 42, 0.45);
+	padding: 0;
 }
 
 .ai-eyebrow {
 	margin: 0;
-	color: #2563eb;
-	font-size: 0.7rem;
-	letter-spacing: 0.16em;
-	font-weight: 800;
+	color: var(--c-accent);
+	font-size: var(--fs-caption);
+	letter-spacing: 0.15em;
+	font-weight: 600;
 }
 
 .ai-header h1 {
-	margin: 0.35rem 0 0;
-	color: #0f172a;
-	font-size: 1.55rem;
+	margin: 0.3rem 0 0;
+	color: var(--c-ink);
+	font-size: var(--fs-heading);
+	letter-spacing: -0.02em;
 }
 
 .ai-header p {
-	margin: 0.35rem 0 0;
-	color: #475569;
+	margin: 0.25rem 0 0;
+	color: var(--c-muted);
+	font-size: var(--fs-body);
 }
 
 .ai-grid {
@@ -42,10 +40,9 @@
 }
 
 .ai-card {
-	border: 1px solid #e2e8f0;
-	border-radius: 1rem;
-	background: #ffffff;
-	box-shadow: 0 12px 30px -28px rgba(15, 23, 42, 0.58);
+	border: 1px solid var(--c-border);
+	border-radius: var(--r-lg);
+	background: var(--c-surface);
 }
 
 .ai-form-card {
@@ -55,13 +52,13 @@
 .ai-form-card h2 {
 	margin: 0;
 	color: #0f172a;
-	font-size: 1.1rem;
+	font-size: var(--fs-title);
 }
 
 .ai-form-card > p {
 	margin: 0.35rem 0 0;
 	color: #64748b;
-	font-size: 0.9rem;
+	font-size: var(--fs-body);
 }
 
 .ai-form-stack {
@@ -73,8 +70,8 @@
 
 .ai-form-stack label {
 	color: #0f172a;
-	font-size: 0.83rem;
-	font-weight: 700;
+	font-size: var(--fs-body);
+	font-weight: 600;
 }
 
 .ai-form-stack input {
@@ -82,10 +79,11 @@
 	border-radius: 0.7rem;
 	min-height: 42px;
 	padding: 0 0.8rem;
-	font-size: 0.9rem;
+	font-size: var(--fs-body);
 	color: #0f172a;
 	background: #ffffff;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	transition: border-color var(--duration-fast) var(--ease-default),
+	            box-shadow var(--duration-fast) var(--ease-default);
 }
 
 .ai-form-stack input:focus {
@@ -96,28 +94,29 @@
 
 .primary-btn {
 	margin-top: 0.3rem;
-	border: 1px solid #1d4ed8;
-	border-radius: 0.75rem;
+	border: none;
+	border-radius: var(--r-md);
 	min-height: 44px;
-	background: linear-gradient(135deg, #1d4ed8, #2563eb);
-	color: #eff6ff;
+	padding: 0 1.25rem;
+	background: var(--c-accent);
+	color: #fff;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.4rem;
-	font-size: 0.88rem;
-	font-weight: 700;
+	gap: 0.35rem;
+	font-size: var(--fs-body);
+	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: background var(--duration-fast) var(--ease-default);
 }
 
 .primary-btn:disabled {
-	opacity: 0.65;
+	opacity: 0.55;
 	cursor: not-allowed;
 }
 
 .primary-btn:not(:disabled):hover {
-	filter: brightness(1.06);
+	background: var(--c-accent-hover);
 }
 
 .alert {
@@ -127,7 +126,7 @@
 	align-items: center;
 	gap: 0.5rem;
 	padding: 0.58rem 0.65rem;
-	font-size: 0.82rem;
+	font-size: var(--fs-body);
 	font-weight: 600;
 }
 
@@ -156,13 +155,13 @@
 .result-header h2 {
 	margin: 0;
 	color: #0f172a;
-	font-size: 1.1rem;
+	font-size: var(--fs-title);
 }
 
 .result-header p {
 	margin: 0.3rem 0 0;
 	color: #64748b;
-	font-size: 0.82rem;
+	font-size: var(--fs-body);
 }
 
 .risk-summary {
@@ -176,8 +175,8 @@
 .risk-summary-label {
 	margin: 0;
 	color: #64748b;
-	font-size: 0.76rem;
-	font-weight: 700;
+	font-size: var(--fs-caption);
+	font-weight: 600;
 	letter-spacing: 0.08em;
 }
 
@@ -188,8 +187,8 @@
 	border-radius: 999px;
 	border: 1px solid transparent;
 	padding: 0.2rem 0.65rem;
-	font-size: 0.78rem;
-	font-weight: 700;
+	font-size: var(--fs-caption);
+	font-weight: 600;
 }
 
 .risk-high {
@@ -228,8 +227,8 @@
 	justify-content: space-between;
 	align-items: center;
 	color: #1e293b;
-	font-size: 0.8rem;
-	font-weight: 700;
+	font-size: var(--fs-body);
+	font-weight: 600;
 }
 
 .probability-track {
@@ -243,19 +242,19 @@
 .probability-bar {
 	height: 100%;
 	border-radius: 999px;
-	transition: width 0.35s ease;
+	transition: width 0.4s var(--ease-out);
 }
 
 .bar-low {
-	background: linear-gradient(90deg, #16a34a, #22c55e);
+	background: #22c55e;
 }
 
 .bar-medium {
-	background: linear-gradient(90deg, #ca8a04, #eab308);
+	background: #eab308;
 }
 
 .bar-high {
-	background: linear-gradient(90deg, #dc2626, #ef4444);
+	background: #ef4444;
 }
 
 .result-placeholder {
@@ -280,7 +279,7 @@
 .result-placeholder h2 {
 	margin: 0;
 	color: #0f172a;
-	font-size: 1rem;
+	font-size: var(--fs-title);
 }
 
 .result-placeholder p {
@@ -304,8 +303,8 @@
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
-	font-size: 0.78rem;
-	font-weight: 800;
+	font-size: var(--fs-caption);
+	font-weight: 600;
 	letter-spacing: 0.06em;
 	color: #2563eb;
 	text-transform: uppercase;
@@ -330,7 +329,7 @@
 }
 
 .field-hint {
-	font-size: 0.72rem;
+	font-size: var(--fs-caption);
 	color: #94a3b8;
 	margin-top: 0.1rem;
 }
@@ -340,12 +339,13 @@
 	border-radius: 0.7rem;
 	min-height: 42px;
 	padding: 0 0.8rem;
-	font-size: 0.9rem;
+	font-size: var(--fs-body);
 	color: #0f172a;
 	background: #ffffff;
 	appearance: auto;
 	cursor: pointer;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	transition: border-color var(--duration-fast) var(--ease-default),
+	            box-shadow var(--duration-fast) var(--ease-default);
 
 	&:focus {
 		outline: none;
@@ -377,15 +377,15 @@
 /* ---- Probability section ---- */
 .probability-title {
 	margin: 0.85rem 0 0.4rem;
-	font-size: 0.76rem;
-	font-weight: 800;
+	font-size: var(--fs-caption);
+	font-weight: 600;
 	letter-spacing: 0.06em;
 	color: #64748b;
 	text-transform: uppercase;
 }
 
 .probability-pct {
-	font-weight: 800;
+	font-weight: 600;
 }
 
 /* ---- Input summary ---- */
@@ -399,8 +399,8 @@
 
 .input-summary-title {
 	margin: 0 0 0.6rem;
-	font-size: 0.76rem;
-	font-weight: 800;
+	font-size: var(--fs-caption);
+	font-weight: 600;
 	letter-spacing: 0.06em;
 	color: #64748b;
 	text-transform: uppercase;
@@ -413,14 +413,14 @@
 }
 
 .input-key {
-	font-size: 0.78rem;
+	font-size: var(--fs-caption);
 	color: #64748b;
 	white-space: nowrap;
 }
 
 .input-val {
-	font-size: 0.78rem;
-	font-weight: 700;
+	font-size: var(--fs-caption);
+	font-weight: 600;
 	color: #0f172a;
 }
 

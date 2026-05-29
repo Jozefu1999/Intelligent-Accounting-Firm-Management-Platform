@@ -20,25 +20,9 @@ const getAll = async (req, res, next) => {
     const where = {};
 
     if (normalizedRole === 'assistant') {
-      const assistantClientIds = await resolveAssistantClientIds(req.user);
-
-      if (!assistantClientIds.length) {
-        return res.json([]);
-      }
-
-      if (requestedClientId && requestedClientId !== 'me') {
-        const parsedClientId = parseNumericId(requestedClientId);
-        if (!parsedClientId || !hasClientAccess(assistantClientIds, parsedClientId)) {
-          return res.status(403).json({ message: 'Forbidden. You can only access projects linked to your account.' });
-        }
-
-        where.client_id = parsedClientId;
-      } else {
-        where.client_id = {
-          [Op.in]: assistantClientIds,
-        };
-      }
-    } else if (normalizedRole === 'visiteur') {
+      // Assistant sees ONLY projects directly assigned to them
+      where.assigned_to = req.user.id;
+    } else if (normalizedRole === 'client') {
       const ownedClientIds = await resolveClientIdsForUser(req.user);
 
       if (!ownedClientIds.length) {
@@ -98,7 +82,7 @@ const getById = async (req, res, next) => {
       }
     }
 
-    if (normalizedRole === 'visiteur') {
+    if (normalizedRole === 'client') {
       const ownedClientIds = await resolveClientIdsForUser(req.user);
 
       if (!hasClientAccess(ownedClientIds, project.client_id)) {
@@ -116,7 +100,7 @@ const create = async (req, res, next) => {
   try {
     const normalizedRole = normalizeRole(req.user.role);
 
-    if (normalizedRole === 'visiteur') {
+    if (normalizedRole === 'client') {
       return res.status(403).json({ message: 'Forbidden. Client role has read-only access to projects.' });
     }
 
@@ -133,7 +117,19 @@ const create = async (req, res, next) => {
       }
     }
 
-    const project = await Project.create(req.body);
+    const { client_id, name, description, type, status, priority, risk_score, estimated_budget, start_date, due_date } = req.body;
+    const project = await Project.create({
+      client_id: client_id || null,
+      name,
+      description,
+      type,
+      status,
+      priority,
+      risk_score,
+      estimated_budget,
+      start_date,
+      due_date,
+    });
     res.status(201).json(project);
   } catch (error) {
     next(error);
@@ -144,7 +140,7 @@ const update = async (req, res, next) => {
   try {
     const normalizedRole = normalizeRole(req.user.role);
 
-    if (normalizedRole === 'visiteur') {
+    if (normalizedRole === 'client') {
       return res.status(403).json({ message: 'Forbidden. Client role has read-only access to projects.' });
     }
 
@@ -184,7 +180,7 @@ const remove = async (req, res, next) => {
   try {
     const normalizedRole = normalizeRole(req.user.role);
 
-    if (normalizedRole === 'visiteur') {
+    if (normalizedRole === 'client') {
       return res.status(403).json({ message: 'Forbidden. Client role has read-only access to projects.' });
     }
 

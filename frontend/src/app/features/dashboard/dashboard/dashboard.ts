@@ -5,6 +5,50 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/services/auth';
+import { User } from '../../../core/models';
+
+interface DashboardStats {
+  totalClients: number;
+  totalProjects: number;
+  activeProjects: number;
+  highRiskProjects: number;
+}
+
+interface StatusItem {
+  statut: string;
+  count: number;
+}
+
+interface RiskItem {
+  niveau_risque: string;
+  count: number;
+}
+
+interface DashboardResponse {
+  stats: DashboardStats;
+  recentProjects: RecentProject[];
+  recentClients: RecentClient[];
+  projectsByStatus: StatusItem[];
+  projectsByRisk: RiskItem[];
+}
+
+interface RecentProject {
+  id: number;
+  titre: string;
+  statut: string;
+  niveau_risque?: string;
+  client_nom?: string;
+  created_at?: string;
+}
+
+interface RecentClient {
+  id: number;
+  nom: string;
+  secteur?: string;
+  statut?: string;
+  created_at?: string;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -16,47 +60,35 @@ import { environment } from '../../../../environments/environment';
 })
 export class Dashboard implements OnInit {
   today = new Date();
-  stats = {
+  stats: DashboardStats = {
     totalClients: 0,
     totalProjects: 0,
     activeProjects: 0,
     highRiskProjects: 0,
   };
-  recentProjects: any[] = [];
-  recentClients: any[] = [];
-  projectsByStatus: any[] = [];
-  projectsByRisk: any[] = [];
+  recentProjects: RecentProject[] = [];
+  recentClients: RecentClient[] = [];
+  projectsByStatus: StatusItem[] = [];
+  projectsByRisk: RiskItem[] = [];
   isLoading = true;
-  currentUser: any = null;
+  currentUser: User | null = null;
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        this.currentUser = {
-          ...parsedUser,
-          prenom: parsedUser.prenom ?? parsedUser.first_name ?? '',
-          nom: parsedUser.nom ?? parsedUser.last_name ?? '',
-        };
-      } catch {
-        this.currentUser = null;
-      }
-    }
-
+    this.currentUser = this.authService.getCurrentUser();
     this.loadDashboard();
   }
 
   loadDashboard(): void {
     this.isLoading = true;
 
-    this.http.get<any>(`${environment.apiUrl}/dashboard/stats`)
+    this.http.get<DashboardResponse>(`${environment.apiUrl}/dashboard/stats`)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .pipe(finalize(() => {
         this.isLoading = false;
@@ -71,8 +103,7 @@ export class Dashboard implements OnInit {
           this.projectsByRisk = res?.projectsByRisk ?? [];
           this.cdr.detectChanges();
         },
-        error: (err) => {
-          console.error(err);
+        error: () => {
           this.cdr.detectChanges();
         },
       });
@@ -164,5 +195,9 @@ export class Dashboard implements OnInit {
     }
 
     return name.charAt(0).toUpperCase();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

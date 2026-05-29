@@ -18,14 +18,14 @@ export class App {
   ) {}
 
   get currentRole(): string {
-    return this.authService.getCurrentUser()?.role ?? 'visiteur';
+    return this.authService.getCurrentUser()?.role ?? 'client';
   }
 
   get useStandaloneLayout(): boolean {
     const currentUrl = this.router.url ?? '';
     const currentPath = currentUrl.split('?')[0].split('#')[0];
 
-    return ['/assistant', '/client', '/admin', '/expert']
+    return ['/assistant', '/client', '/admin', '/expert', '/landing', '/forgot-password', '/reset-password']
       .some((prefix) => currentPath === prefix || currentPath.startsWith(`${prefix}/`));
   }
 }

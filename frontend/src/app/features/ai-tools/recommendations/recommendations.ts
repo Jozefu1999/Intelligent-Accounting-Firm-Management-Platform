@@ -136,6 +136,17 @@ export class Recommendations implements OnInit {
     return 'Medium';
   }
 
+  getCategoryLabel(category: string): string {
+    const map: Record<string, string> = {
+      fiscal: 'Fiscal',
+      financial: 'Financial',
+      compliance: 'Compliance',
+      strategy: 'Strategy',
+      operations: 'Operations',
+    };
+    return map[category?.toLowerCase()] || category || '';
+  }
+
   getPriorityClass(priority: string): string {
     const normalized = this.normalizePriority(priority);
 

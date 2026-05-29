@@ -1,7 +1,7 @@
 <section class="admin-card ml-hero">
   <div>
     <h2>ML Models</h2>
-    <p>Monitor and retrain the risk prediction and project classification models.</p>
+    <p>Monitor and retrain the risk prediction model.</p>
   </div>
   <button type="button" class="run-btn" [disabled]="!!retrainingModel" (click)="retrain('all')">
     {{ retrainingModel === 'all' ? 'Running...' : 'Retrain All Models' }}
@@ -31,7 +31,7 @@
           type="button"
           class="run-btn run-btn-sm"
           [disabled]="!!retrainingModel"
-          (click)="retrain(info.model === 'risk' ? 'risk' : 'classification')"
+          (click)="retrain('risk')"
         >
           {{ retrainingModel === info.model ? 'Running...' : 'Retrain' }}
         </button>

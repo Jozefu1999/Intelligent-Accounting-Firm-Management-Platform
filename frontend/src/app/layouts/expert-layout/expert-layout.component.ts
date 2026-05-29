@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth';
 
 @Component({
   selector: 'app-expert-layout',
@@ -13,32 +14,21 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class ExpertLayoutComponent {
   isSidebarOpen = false;
-  readonly todayLabel = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date());
+  readonly todayLabel = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(new Date());
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   get userDisplayName(): string {
-    const rawUser = localStorage.getItem('user');
-    if (!rawUser) {
+    const user = this.authService.getCurrentUser();
+    if (!user) {
       return 'Expert';
     }
 
-    try {
-      const user = JSON.parse(rawUser) as {
-        first_name?: string;
-        last_name?: string;
-        prenom?: string;
-        nom?: string;
-      };
+    const firstName = user.prenom || user.first_name || '';
+    const lastName = user.nom || user.last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
 
-      const firstName = user.prenom || user.first_name || '';
-      const lastName = user.nom || user.last_name || '';
-      const fullName = `${firstName} ${lastName}`.trim();
-
-      return fullName || 'Expert';
-    } catch {
-      return 'Expert';
-    }
+    return fullName || 'Expert';
   }
 
   toggleSidebar(): void {
@@ -50,8 +40,7 @@ export class ExpertLayoutComponent {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    this.authService.logout();
     this.closeSidebar();
     void this.router.navigate(['/login']);
   }

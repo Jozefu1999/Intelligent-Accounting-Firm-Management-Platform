@@ -33,6 +33,10 @@ export class DocumentService {
     return this.http.get(`${this.apiUrl}/download/${id}`, { responseType: 'blob' });
   }
 
+  preview(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/preview`, { responseType: 'blob' });
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

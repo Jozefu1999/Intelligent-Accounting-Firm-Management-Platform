@@ -1,86 +1,96 @@
-﻿<div class="dashboard-shell">
+<div class="dashboard-shell">
   @if (errorMessage) {
-    <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-      {{ errorMessage }}
-    </div>
+    <div class="alert-error">{{ errorMessage }}</div>
   }
 
-  <section class="hero-card">
+  <header class="page-header">
     <div>
-      <p class="hero-eyebrow">Assistant workspace</p>
-      <h1 class="hero-title">
-        Hello {{ fullName || 'Assistant' }}
-        <span class="role-pill">Assistant</span>
-      </h1>
-      <p class="hero-date">{{ todayLabel }}</p>
+      <h1 class="page-title">Hello {{ fullName || 'Assistant' }}</h1>
+      <p class="page-date">{{ todayLabel }}</p>
     </div>
-
-    <div class="hero-actions">
-      <a routerLink="/assistant/projets/new" class="quick-action quick-action--primary">Add project</a>
+    <div class="header-actions">
       <a routerLink="/assistant/documents" class="quick-action quick-action--ghost">View documents</a>
     </div>
-  </section>
+  </header>
 
-  <section class="kpi-grid">
-    <article class="kpi-card">
-      <p class="kpi-label">Assigned projects</p>
-      <p class="kpi-value">{{ assignedProjectsCount }}</p>
-      <p class="kpi-sub">{{ inProgressProjectsCount }} in progress</p>
-    </article>
-
-    <article class="kpi-card">
-      <p class="kpi-label">Uploaded documents</p>
-      <p class="kpi-value">{{ uploadedDocumentsCount }}</p>
-      <p class="kpi-sub">Available files</p>
-    </article>
-
-    <article class="kpi-card kpi-card--accent">
-      <p class="kpi-label">Completion rate</p>
-      <p class="kpi-value">{{ completionRate }}%</p>
-      <p class="kpi-sub">{{ completedProjectsCount }} completed project(s)</p>
-    </article>
+  <section class="metrics-strip">
+    <div class="metric">
+      <span class="metric-value metric-value--primary">{{ assignedProjectsCount }}</span>
+      <span class="metric-label">Assigned projects</span>
+      <span class="metric-sub">{{ inProgressProjectsCount }} in progress</span>
+    </div>
+    <div class="metric-divider"></div>
+    <div class="metric">
+      <span class="metric-value">{{ uploadedDocumentsCount }}</span>
+      <span class="metric-label">Documents</span>
+    </div>
+    <div class="metric-divider"></div>
+    <div class="metric">
+      <span class="metric-value metric-value--accent">{{ completionRate }}%</span>
+      <span class="metric-label">Completion</span>
+      <span class="metric-sub">{{ completedProjectsCount }} completed</span>
+    </div>
   </section>
 
   <section class="projects-card">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-slate-900">Latest assigned projects</h2>
-      <a routerLink="/assistant/projets" class="text-sm font-semibold text-cyan-700 hover:text-cyan-800">View all</a>
+    <div class="card-header">
+      <h2>Latest assigned projects</h2>
+      <a routerLink="/assistant/projets" class="card-link">View all</a>
     </div>
 
     @if (isLoading) {
-      <div class="flex items-center justify-center py-8">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-600"></div>
-      </div>
-    } @else {
-      <div class="overflow-x-auto">
-        <table class="w-full min-w-[760px] text-left">
-          <thead class="border-b border-slate-200 bg-slate-50">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
             <tr>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Title</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Client</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Priority</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th>
+              <th>Title</th>
+              <th>Client</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Date</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody>
+            @for (row of [1,2,3,4,5]; track row) {
+              <tr>
+                <td><div class="skeleton-line skeleton-w-lg"></div></td>
+                <td><div class="skeleton-line skeleton-w-md"></div></td>
+                <td><div class="skeleton-line skeleton-w-sm skeleton-pill"></div></td>
+                <td><div class="skeleton-line skeleton-w-sm skeleton-pill"></div></td>
+                <td><div class="skeleton-line skeleton-w-md"></div></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Client</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
             @for (project of recentProjects; track project.id) {
               <tr>
-                <td class="px-3 py-3 text-sm font-medium text-slate-900">{{ project.name }}</td>
-                <td class="px-3 py-3 text-sm text-slate-600">{{ project.client?.company_name || 'N/A' }}</td>
-                <td class="px-3 py-3 text-sm text-slate-700">
+                <td class="cell-primary">{{ project.name }}</td>
+                <td>{{ project.client?.company_name || 'N/A' }}</td>
+                <td>
                   <span [class]="getStatusBadgeClass(project.status)">{{ getStatusLabel(project.status) }}</span>
                 </td>
-                <td class="px-3 py-3 text-sm text-slate-700">
+                <td>
                   <span [class]="getPriorityBadgeClass(project.priority)">{{ getPriorityLabel(project.priority) }}</span>
                 </td>
-                <td class="px-3 py-3 text-sm text-slate-600">{{ formatDate(project.created_at || project.updated_at) }}</td>
+                <td class="cell-muted">{{ formatDate(project.created_at || project.updated_at) }}</td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">
-                  No assigned projects at the moment.
-                </td>
+                <td colspan="5" class="cell-empty">No assigned projects at the moment.</td>
               </tr>
             }
           </tbody>
@@ -89,4 +99,3 @@
     }
   </section>
 </div>
-
