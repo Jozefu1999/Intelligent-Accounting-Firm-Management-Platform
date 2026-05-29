@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
+import { User } from '../../core/models';
 
 @Component({
   selector: 'app-admin-layout',
@@ -18,7 +19,16 @@ export class AdminLayoutComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {}
+  ) {
+    const rawUser = localStorage.getItem('user');
+    if (rawUser) {
+      try {
+        this.currentUser = JSON.parse(rawUser);
+      } catch {
+        this.currentUser = null;
+      }
+    }
+  }
 
   get fullName(): string {
     const firstName = this.currentUser?.prenom || this.currentUser?.first_name || '';
@@ -32,35 +42,10 @@ export class AdminLayoutComponent {
 
   get pageTitle(): string {
     const currentUrl = this.router.url;
-
-    if (currentUrl.includes('/admin/users')) {
-      return 'User Management';
-    }
-
-    try {
-      const user = JSON.parse(rawUser) as {
-        first_name?: string;
-        last_name?: string;
-        prenom?: string;
-        nom?: string;
-      };
-
-      const firstName = user.prenom || user.first_name || '';
-      const lastName = user.nom || user.last_name || '';
-      const fullName = `${firstName} ${lastName}`.trim();
-
-      return fullName || 'Administrator';
-    } catch {
-      return 'Administrator';
-    }
-  }
-
-  toggleSidebar(): void {
-    this.isSidebarOpen = !this.isSidebarOpen;
-  }
-
-  closeSidebar(): void {
-    this.isSidebarOpen = false;
+    if (currentUrl.includes('/admin/users')) return 'User Management';
+    if (currentUrl.includes('/admin/statistics')) return 'Statistics';
+    if (currentUrl.includes('/admin/ml')) return 'ML Models';
+    return this.fullName || 'Administrator';
   }
 
   toggleSidebar(): void {

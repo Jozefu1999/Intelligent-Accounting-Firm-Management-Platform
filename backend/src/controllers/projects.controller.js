@@ -3,6 +3,7 @@ const { Project, Client } = require('../models');
 const { normalizeRole } = require('../utils/roles');
 const {
   resolveClientIdsForUser,
+  resolveAssistantClientIds,
 } = require('../utils/client-scope');
 
 const parseNumericId = (value) => {
