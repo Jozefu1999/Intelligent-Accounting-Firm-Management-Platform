@@ -199,55 +199,57 @@ const getMyPlatformClients = async (req, res, next) => {
     const expertId = req.user.id;
     const { search, status } = req.query;
 
-    const where = {
-      role: 'client',
-      assigned_expert_id: expertId,
-    };
-
-    if (search) {
-      const searchTerm = `%${search}%`;
-      where[Op.or] = [
-        { first_name: { [Op.like]: searchTerm } },
-        { last_name: { [Op.like]: searchTerm } },
-        { email: { [Op.like]: searchTerm } },
-      ];
-    }
-
-    const users = await User.findAll({
-      where,
-      attributes: ['id', 'first_name', 'last_name', 'email', 'created_at'],
-      order: [['created_at', 'DESC']],
+    // Find all client records assigned to this expert
+    const clientRecords = await Client.findAll({
+      where: { assigned_expert_id: expertId },
+      include: [{ model: Project, as: 'projects', attributes: ['id', 'name', 'status', 'priority', 'type'] }],
     });
 
-    // For each user, find their Client record (by email) and projects
-    const result = await Promise.all(users.map(async (user) => {
-      const clientRecord = await Client.findOne({
-        where: { email: user.email },
-        include: [{ model: Project, as: 'projects', attributes: ['id', 'name', 'status', 'priority', 'type'] }],
-      });
+    // For each client record, find the matching user by email
+    const result = await Promise.all(clientRecords.map(async (clientRecord) => {
+      const user = clientRecord.email
+        ? await User.findOne({
+            where: { email: clientRecord.email, role: 'client' },
+            attributes: ['id', 'first_name', 'last_name', 'email', 'created_at'],
+          })
+        : null;
 
-      const projects = clientRecord?.projects || [];
-      let clientStatus = 'pending'; // no client record yet
-      if (clientRecord && projects.length > 0) {
+      const projects = clientRecord.projects || [];
+      let clientStatus = 'registered';
+      if (projects.length > 0) {
         clientStatus = 'active';
-      } else if (clientRecord) {
-        clientStatus = 'registered';
       }
 
       return {
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        created_at: user.created_at,
-        client_id: clientRecord?.id || null,
+        id: user?.id || null,
+        first_name: user?.first_name || clientRecord.contact_person?.split(' ')[0] || '',
+        last_name: user?.last_name || clientRecord.contact_person?.split(' ').slice(1).join(' ') || '',
+        email: clientRecord.email || user?.email || '',
+        company_name: clientRecord.company_name,
+        created_at: user?.created_at || clientRecord.created_at,
+        client_id: clientRecord.id,
         status: clientStatus,
         projects,
       };
     }));
 
-    // Filter by status if provided
-    const filtered = status ? result.filter((r) => r.status === status) : result;
+    // Apply search filter
+    let filtered = result;
+    if (search) {
+      const term = search.toLowerCase();
+      filtered = filtered.filter(
+        (r) =>
+          r.first_name?.toLowerCase().includes(term) ||
+          r.last_name?.toLowerCase().includes(term) ||
+          r.email?.toLowerCase().includes(term) ||
+          r.company_name?.toLowerCase().includes(term),
+      );
+    }
+
+    // Apply status filter
+    if (status) {
+      filtered = filtered.filter((r) => r.status === status);
+    }
 
     res.json(filtered);
   } catch (error) {
@@ -264,32 +266,26 @@ const assignProject = async (req, res, next) => {
       return res.status(400).json({ message: 'user_id and project_id are required.' });
     }
 
-    // Verify the user is a client assigned to this expert
+    // Verify the user is a client assigned to this expert (via clients table)
     const targetUser = await User.findOne({
-      where: { id: user_id, role: 'client', assigned_expert_id: expertId },
+      where: { id: user_id, role: 'client' },
+      attributes: ['id', 'first_name', 'last_name', 'email'],
     });
 
     if (!targetUser) {
-      return res.status(404).json({ message: 'Client user not found or not assigned to you.' });
+      return res.status(404).json({ message: 'Client user not found.' });
+    }
+
+    // Verify the client record is assigned to this expert
+    const clientRecord = await Client.findOne({ where: { email: targetUser.email, assigned_expert_id: expertId } });
+    if (!clientRecord) {
+      return res.status(403).json({ message: 'Client user not found or not assigned to you.' });
     }
 
     // Verify the project exists
     const project = await Project.findByPk(project_id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found.' });
-    }
-
-    // Find or create a Client record for this user
-    let clientRecord = await Client.findOne({ where: { email: targetUser.email } });
-
-    if (!clientRecord) {
-      clientRecord = await Client.create({
-        company_name: `${targetUser.first_name} ${targetUser.last_name}`,
-        contact_person: `${targetUser.first_name} ${targetUser.last_name}`,
-        email: targetUser.email,
-        assigned_expert_id: expertId,
-        status: 'active',
-      });
     }
 
     // Assign the project to this client
