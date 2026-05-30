@@ -1,9 +1,10 @@
 ﻿import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { User } from '../../core/models';
+import { User, Project } from '../../core/models';
 import { AuthService } from '../../core/services/auth';
 import { ContactService } from '../../core/services/contact';
+import { ProjectService } from '../../core/services/project';
 import { getRoleLabel } from '../../core/utils/role-home';
 
 @Component({
@@ -27,6 +28,10 @@ export class ClientDashboardComponent implements OnInit {
   feedbackError = '';
   feedbackSuccess = '';
 
+  // Projects
+  projects: Project[] = [];
+  isLoadingProjects = false;
+
   profileForm = {
     nom: '',
     prenom: '',
@@ -37,11 +42,30 @@ export class ClientDashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private contactService: ContactService,
+    private projectService: ProjectService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.resetProfileForm();
+    this.loadProjects();
+  }
+
+  private loadProjects(): void {
+    this.isLoadingProjects = true;
+    this.projectService.getForCurrentClient().subscribe({
+      next: (projects) => {
+        this.projects = projects;
+        this.isLoadingProjects = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.projects = [];
+        this.isLoadingProjects = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   get displayNom(): string {
@@ -84,10 +108,12 @@ export class ClientDashboardComponent implements OnInit {
         this.message = '';
         this.feedbackSuccess = 'Message sent to the firm.';
         this.isSendingMessage = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.feedbackError = 'Unable to send the message.';
         this.isSendingMessage = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -126,10 +152,12 @@ export class ClientDashboardComponent implements OnInit {
         this.isSavingProfile = false;
         this.showEditProfile = false;
         this.profileForm.password = '';
+        this.cdr.detectChanges();
       },
       error: () => {
         this.feedbackError = 'Unable to update the profile.';
         this.isSavingProfile = false;
+        this.cdr.detectChanges();
       },
     });
   }

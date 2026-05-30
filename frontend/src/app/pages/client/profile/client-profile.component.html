@@ -1,93 +1,170 @@
-﻿<div class="profile-page">
-  <section class="profile-hero client-fade-up">
-    <div class="hero-main">
+<div class="profile-page">
+  <header class="page-header">
+    <div class="header-left">
       <div class="hero-avatar">{{ avatarInitials }}</div>
       <div>
-        <p class="hero-eyebrow">Client account</p>
-        <h1>{{ fullName }}</h1>
-        <p>{{ currentUser?.email }}</p>
+        <h1 class="page-title">{{ fullName }}</h1>
+        <p class="page-subtitle">{{ currentUser?.email }} · Member since {{ memberSince }}</p>
       </div>
     </div>
-
-    <div class="hero-meta">
-      <span class="role-chip">Client</span>
-      <span>Member since {{ memberSince }}</span>
-    </div>
-  </section>
+  </header>
 
   <div class="profile-grid">
-    <section class="panel client-fade-up">
-      <h2>Personal information</h2>
+    <div class="profile-col-left">
+      <section class="panel">
+        <h2><mat-icon>person</mat-icon> Personal information</h2>
 
-      @if (profileSuccessMessage) {
-        <div class="alert-success">{{ profileSuccessMessage }}</div>
-      }
+        @if (profileSuccessMessage) {
+          <div class="alert-success">{{ profileSuccessMessage }}</div>
+        }
 
-      @if (profileErrorMessage) {
-        <div class="alert-error">{{ profileErrorMessage }}</div>
-      }
+        @if (profileErrorMessage) {
+          <div class="alert-error">{{ profileErrorMessage }}</div>
+        }
 
-      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="form-grid">
-        <div class="field-group">
-          <label>Last name</label>
-          <input formControlName="nom" type="text" class="field" />
-        </div>
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="form-grid">
+          <div class="field-group">
+            <label>Last name</label>
+            <input formControlName="nom" type="text" class="field" />
+          </div>
 
-        <div class="field-group">
-          <label>First name</label>
-          <input formControlName="prenom" type="text" class="field" />
-        </div>
+          <div class="field-group">
+            <label>First name</label>
+            <input formControlName="prenom" type="text" class="field" />
+          </div>
 
-        <div class="field-group field-wide">
-          <label>Email</label>
-          <input formControlName="email" type="email" class="field" />
-        </div>
+          <div class="field-group field-wide">
+            <label>Email</label>
+            <input formControlName="email" type="email" class="field" />
+          </div>
 
-        <div class="field-wide">
-          <button type="submit" [disabled]="isSavingProfile" class="primary-btn">
-            {{ isSavingProfile ? 'Saving...' : 'Save changes' }}
+          <div class="field-wide">
+            <button type="submit" [disabled]="isSavingProfile" class="primary-btn">
+              {{ isSavingProfile ? 'Saving...' : 'Save changes' }}
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2><mat-icon>lock</mat-icon> Change password</h2>
+
+        @if (passwordSuccessMessage) {
+          <div class="alert-success">{{ passwordSuccessMessage }}</div>
+        }
+
+        @if (passwordErrorMessage) {
+          <div class="alert-error">{{ passwordErrorMessage }}</div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
+          <div class="field-group">
+            <label>Current password</label>
+            <input formControlName="currentPassword" type="password" class="field" />
+          </div>
+
+          <div class="field-group">
+            <label>New password</label>
+            <input formControlName="newPassword" type="password" class="field" />
+          </div>
+
+          <div class="field-group">
+            <label>Confirm new password</label>
+            <input formControlName="confirmPassword" type="password" class="field" />
+          </div>
+
+          <div class="rule-list">
+            <p [class]="passwordMinLengthMet ? 'rule-ok' : 'rule-pending'">? Minimum 6 characters</p>
+            <p [class]="passwordsMatch ? 'rule-ok' : 'rule-pending'">? Passwords match</p>
+          </div>
+
+          <button type="submit" [disabled]="isChangingPassword" class="primary-btn dark-btn">
+            {{ isChangingPassword ? 'Updating...' : 'Change password' }}
           </button>
-        </div>
-      </form>
-    </section>
+        </form>
+      </section>
+    </div>
 
-    <section class="panel client-fade-up">
-      <h2>Change password</h2>
+    <div class="profile-col-right">
+      <section class="panel panel-company">
+        <h2><mat-icon>business</mat-icon> Company Information</h2>
 
-      @if (passwordSuccessMessage) {
-        <div class="alert-success">{{ passwordSuccessMessage }}</div>
-      }
+        @if (isLoadingCompany) {
+          <div class="loading-text">Loading company data...</div>
+        } @else if (!clientProfile) {
+          <div class="no-company">
+            <mat-icon>info</mat-icon>
+            <p>No company profile linked to your account yet. Contact your expert to set it up.</p>
+          </div>
+        } @else {
+          @if (companySuccessMessage) {
+            <div class="alert-success">{{ companySuccessMessage }}</div>
+          }
 
-      @if (passwordErrorMessage) {
-        <div class="alert-error">{{ passwordErrorMessage }}</div>
-      }
+          @if (companyErrorMessage) {
+            <div class="alert-error">{{ companyErrorMessage }}</div>
+          }
 
-      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
-        <div class="field-group">
-          <label>Current password</label>
-          <input formControlName="currentPassword" type="password" class="field" />
-        </div>
+          <form [formGroup]="companyForm" (ngSubmit)="saveCompanyInfo()" class="form-grid">
+            <div class="field-group field-wide">
+              <label>Company name *</label>
+              <input formControlName="company_name" type="text" class="field" />
+            </div>
 
-        <div class="field-group">
-          <label>New password</label>
-          <input formControlName="newPassword" type="password" class="field" />
-        </div>
+            <div class="field-group">
+              <label>SIRET</label>
+              <input formControlName="siret" type="text" class="field" placeholder="14 digits" />
+            </div>
 
-        <div class="field-group">
-          <label>Confirm new password</label>
-          <input formControlName="confirmPassword" type="password" class="field" />
-        </div>
+            <div class="field-group">
+              <label>Sector</label>
+              <select formControlName="sector" class="field">
+                <option value="">� Select sector �</option>
+                @for (s of sectors; track s) {
+                  <option [value]="s">{{ s }}</option>
+                }
+              </select>
+            </div>
 
-        <div class="rule-list">
-          <p [class]="passwordMinLengthMet ? 'rule-ok' : 'rule-pending'">✓ Minimum 6 characters</p>
-          <p [class]="passwordsMatch ? 'rule-ok' : 'rule-pending'">✓ Passwords match</p>
-        </div>
+            <div class="field-group">
+              <label>Phone</label>
+              <input formControlName="phone" type="tel" class="field" />
+            </div>
 
-        <button type="submit" [disabled]="isChangingPassword" class="primary-btn dark-btn">
-          {{ isChangingPassword ? 'Updating...' : 'Change password' }}
-        </button>
-      </form>
-    </section>
+            <div class="field-group">
+              <label>Annual Revenue (TND)</label>
+              <input formControlName="annual_revenue" type="number" class="field" placeholder="0.00" />
+            </div>
+
+            <div class="field-group">
+              <label>Address</label>
+              <input formControlName="address" type="text" class="field" />
+            </div>
+
+            <div class="field-group">
+              <label>City</label>
+              <input formControlName="city" type="text" class="field" />
+            </div>
+
+            <div class="field-group field-wide">
+              <label>Contact person</label>
+              <input formControlName="contact_person" type="text" class="field" />
+            </div>
+
+            <div class="field-group field-wide">
+              <label>Notes</label>
+              <textarea formControlName="notes" class="field textarea" rows="2" placeholder="Additional notes..."></textarea>
+            </div>
+
+            <div class="field-wide">
+              <button type="submit" [disabled]="isSavingCompany" class="primary-btn">
+                {{ isSavingCompany ? 'Saving...' : 'Update company info' }}
+              </button>
+            </div>
+          </form>
+        }
+      </section>
+    </div>
   </div>
 </div>
 

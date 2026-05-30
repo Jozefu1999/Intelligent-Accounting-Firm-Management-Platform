@@ -199,4 +199,34 @@ const remove = async (req, res, next) => {
   }
 };
 
-module.exports = { getAll, upload, uploadDocument, downloadDocument, remove };
+const previewDocument = async (req, res, next) => {
+  try {
+    const document = await Document.findByPk(req.params.id, {
+      include: [{ model: Project, as: 'project', attributes: ['id', 'client_id'] }],
+    });
+
+    if (!document) {
+      return res.status(404).json({ message: 'Document not found.' });
+    }
+
+    const normalizedRole = normalizeRole(req.user.role);
+
+    if (normalizedRole === 'assistant' && document.uploaded_by !== req.user.id) {
+      return res.status(403).json({ message: 'Forbidden.' });
+    }
+
+    const filePath = path.resolve(document.file_path);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found on disk.' });
+    }
+
+    const mimeType = document.mime_type || 'application/octet-stream';
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `inline; filename="${document.name}"`);
+    fs.createReadStream(filePath).pipe(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getAll, upload, uploadDocument, downloadDocument, previewDocument, remove };

@@ -1,5 +1,5 @@
 ﻿import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
@@ -34,6 +34,7 @@ export class ClientProjectsComponent implements OnInit {
     private authService: AuthService,
     private projectService: ProjectService,
     private documentService: DocumentService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -67,10 +68,12 @@ export class ClientProjectsComponent implements OnInit {
       next: (documents) => {
         this.selectedProjectDocuments = documents;
         this.isLoadingDetails = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.selectedProjectDocuments = [];
         this.isLoadingDetails = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -158,10 +161,12 @@ export class ClientProjectsComponent implements OnInit {
       next: (projects) => {
         this.projects = projects;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.projects = [];
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
     });
   }

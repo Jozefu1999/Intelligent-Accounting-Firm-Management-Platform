@@ -1,109 +1,83 @@
-﻿<aside class="w-full shrink-0 border-b border-slate-200/70 bg-white/75 backdrop-blur-xl lg:h-full lg:w-72 lg:border-b-0 lg:border-r">
-  <div class="hidden border-b border-slate-200/70 px-5 py-5 lg:block">
-    <p class="font-['Sora'] text-sm font-semibold text-slate-900">Navigation</p>
-    <p class="mt-1 text-xs text-slate-500">Operational management of the firm</p>
+<aside class="hidden h-full w-[272px] shrink-0 flex-col border-r border-white/[0.08] bg-[#0f172a] lg:flex">
+  <div class="border-b border-white/[0.08] px-5 py-4">
+    <div class="flex items-center gap-2.5">
+      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[rgba(37,99,235,0.24)] text-white">
+        <mat-icon class="text-[18px]">account_balance</mat-icon>
+      </div>
+      <p class="text-[0.82rem] font-semibold text-white/90">Accounting Platform</p>
+    </div>
   </div>
 
-  <nav class="overflow-x-auto px-2 py-3 sm:px-4 lg:px-4 lg:py-5">
-    <ul class="flex gap-2 lg:block lg:space-y-1">
-      <li class="min-w-[12rem] lg:min-w-0">
+  <nav class="flex-1 overflow-y-auto px-3 py-4">
+    <ul class="space-y-0.5">
+      <li>
         <a
           routerLink="/dashboard"
-          routerLinkActive="border-cyan-200 bg-cyan-50/80 text-cyan-800 shadow-sm"
+          routerLinkActive="bg-[rgba(37,99,235,0.24)] text-white border-[rgba(37,99,235,0.85)]"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="group flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50/60 hover:text-cyan-700"
+          class="flex items-center gap-2.5 rounded-[0.72rem] border border-transparent px-3 py-[0.68rem] text-[0.83rem] font-medium text-[#94a3b8] transition-colors duration-150 hover:bg-[rgba(37,99,235,0.16)] hover:text-white"
         >
-          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-cyan-100 group-hover:text-cyan-700">
-            <mat-icon class="text-[20px]">dashboard</mat-icon>
-          </span>
-          <div>
-            <p class="text-sm font-semibold">Dashboard</p>
-            <p class="text-xs text-slate-400">Overview</p>
-          </div>
+          <mat-icon class="text-[18px]">dashboard</mat-icon>
+          <span>Dashboard</span>
         </a>
       </li>
 
-      <li class="min-w-[12rem] lg:min-w-0">
+      <li>
         <a
           routerLink="/clients"
-          routerLinkActive="border-cyan-200 bg-cyan-50/80 text-cyan-800 shadow-sm"
-          class="group flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50/60 hover:text-cyan-700"
+          routerLinkActive="bg-[rgba(37,99,235,0.24)] text-white border-[rgba(37,99,235,0.85)]"
+          class="flex items-center gap-2.5 rounded-[0.72rem] border border-transparent px-3 py-[0.68rem] text-[0.83rem] font-medium text-[#94a3b8] transition-colors duration-150 hover:bg-[rgba(37,99,235,0.16)] hover:text-white"
         >
-          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-cyan-100 group-hover:text-cyan-700">
-            <mat-icon class="text-[20px]">people</mat-icon>
-          </span>
-          <div>
-            <p class="text-sm font-semibold">Clients</p>
-            <p class="text-xs text-slate-400">Portfolio</p>
-          </div>
+          <mat-icon class="text-[18px]">people</mat-icon>
+          <span>Clients</span>
         </a>
       </li>
 
-      <li class="min-w-[12rem] lg:min-w-0">
+      <li>
         <a
           routerLink="/projects"
-          routerLinkActive="border-cyan-200 bg-cyan-50/80 text-cyan-800 shadow-sm"
-          class="group flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50/60 hover:text-cyan-700"
+          routerLinkActive="bg-[rgba(37,99,235,0.24)] text-white border-[rgba(37,99,235,0.85)]"
+          class="flex items-center gap-2.5 rounded-[0.72rem] border border-transparent px-3 py-[0.68rem] text-[0.83rem] font-medium text-[#94a3b8] transition-colors duration-150 hover:bg-[rgba(37,99,235,0.16)] hover:text-white"
         >
-          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-cyan-100 group-hover:text-cyan-700">
-            <mat-icon class="text-[20px]">folder</mat-icon>
-          </span>
-          <div>
-            <p class="text-sm font-semibold">Projects</p>
-            <p class="text-xs text-slate-400">Current missions</p>
-          </div>
+          <mat-icon class="text-[18px]">folder</mat-icon>
+          <span>Projects</span>
         </a>
       </li>
 
-      <li class="hidden px-3 pb-1 pt-3 lg:block">
-        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">AI Tools</p>
+      <li class="pb-1 pt-5">
+        <p class="px-3 text-[0.67rem] font-bold uppercase tracking-[0.17em] text-[#94a3b8]/60">AI Tools</p>
       </li>
 
-      <li class="min-w-[12rem] lg:min-w-0">
+      <li>
         <a
           routerLink="/ai-tools/business-plan"
-          routerLinkActive="border-cyan-200 bg-cyan-50/80 text-cyan-800 shadow-sm"
-          class="group flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50/60 hover:text-cyan-700"
+          routerLinkActive="bg-[rgba(37,99,235,0.24)] text-white border-[rgba(37,99,235,0.85)]"
+          class="flex items-center gap-2.5 rounded-[0.72rem] border border-transparent px-3 py-[0.68rem] text-[0.83rem] font-medium text-[#94a3b8] transition-colors duration-150 hover:bg-[rgba(37,99,235,0.16)] hover:text-white"
         >
-          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-cyan-100 group-hover:text-cyan-700">
-            <mat-icon class="text-[20px]">auto_awesome</mat-icon>
-          </span>
-          <div>
-            <p class="text-sm font-semibold">Business Plan</p>
-            <p class="text-xs text-slate-400">AI generation</p>
-          </div>
+          <mat-icon class="text-[18px]">auto_awesome</mat-icon>
+          <span>Business Plan</span>
         </a>
       </li>
 
-      <li class="min-w-[12rem] lg:min-w-0">
+      <li>
         <a
           routerLink="/ai-tools/recommendations"
-          routerLinkActive="border-cyan-200 bg-cyan-50/80 text-cyan-800 shadow-sm"
-          class="group flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50/60 hover:text-cyan-700"
+          routerLinkActive="bg-[rgba(37,99,235,0.24)] text-white border-[rgba(37,99,235,0.85)]"
+          class="flex items-center gap-2.5 rounded-[0.72rem] border border-transparent px-3 py-[0.68rem] text-[0.83rem] font-medium text-[#94a3b8] transition-colors duration-150 hover:bg-[rgba(37,99,235,0.16)] hover:text-white"
         >
-          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-cyan-100 group-hover:text-cyan-700">
-            <mat-icon class="text-[20px]">lightbulb</mat-icon>
-          </span>
-          <div>
-            <p class="text-sm font-semibold">Recommendations</p>
-            <p class="text-xs text-slate-400">Targeted consulting</p>
-          </div>
+          <mat-icon class="text-[18px]">lightbulb</mat-icon>
+          <span>Recommendations</span>
         </a>
       </li>
 
-      <li class="min-w-[12rem] lg:min-w-0">
+      <li>
         <a
           routerLink="/ai-tools/risk-prediction"
-          routerLinkActive="border-cyan-200 bg-cyan-50/80 text-cyan-800 shadow-sm"
-          class="group flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-slate-600 transition hover:border-cyan-100 hover:bg-cyan-50/60 hover:text-cyan-700"
+          routerLinkActive="bg-[rgba(37,99,235,0.24)] text-white border-[rgba(37,99,235,0.85)]"
+          class="flex items-center gap-2.5 rounded-[0.72rem] border border-transparent px-3 py-[0.68rem] text-[0.83rem] font-medium text-[#94a3b8] transition-colors duration-150 hover:bg-[rgba(37,99,235,0.16)] hover:text-white"
         >
-          <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-cyan-100 group-hover:text-cyan-700">
-            <mat-icon class="text-[20px]">warning</mat-icon>
-          </span>
-          <div>
-            <p class="text-sm font-semibold">Risk Prediction</p>
-            <p class="text-xs text-slate-400">Risk anticipation</p>
-          </div>
+          <mat-icon class="text-[18px]">warning</mat-icon>
+          <span>Risk Prediction</span>
         </a>
       </li>
     </ul>

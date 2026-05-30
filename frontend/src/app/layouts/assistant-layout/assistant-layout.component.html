@@ -1,7 +1,4 @@
-﻿<div class="assistant-shell">
-  <div class="ambient-shape ambient-shape--one" aria-hidden="true"></div>
-  <div class="ambient-shape ambient-shape--two" aria-hidden="true"></div>
-
+﻿<div class="shell">
   <button
     type="button"
     class="sidebar-backdrop"
@@ -10,84 +7,49 @@
     (click)="closeSidebar()"
   ></button>
 
-  <aside class="assistant-sidebar" [class.open]="isSidebarOpen">
-    <div class="sidebar-brand">
-      <div class="brand-mark">AF</div>
-      <div>
-        <p class="brand-eyebrow">Workspace</p>
-        <h2 class="brand-title">Assistant Hub</h2>
-      </div>
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">EC</span>
+      <span class="sidebar-title">MD Audit</span>
     </div>
 
-    <section class="identity-card">
-      <p class="identity-label">Signed in as</p>
-      <p class="identity-name">{{ userDisplayName }}</p>
-      <p class="identity-date">{{ todayLabel }}</p>
-    </section>
-
-    <nav class="nav-menu">
-      <a
-        routerLink="/assistant/dashboard"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
-        <span class="nav-label">Dashboard</span>
+    <nav class="sidebar-nav">
+      <a routerLink="/assistant/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
+        <mat-icon>space_dashboard</mat-icon>
+        <span>Dashboard</span>
       </a>
-
-      <a
-        routerLink="/assistant/projets"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon"><mat-icon>assignment</mat-icon></span>
-        <span class="nav-label">My assigned projects</span>
+      <a routerLink="/assistant/projets" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }" class="nav-item" (click)="closeSidebar()">
+        <mat-icon>assignment</mat-icon>
+        <span>Assigned Projects</span>
       </a>
-
-      <a
-        routerLink="/assistant/documents"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon"><mat-icon>description</mat-icon></span>
-        <span class="nav-label">Documents</span>
+      <a routerLink="/assistant/documents" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
+        <mat-icon>description</mat-icon>
+        <span>Documents</span>
       </a>
     </nav>
 
-    <button type="button" class="sidebar-logout" (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Log out</span>
-    </button>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <span class="user-name">{{ userDisplayName }}</span>
+        <span class="user-role">Assistant</span>
+      </div>
+      <button type="button" class="sidebar-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
   </aside>
 
-  <section class="assistant-workspace">
-    <header class="workspace-header">
-      <div class="header-left">
-        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
-          <mat-icon>menu</mat-icon>
-        </button>
-
-        <div>
-          <p class="workspace-eyebrow">Assistant Interface</p>
-          <h1 class="workspace-title">Daily operations</h1>
-        </div>
-      </div>
-
-      <button type="button" class="header-logout" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Log out</span>
+  <div class="main-area">
+    <header class="topbar">
+      <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
+        <mat-icon>menu</mat-icon>
       </button>
+      <span class="topbar-date">{{ todayLabel }}</span>
     </header>
 
-    <main class="workspace-content">
+    <main class="content">
       <router-outlet></router-outlet>
     </main>
-  </section>
+  </div>
 </div>
 

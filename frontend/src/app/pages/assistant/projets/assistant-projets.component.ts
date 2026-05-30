@@ -1,9 +1,10 @@
 ﻿import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin, finalize } from 'rxjs';
 import { Document, Project } from '../../../core/models';
 import { DocumentService } from '../../../core/services/document';
 import { ProjectService } from '../../../core/services/project';
@@ -26,6 +27,12 @@ export class AssistantProjetsComponent implements OnInit {
   selectedProject: Project | null = null;
   selectedProjectDocuments: Document[] = [];
 
+  // Upload modal
+  showUploadModal = false;
+  uploadTargetProject: Project | null = null;
+  selectedFile: File | null = null;
+  isUploading = false;
+
   errorMessage = '';
   successMessage = '';
 
@@ -35,9 +42,12 @@ export class AssistantProjetsComponent implements OnInit {
     { label: 'Suspended', value: 'suspendu' },
   ];
 
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private projectService: ProjectService,
     private documentService: DocumentService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -75,29 +85,88 @@ export class AssistantProjetsComponent implements OnInit {
     forkJoin({
       projects: this.projectService.getAll(),
       documents: this.documentService.getAll(),
-    }).subscribe({
-      next: ({ projects, documents }) => {
-        this.projects = projects ?? [];
-        this.documents = documents ?? [];
-        this.isLoading = false;
-      },
-      error: () => {
-        this.errorMessage = 'Unable to load assigned projects.';
-        this.isLoading = false;
-      },
-    });
+    })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: ({ projects, documents }) => {
+          this.projects = projects ?? [];
+          this.documents = documents ?? [];
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.errorMessage = 'Unable to load assigned projects.';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   openModal(project: Project): void {
     this.selectedProject = project;
     this.selectedProjectDocuments = this.documents.filter((document) => document.project_id === project.id);
     this.showModal = true;
+    this.cdr.detectChanges();
   }
 
   closeModal(): void {
     this.showModal = false;
     this.selectedProject = null;
     this.selectedProjectDocuments = [];
+    this.cdr.detectChanges();
+  }
+
+  openUploadModal(project: Project): void {
+    this.uploadTargetProject = project;
+    this.selectedFile = null;
+    this.showUploadModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeUploadModal(): void {
+    this.showUploadModal = false;
+    this.uploadTargetProject = null;
+    this.selectedFile = null;
+    this.cdr.detectChanges();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+      this.cdr.detectChanges();
+    }
+  }
+
+  submitUpload(): void {
+    if (!this.uploadTargetProject || !this.selectedFile) return;
+
+    this.isUploading = true;
+    this.cdr.detectChanges();
+
+    this.documentService.upload(this.selectedFile, { project_id: this.uploadTargetProject.id })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.isUploading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = `Document uploaded for "${this.uploadTargetProject!.name}".`;
+          this.closeUploadModal();
+          this.loadProjects();
+        },
+        error: () => {
+          this.errorMessage = 'Failed to upload document.';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   updateStatus(project: Project, rawValue: string): void {
@@ -125,6 +194,7 @@ export class AssistantProjetsComponent implements OnInit {
       next: (updatedProject) => {
         project.status = updatedProject?.status ?? nextApiStatus;
         this.successMessage = 'Status updated successfully.';
+        this.cdr.detectChanges();
 
         if (this.selectedProject?.id === project.id) {
           this.selectedProject = { ...project };
@@ -133,6 +203,7 @@ export class AssistantProjetsComponent implements OnInit {
       error: () => {
         project.status = previousStatus;
         this.errorMessage = 'Failed to update project status.';
+        this.cdr.detectChanges();
       },
     });
   }

@@ -1,4 +1,4 @@
-const VALID_ROLES = ['expert_comptable', 'assistant', 'administrateur', 'visiteur'];
+const VALID_ROLES = ['expert_comptable', 'assistant', 'administrateur', 'client'];
 
 const ROLE_ALIASES = {
   expert_comptable: 'expert_comptable',
@@ -10,9 +10,9 @@ const ROLE_ALIASES = {
   administrateur: 'administrateur',
   admin: 'administrateur',
   administrator: 'administrateur',
-  visiteur: 'visiteur',
-  client: 'visiteur',
-  customer: 'visiteur',
+  client: 'client',
+  visiteur: 'client',
+  customer: 'client',
 };
 
 const normalizeRoleKey = (role) => role
@@ -24,7 +24,7 @@ const normalizeRoleKey = (role) => role
 
 const normalizeRole = (role) => {
   if (typeof role !== 'string' || role.trim().length === 0) {
-    return 'visiteur';
+    return 'client';
   }
 
   const normalizedRole = normalizeRoleKey(role);
@@ -47,10 +47,10 @@ const normalizeRole = (role) => {
   }
 
   if (normalizedRole.includes('client') || normalizedRole.includes('visit')) {
-    return 'visiteur';
+    return 'client';
   }
 
-  return 'visiteur';
+  return 'client';
 };
 
 const isValidRole = (role) => {

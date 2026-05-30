@@ -13,7 +13,7 @@
 
 			<form [formGroup]="form" (ngSubmit)="classify()" class="ai-form-stack">
 
-				<label for="annualRevenue">Annual revenue (EUR)</label>
+				<label for="annualRevenue">Annual revenue (TND)</label>
 				<input
 					id="annualRevenue"
 					type="number"
@@ -22,7 +22,7 @@
 					[attr.disabled]="isClassifying || null"
 				/>
 
-				<label for="estimatedBudget">Estimated project budget (EUR)</label>
+				<label for="estimatedBudget">Estimated project budget (TND)</label>
 				<input
 					id="estimatedBudget"
 					type="number"

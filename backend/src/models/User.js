@@ -26,8 +26,21 @@ const User = sequelize.define('User', {
     allowNull: false,
   },
   role: {
-    type: DataTypes.ENUM('expert_comptable', 'assistant', 'administrateur', 'visiteur'),
-    defaultValue: 'visiteur',
+    type: DataTypes.STRING(50),
+    defaultValue: 'client',
+  },
+  reset_token: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+  reset_token_expires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  assigned_expert_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: { model: 'users', key: 'id' },
   },
 }, {
   tableName: 'users',

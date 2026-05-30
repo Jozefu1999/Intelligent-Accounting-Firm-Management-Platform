@@ -4,7 +4,12 @@ import { guestGuard } from './core/guards/guest-guard';
 import { AdminGuard, AssistantGuard, ClientGuard, ExpertGuard } from './guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/expert/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/landing', pathMatch: 'full' },
+  {
+    path: 'landing',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/landing/landing').then(m => m.Landing),
+  },
   {
     path: 'login',
     canActivate: [guestGuard],
@@ -14,6 +19,16 @@ export const routes: Routes = [
     path: 'register',
     canActivate: [guestGuard],
     loadComponent: () => import('./features/auth/register/register').then(m => m.Register),
+  },
+  {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/forgot-password/forgot-password').then(m => m.ForgotPassword),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/auth/reset-password/reset-password').then(m => m.ResetPassword),
   },
   {
     path: 'expert',
@@ -72,6 +87,10 @@ export const routes: Routes = [
         ],
       },
       {
+        path: 'assistants',
+        loadComponent: () => import('./features/assistants/assistant-list/assistant-list').then(m => m.AssistantList),
+      },
+      {
         path: 'ai-tools/business-plan',
         loadComponent: () => import('./features/ai-tools/business-plan/business-plan').then(m => m.BusinessPlan),
       },
@@ -82,10 +101,6 @@ export const routes: Routes = [
       {
         path: 'ai-tools/risk-prediction',
         loadComponent: () => import('./features/ai-tools/risk-prediction/risk-prediction').then(m => m.RiskPrediction),
-      },
-      {
-        path: 'ai-tools/project-classification',
-        loadComponent: () => import('./features/ai-tools/project-classification/project-classification').then(m => m.ProjectClassification),
       },
     ],
   },
@@ -102,10 +117,6 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./pages/assistant/dashboard/assistant-dashboard.component').then(m => m.AssistantDashboardComponent),
-      },
-      {
-        path: 'projets/new',
-        loadComponent: () => import('./features/projects/project-form/project-form').then(m => m.ProjectForm),
       },
       {
         path: 'projets',
@@ -253,5 +264,5 @@ export const routes: Routes = [
     redirectTo: '/expert/ai-tools/business-plan',
     pathMatch: 'full',
   },
-  { path: '**', redirectTo: '/expert/dashboard' },
+  { path: '**', redirectTo: '/landing' },
 ];

@@ -1,65 +1,49 @@
-<div class="mx-auto max-w-4xl">
-	<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+<div class="mx-auto max-w-3xl">
+	<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
 		<div>
-			<p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Project management</p>
-			<h1 class="mt-1 text-2xl font-bold text-slate-900">
-				{{ isEditMode ? 'Edit project' : 'Add new project' }}
+			<h1 class="text-[1.5rem] font-bold tracking-tight text-[#0f172a]">
+				{{ isEditMode ? 'Edit project' : 'New project' }}
 			</h1>
-			<p class="mt-1 text-sm text-slate-500">Create projects from this page. Client creation no longer creates projects.</p>
+			<p class="mt-1 text-[0.82rem] text-[#64748b]">Define project details and assignment.</p>
 		</div>
 
-		<a [routerLink]="listRoute" mat-stroked-button class="border-slate-300 text-slate-700">
-			<mat-icon>arrow_back</mat-icon>
-			{{ isAssistantContext ? 'Back to assistant projects' : 'Back to list' }}
+		<a [routerLink]="listRoute" class="inline-flex items-center gap-1.5 rounded-[0.7rem] border border-[#e2e8f0] bg-white px-3 py-2 text-[0.82rem] font-semibold text-[#64748b] hover:bg-[#f1f5f9]">
+			<mat-icon class="text-[16px]">arrow_back</mat-icon>
+			Back
 		</a>
 	</div>
 
 	@if (errorMessage) {
-		<div class="mb-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+		<div class="mb-5 flex items-start gap-2 rounded-[0.7rem] border border-red-200 bg-red-50 px-4 py-2.5 text-[0.82rem] text-red-700">
 			<mat-icon class="text-base">error_outline</mat-icon>
 			<span>{{ errorMessage }}</span>
 		</div>
 	}
 
-	<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+	<div class="rounded-[0.75rem] border border-[#e2e8f0] bg-white p-6 sm:p-8">
 		@if (isLoading) {
-			<div class="py-12 text-center text-sm text-slate-500">Loading project data...</div>
+			<div class="py-12 text-center text-[0.82rem] text-[#94a3b8]">Loading project data...</div>
 		} @else {
-			<form (ngSubmit)="onSubmit()" class="space-y-6">
+			<form (ngSubmit)="onSubmit()" class="space-y-5">
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Client</label>
-						<select
-							[(ngModel)]="selectedClientId"
-							name="selectedClientId"
-							required
-							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-						>
-							<option value="">Select a client</option>
-							@for (client of clients; track client.id) {
-								<option [value]="client.id">{{ client.company_name }}</option>
-							}
-						</select>
-					</div>
-
-					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Project name</label>
+						<div class="sm:col-span-2">
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Project name</label>
 						<input
 							type="text"
 							[(ngModel)]="name"
 							name="name"
 							required
 							placeholder="Tax Optimization 2026"
-							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						/>
 					</div>
 
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Type</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Type</label>
 						<select
 							[(ngModel)]="type"
 							name="type"
-							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] bg-white px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						>
 							<option value="creation">Creation</option>
 							<option value="development">Development</option>
@@ -70,11 +54,11 @@
 					</div>
 
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Status</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Status</label>
 						<select
 							[(ngModel)]="status"
 							name="status"
-							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] bg-white px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						>
 							<option value="draft">Draft</option>
 							<option value="in_progress">In progress</option>
@@ -84,11 +68,11 @@
 					</div>
 
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Priority</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Priority</label>
 						<select
 							[(ngModel)]="priority"
 							name="priority"
-							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] bg-white px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						>
 							<option value="low">Low</option>
 							<option value="medium">Medium</option>
@@ -97,46 +81,44 @@
 					</div>
 
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Start date</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Start date</label>
 						<input
 							type="date"
 							[(ngModel)]="startDate"
 							name="startDate"
-							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						/>
 					</div>
 				</div>
 
 				<div>
-					<label class="mb-1.5 block text-sm font-medium text-slate-700">Due date</label>
+					<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Due date</label>
 					<input
 						type="date"
 						[(ngModel)]="dueDate"
 						name="dueDate"
-						class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 					/>
 				</div>
 
 				<div>
-					<label class="mb-1.5 block text-sm font-medium text-slate-700">Description</label>
+					<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Description</label>
 					<textarea
 						[(ngModel)]="description"
 						name="description"
 						rows="4"
 						placeholder="Project details"
-						class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 					></textarea>
 				</div>
 
-				<div class="flex flex-wrap items-center justify-end gap-3 border-t border-slate-100 pt-4">
-					<button type="button" [routerLink]="listRoute" mat-button class="text-slate-600">Cancel</button>
+				<div class="flex flex-wrap items-center justify-end gap-3 border-t border-[#f1f5f9] pt-4">
+					<a [routerLink]="listRoute" class="rounded-[0.7rem] px-4 py-2 text-[0.82rem] font-semibold text-[#64748b] hover:bg-[#f1f5f9]">Cancel</a>
 
-					<button type="submit" [disabled]="isSubmitting" mat-flat-button class="bg-blue-600 text-white">
+					<button type="submit" [disabled]="isSubmitting" class="inline-flex items-center gap-1.5 rounded-[0.7rem] bg-[#2563eb] px-4 py-2.5 text-[0.82rem] font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-55">
 						@if (isSubmitting) {
-							<span class="inline-flex items-center gap-1.5">
-								<mat-icon class="animate-spin text-base">refresh</mat-icon>
-								<span>{{ isEditMode ? 'Saving...' : 'Creating...' }}</span>
-							</span>
+							<mat-icon class="animate-spin text-[16px]">refresh</mat-icon>
+							<span>{{ isEditMode ? 'Saving...' : 'Creating...' }}</span>
 						} @else {
 							<span>{{ isEditMode ? 'Save project' : 'Create project' }}</span>
 						}

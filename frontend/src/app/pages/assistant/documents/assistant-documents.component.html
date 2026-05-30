@@ -1,98 +1,226 @@
-﻿<div class="space-y-6">
+<div class="space-y-6">
+  <!-- Alerts -->
   @if (errorMessage) {
-    <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-      {{ errorMessage }}
+    <div class="flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      <mat-icon class="text-rose-400">error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+      <button (click)="errorMessage = ''" class="ml-auto text-rose-400 hover:text-rose-600">
+        <mat-icon class="text-[18px]">close</mat-icon>
+      </button>
     </div>
   }
 
   @if (successMessage) {
-    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-      {{ successMessage }}
+    <div class="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      <mat-icon class="text-emerald-400">check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
+      <button (click)="successMessage = ''" class="ml-auto text-emerald-400 hover:text-emerald-600">
+        <mat-icon class="text-[18px]">close</mat-icon>
+      </button>
     </div>
   }
 
-  @if (projectWarningMessage) {
-    <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-      {{ projectWarningMessage }}
-    </div>
-  }
-
+  <!-- Header -->
   <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-slate-900">Documents</h1>
-        <p class="mt-2 text-sm text-slate-500">Review and upload your mission files.</p>
+        <p class="mt-1 text-sm text-slate-500">Manage and preview your project files</p>
       </div>
       <button
         type="button"
         (click)="openUploadModal()"
-        class="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+        class="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 hover:shadow-md"
       >
-        + Upload document
+        <mat-icon class="text-[20px]">cloud_upload</mat-icon>
+        Upload document
       </button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div class="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100">
+          <mat-icon class="text-blue-600 text-[20px]">folder</mat-icon>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Total files</p>
+          <p class="text-lg font-bold text-slate-900">{{ documents.length }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-100">
+          <mat-icon class="text-purple-600 text-[20px]">storage</mat-icon>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Total size</p>
+          <p class="text-lg font-bold text-slate-900">{{ formatFileSize(totalSize) }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100">
+          <mat-icon class="text-emerald-600 text-[20px]">assignment</mat-icon>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Projects</p>
+          <p class="text-lg font-bold text-slate-900">{{ projects.length }}</p>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+  <!-- Filter Bar -->
+  <section class="rounded-3xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="relative flex-1">
+        <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search by file name..."
+          [value]="searchTerm"
+          (input)="searchTerm = $any($event.target).value"
+          class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder-slate-400 transition focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
+        />
+      </div>
+      <select
+        [value]="filterProject"
+        (change)="filterProject = +$any($event.target).value || null"
+        class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 transition focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
+      >
+        <option [value]="0">All projects</option>
+        @for (project of projects; track project.id) {
+          <option [value]="project.id">{{ project.name }}</option>
+        }
+      </select>
+    </div>
+  </section>
+
+  <!-- Documents Grid -->
+  <section>
     @if (isLoading) {
-      <div class="flex items-center justify-center py-8">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-cyan-600"></div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="animate-pulse rounded-2xl border border-slate-200 bg-white p-5">
+            <div class="flex items-start gap-3">
+              <div class="h-10 w-10 rounded-xl bg-slate-200"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 w-3/4 rounded bg-slate-200"></div>
+                <div class="h-3 w-1/2 rounded bg-slate-200"></div>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <div class="h-8 w-20 rounded-lg bg-slate-200"></div>
+              <div class="h-8 w-20 rounded-lg bg-slate-200"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (filteredDocuments.length === 0) {
+      <div class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+          <mat-icon class="text-slate-400 text-[32px]">description</mat-icon>
+        </div>
+        <h3 class="mt-4 text-base font-semibold text-slate-700">No documents found</h3>
+        <p class="mt-1 text-sm text-slate-500">
+          @if (searchTerm || filterProject) {
+            Try adjusting your search or filter criteria.
+          } @else {
+            Upload your first document to get started.
+          }
+        </p>
+        @if (!searchTerm && !filterProject) {
+          <button
+            (click)="openUploadModal()"
+            class="mt-4 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            <mat-icon class="text-[18px]">cloud_upload</mat-icon>
+            Upload document
+          </button>
+        }
       </div>
     } @else {
-      <div class="overflow-x-auto">
-        <table class="w-full min-w-[900px] text-left">
-          <thead class="border-b border-slate-200 bg-slate-50">
-            <tr>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">File name</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Project</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Size</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Upload date</th>
-              <th class="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (document of documents; track document.id) {
-              <tr>
-                <td class="px-3 py-3 text-sm font-medium text-slate-900">{{ document.name }}</td>
-                <td class="px-3 py-3 text-sm text-slate-600">{{ getProjectName(document.project_id) }}</td>
-                <td class="px-3 py-3 text-sm text-slate-600">{{ formatFileSize(document.size_bytes) }}</td>
-                <td class="px-3 py-3 text-sm text-slate-600">{{ formatDate(document.created_at) }}</td>
-                <td class="px-3 py-3">
-                  <button
-                    type="button"
-                    (click)="downloadDocument(document.id, document.name)"
-                    class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                  >
-                    Download
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">
-                  No document available.
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (doc of filteredDocuments; track doc.id) {
+          <div class="group relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md">
+            <!-- File info -->
+            <div class="flex items-start gap-3">
+              <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 transition group-hover:bg-slate-200">
+                <mat-icon [class]="getFileIconColor(doc.mime_type) + ' text-[24px]'">{{ getFileIcon(doc.mime_type) }}</mat-icon>
+              </div>
+              <div class="min-w-0 flex-1">
+                <h3 class="truncate text-sm font-semibold text-slate-900" [title]="doc.name">{{ doc.name }}</h3>
+                <p class="mt-0.5 text-xs text-slate-500">{{ getProjectName(doc.project_id) }}</p>
+              </div>
+              <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                {{ getFileExtension(doc.name) }}
+              </span>
+            </div>
+
+            <!-- Meta -->
+            <div class="mt-3 flex items-center gap-4 border-t border-slate-100 pt-3">
+              <span class="inline-flex items-center gap-1 text-xs text-slate-500">
+                <mat-icon class="text-[14px]">straighten</mat-icon>
+                {{ formatFileSize(doc.size_bytes) }}
+              </span>
+              <span class="inline-flex items-center gap-1 text-xs text-slate-500">
+                <mat-icon class="text-[14px]">event</mat-icon>
+                {{ formatDate(doc.createdAt || doc.created_at) }}
+              </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-3 flex items-center gap-2">
+              @if (isPreviewable(doc.mime_type)) {
+                <button
+                  type="button"
+                  (click)="openPreview(doc)"
+                  class="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                >
+                  <mat-icon class="text-[16px]">visibility</mat-icon>
+                  Preview
+                </button>
+              }
+              <button
+                type="button"
+                (click)="downloadDocument(doc.id, doc.name)"
+                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+              >
+                <mat-icon class="text-[16px]">download</mat-icon>
+                Download
+              </button>
+              <button
+                type="button"
+                (click)="deleteDocument(doc)"
+                class="ml-auto inline-flex items-center justify-center rounded-lg border border-transparent p-1.5 text-slate-400 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+              >
+                <mat-icon class="text-[18px]">delete_outline</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
   </section>
 </div>
 
+<!-- Upload Modal -->
 @if (showUploadModal) {
-  <div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-overlay" (click)="closeUploadModal()">
     <div class="modal-box" (click)="$event.stopPropagation()">
-      <h2>Upload a document</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Upload a document</h2>
+        <button (click)="closeUploadModal()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
-      <div class="mt-4 space-y-4">
+      <div class="mt-5 space-y-4">
         <div>
-          <label class="mb-1.5 block text-sm font-medium text-slate-700">Select the project</label>
+          <label class="mb-1.5 block text-sm font-medium text-slate-700">Project</label>
           <select
             [value]="selectedProjectId"
             (change)="selectedProjectId = +$any($event.target).value"
-            class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-500 focus:outline-none"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 transition focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
           >
             <option [value]="null">Choose a project</option>
             @for (project of projects; track project.id) {
@@ -103,33 +231,115 @@
 
         <div>
           <label class="mb-1.5 block text-sm font-medium text-slate-700">File</label>
-          <input
-            type="file"
-            accept="*/*"
-            (change)="onFileSelected($event)"
-            class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700"
-          />
+          <div class="relative rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-blue-400 hover:bg-blue-50/30">
+            <mat-icon class="mx-auto text-slate-400 text-[32px]">cloud_upload</mat-icon>
+            <p class="mt-2 text-sm text-slate-600">
+              @if (selectedFile) {
+                <span class="font-semibold text-blue-600">{{ selectedFile.name }}</span>
+              } @else {
+                Click to select a file
+              }
+            </p>
+            <input
+              type="file"
+              accept="*/*"
+              (change)="onFileSelected($event)"
+              class="absolute inset-0 cursor-pointer opacity-0"
+            />
+          </div>
         </div>
       </div>
 
       <div class="mt-6 flex items-center justify-end gap-2">
         <button
           type="button"
-          (click)="closeModal()"
-          class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          (click)="closeUploadModal()"
+          class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
         >
           Cancel
         </button>
         <button
           type="button"
-          [disabled]="isUploading"
+          [disabled]="isUploading || !selectedFile || !selectedProjectId"
           (click)="uploadDocument()"
-          class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
         >
-          {{ isUploading ? 'Uploading...' : 'Upload' }}
+          @if (isUploading) {
+            <div class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            Uploading...
+          } @else {
+            Upload
+          }
         </button>
       </div>
     </div>
   </div>
 }
 
+<!-- Preview Modal -->
+@if (showPreviewModal && previewDocument) {
+  <div class="preview-overlay" (click)="closePreview()">
+    <div class="preview-container" (click)="$event.stopPropagation()">
+      <!-- Preview Header -->
+      <div class="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <mat-icon [class]="getFileIconColor(previewDocument.mime_type)">{{ getFileIcon(previewDocument.mime_type) }}</mat-icon>
+          <div class="min-w-0">
+            <h3 class="truncate text-sm font-semibold text-slate-900">{{ previewDocument.name }}</h3>
+            <p class="text-xs text-slate-500">{{ formatFileSize(previewDocument.size_bytes) }} &middot; {{ getProjectName(previewDocument.project_id) }}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            (click)="downloadDocument(previewDocument.id, previewDocument.name)"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <mat-icon class="text-[16px]">download</mat-icon>
+            Download
+          </button>
+          <button
+            (click)="closePreview()"
+            class="flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Body -->
+      <div class="preview-body">
+        @if (previewLoading) {
+          <div class="flex h-full items-center justify-center">
+            <div class="flex flex-col items-center gap-3">
+              <div class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-blue-500"></div>
+              <p class="text-sm text-slate-500">Loading preview...</p>
+            </div>
+          </div>
+        } @else if (previewType === 'pdf' && previewUrl) {
+          <iframe [src]="previewUrl" class="h-full w-full border-0"></iframe>
+        } @else if (previewType === 'image' && previewUrl) {
+          <div class="flex h-full items-center justify-center bg-slate-900/5 p-4">
+            <img [src]="previewUrl" [alt]="previewDocument.name" class="max-h-full max-w-full rounded-lg object-contain shadow-lg" />
+          </div>
+        } @else {
+          <div class="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+              <mat-icon class="text-slate-400 text-[32px]">visibility_off</mat-icon>
+            </div>
+            <div>
+              <h4 class="text-base font-semibold text-slate-700">Preview not available</h4>
+              <p class="mt-1 text-sm text-slate-500">This file type cannot be previewed. Download it to view.</p>
+            </div>
+            <button
+              (click)="downloadDocument(previewDocument.id, previewDocument.name)"
+              class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+              <mat-icon class="text-[18px]">download</mat-icon>
+              Download file
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

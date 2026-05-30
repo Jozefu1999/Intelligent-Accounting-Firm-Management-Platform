@@ -15,7 +15,7 @@
   border-radius: 0.75rem;
   padding: 0.68rem 0.82rem;
   border: 1px solid;
-  font-size: 0.86rem;
+  font-size: var(--fs-body);
 }
 
 .admin-alert-danger {
@@ -40,8 +40,8 @@
 .page-title {
   margin: 0;
   color: #0f172a;
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: var(--fs-title);
+  font-weight: 600;
 }
 
 .header-actions {
@@ -55,7 +55,7 @@
   border-radius: 0.9rem;
   border: 1px solid rgba(148, 163, 184, 0.5);
   padding: 0.48rem 0.65rem;
-  font-size: 0.83rem;
+  font-size: var(--fs-body);
   color: #334155;
   background: #ffffff;
 }
@@ -77,8 +77,8 @@
   background: #f0fdfa;
   color: #0f766e;
   padding: 0.2rem 0.6rem;
-  font-size: 0.73rem;
-  font-weight: 700;
+  font-size: var(--fs-caption);
+  font-weight: 600;
 }
 
 .table-card {
@@ -103,7 +103,7 @@ th {
   padding: 0.66rem;
   text-align: left;
   color: #64748b;
-  font-size: 0.71rem;
+  font-size: var(--fs-caption);
   letter-spacing: 0.06em;
 }
 
@@ -111,7 +111,7 @@ td {
   border-top: 1px solid #f1f5f9;
   padding: 0.68rem;
   color: #334155;
-  font-size: 0.82rem;
+  font-size: var(--fs-body);
   vertical-align: top;
 }
 
@@ -136,8 +136,8 @@ tbody tr {
   border-radius: 999px;
   background: #e2e8f0;
   color: #0f172a;
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: var(--fs-caption);
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -145,21 +145,21 @@ tbody tr {
 
 .name {
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
 }
 
 .mail {
   margin: 0.1rem 0 0;
   color: #64748b;
-  font-size: 0.73rem;
+  font-size: var(--fs-caption);
 }
 
 .badge {
   border-radius: 999px;
   padding: 0.12rem 0.5rem;
-  font-size: 0.69rem;
-  font-weight: 700;
+  font-size: var(--fs-caption);
+  font-weight: 600;
 }
 
 .role-expert {
@@ -233,14 +233,14 @@ tbody tr {
   border: 1px solid #cbd5e1;
   border-radius: 0.45rem;
   padding: 0.25rem 0.35rem;
-  font-size: 0.73rem;
+  font-size: var(--fs-caption);
 }
 
 .confirm-btn,
 .cancel-btn {
   border: 1px solid #cbd5e1;
   border-radius: 0.45rem;
-  font-size: 0.71rem;
+  font-size: var(--fs-caption);
   padding: 0.24rem 0.45rem;
   background: #ffffff;
 }
@@ -274,8 +274,8 @@ tbody tr {
   background: #ffffff;
   color: #334155;
   padding: 0.35rem 0.7rem;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: var(--fs-caption);
+  font-weight: 600;
 }
 
 .pagination button:disabled {
@@ -304,13 +304,13 @@ tbody tr {
 
 .modal h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--fs-title);
   color: #0f172a;
 }
 
 .modal p {
   color: #334155;
-  font-size: 0.84rem;
+  font-size: var(--fs-body);
 }
 
 .modal-grid {
@@ -320,7 +320,7 @@ tbody tr {
 }
 
 .modal-grid span {
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
 }
 
@@ -336,8 +336,8 @@ tbody tr {
   border-radius: 0.55rem;
   background: #ffffff;
   padding: 0.35rem 0.7rem;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: var(--fs-body);
+  font-weight: 600;
 }
 
 .danger-btn {

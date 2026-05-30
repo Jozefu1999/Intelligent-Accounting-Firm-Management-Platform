@@ -1,100 +1,288 @@
-<section class="ai-page">
-	<header class="ai-header">
-		<p class="ai-eyebrow">AI TOOLS</p>
-		<h1>Business Plan Generator</h1>
-		<p>Generate a structured business plan from project data and AI analysis.</p>
-	</header>
+<div class="plan-wrapper">
+  <!-- Top Bar: Title + Form inline -->
+  <header class="plan-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>auto_awesome</mat-icon>
+      </div>
+      <div>
+        <h1>Project Plan Generator</h1>
+        <p>AI-powered project planning from your data</p>
+      </div>
+    </div>
 
-	<div class="ai-grid">
-		<article class="ai-card ai-form-card">
-			<h2>Generate Plan</h2>
-			<p>Select a project, then run AI generation.</p>
+    <form [formGroup]="form" (ngSubmit)="generateBusinessPlan()" class="header-form">
+      <select
+        formControlName="projectId"
+        [disabled]="isProjectsLoading || isGenerating"
+        class="project-select"
+      >
+        <option [ngValue]="0">Select project...</option>
+        @for (project of projects; track project.id) {
+          <option [ngValue]="project.id">{{ project.name }}</option>
+        }
+      </select>
 
-			<form [formGroup]="form" (ngSubmit)="generateBusinessPlan()" class="ai-form-stack">
-				<label for="projectId">Project</label>
-				<select
-					id="projectId"
-					formControlName="projectId"
-					[disabled]="isProjectsLoading || isGenerating"
-				>
-					<option [ngValue]="0">Select a project</option>
-					@for (project of projects; track project.id) {
-						<option [ngValue]="project.id">
-							{{ project.name }}
-							@if (project.client?.company_name) {
-								- {{ project.client?.company_name }}
-							}
-						</option>
-					}
-				</select>
+      <button type="submit" class="generate-btn" [disabled]="isGenerating || isProjectsLoading || projects.length === 0">
+        @if (isGenerating) {
+          <div class="spinner"></div>
+          <span>Generating...</span>
+        } @else {
+          <mat-icon>bolt</mat-icon>
+          <span>Generate</span>
+        }
+      </button>
+    </form>
+  </header>
 
-				@if (selectedProject) {
-					<div class="project-preview">
-						<p class="project-preview-title">Selected project</p>
-						<p class="project-preview-name">{{ selectedProject.name }}</p>
-						<p class="project-preview-meta">
-							Status: {{ selectedProject.status || 'draft' }}
-							| Priority: {{ selectedProject.priority || 'medium' }}
-						</p>
-					</div>
-				}
+  <!-- Alerts -->
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+      <button (click)="errorMessage = ''" class="alert-close"><mat-icon>close</mat-icon></button>
+    </div>
+  }
+  @if (successMessage && !plan) {
+    <div class="alert alert-success">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+  }
 
-				<button
-					type="submit"
-					class="primary-btn"
-					[disabled]="isGenerating || isProjectsLoading || projects.length === 0"
-				>
-					@if (isGenerating) {
-						<mat-icon class="spin">autorenew</mat-icon>
-						<span>Generating...</span>
-					} @else {
-						<mat-icon>auto_awesome</mat-icon>
-						<span>Generate Business Plan</span>
-					}
-				</button>
-			</form>
+  <!-- Results -->
+  @if (plan) {
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      @for (tab of tabs; track tab.id) {
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab === tab.id"
+          (click)="activeTab = tab.id"
+        >
+          <mat-icon>{{ tab.icon }}</mat-icon>
+          <span>{{ tab.label }}</span>
+        </button>
+      }
+    </nav>
 
-			@if (errorMessage) {
-				<div class="alert alert-error">
-					<mat-icon>error</mat-icon>
-					<span>{{ errorMessage }}</span>
-				</div>
-			}
+    <!-- TAB: Overview -->
+    @if (activeTab === 'overview') {
+      <div class="tab-content">
+        <!-- Overview + Objectives side by side -->
+        <div class="grid-2">
+          <!-- Overview Card -->
+          <div class="card">
+            <div class="card-header">
+              <mat-icon class="text-indigo-500">article</mat-icon>
+              <h3>Overview</h3>
+            </div>
+            <p class="overview-text">{{ plan.overview || 'No overview generated.' }}</p>
 
-			@if (successMessage) {
-				<div class="alert alert-success">
-					<mat-icon>check_circle</mat-icon>
-					<span>{{ successMessage }}</span>
-				</div>
-			}
-		</article>
+            @if (plan.recommendations) {
+              <div class="reco-box">
+                <mat-icon>lightbulb</mat-icon>
+                <p>{{ plan.recommendations }}</p>
+              </div>
+            }
+          </div>
 
-		<article class="ai-card ai-result-card">
-			@if (generatedPlan; as plan) {
-				<header class="result-header">
-					<h2>Generated Plan</h2>
-					<p>
-						Project #{{ plan.project_id }}
-						@if (plan.created_at || plan.createdAt) {
-							| Generated {{ (plan.created_at || plan.createdAt) | date:'dd/MM/yyyy HH:mm' }}
-						}
-					</p>
-				</header>
+          <!-- Objectives + Resources + Success -->
+          <div class="card-stack">
+            @if (plan.objectives && plan.objectives.length > 0) {
+              <div class="card compact">
+                <div class="card-header">
+                  <mat-icon class="text-emerald-500">flag</mat-icon>
+                  <h3>Objectives</h3>
+                </div>
+                <ul class="check-list">
+                  @for (obj of plan.objectives; track obj) {
+                    <li><mat-icon>check_circle</mat-icon><span>{{ obj }}</span></li>
+                  }
+                </ul>
+              </div>
+            }
 
-				@for (section of sections; track section.key) {
-					<section class="plan-section">
-						<h3>{{ section.title }}</h3>
-						<p class="section-hint">{{ section.hint }}</p>
-						<pre>{{ formatSectionValue(section.key) }}</pre>
-					</section>
-				}
-			} @else {
-				<div class="result-placeholder">
-					<mat-icon>description</mat-icon>
-					<h2>No plan generated yet</h2>
-					<p>Run a generation to see the AI business plan content here.</p>
-				</div>
-			}
-		</article>
-	</div>
-</section>
+            @if (plan.success_criteria && plan.success_criteria.length > 0) {
+              <div class="card compact">
+                <div class="card-header">
+                  <mat-icon class="text-teal-500">verified</mat-icon>
+                  <h3>Success Criteria</h3>
+                </div>
+                <ul class="check-list teal">
+                  @for (c of plan.success_criteria; track c) {
+                    <li><mat-icon>task_alt</mat-icon><span>{{ c }}</span></li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (plan.resources && plan.resources.length > 0) {
+              <div class="card compact">
+                <div class="card-header">
+                  <mat-icon class="text-purple-500">groups</mat-icon>
+                  <h3>Resources</h3>
+                </div>
+                <div class="tag-list">
+                  @for (r of plan.resources; track r) {
+                    <span class="tag purple">{{ r }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Milestones row -->
+        @if (plan.milestones && plan.milestones.length > 0) {
+          <div class="card full">
+            <div class="card-header">
+              <mat-icon class="text-amber-500">emoji_events</mat-icon>
+              <h3>Milestones</h3>
+            </div>
+            <div class="milestones-row">
+              @for (m of plan.milestones; track m.name; let i = $index; let last = $last) {
+                <div class="milestone-item">
+                  <div class="milestone-dot">{{ i + 1 }}</div>
+                  <div class="milestone-info">
+                    <strong>{{ m.name }}</strong>
+                    <span class="milestone-date">{{ m.target_date }}</span>
+                    <span class="milestone-criteria">{{ m.criteria }}</span>
+                  </div>
+                </div>
+                @if (!last) {
+                  <div class="milestone-connector"></div>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- TAB: Phases -->
+    @if (activeTab === 'phases') {
+      <div class="tab-content">
+        @if (plan.phases && plan.phases.length > 0) {
+          <div class="phases-timeline">
+            @for (phase of plan.phases; track phase.name; let i = $index) {
+              <div class="phase-card">
+                <div class="phase-header">
+                  <div class="phase-number">{{ i + 1 }}</div>
+                  <div class="phase-title">
+                    <h4>{{ phase.name }}</h4>
+                    <span class="phase-duration">{{ phase.duration }}</span>
+                  </div>
+                </div>
+                <div class="phase-body">
+                  @if (phase.tasks && phase.tasks.length > 0) {
+                    <div class="phase-section">
+                      <span class="phase-label">Tasks</span>
+                      <ul class="task-list">
+                        @for (task of phase.tasks; track task) {
+                          <li>{{ task }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (phase.deliverables && phase.deliverables.length > 0) {
+                    <div class="phase-section">
+                      <span class="phase-label">Deliverables</span>
+                      <div class="tag-list">
+                        @for (d of phase.deliverables; track d) {
+                          <span class="tag indigo">{{ d }}</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-tab">
+            <mat-icon>view_timeline</mat-icon>
+            <p>No phases generated.</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- TAB: Risks & Budget -->
+    @if (activeTab === 'risks') {
+      <div class="tab-content">
+        <div class="grid-2">
+          <!-- Risks -->
+          <div class="card">
+            <div class="card-header">
+              <mat-icon class="text-red-500">warning</mat-icon>
+              <h3>Risk Assessment</h3>
+            </div>
+            @if (plan.risks && plan.risks.length > 0) {
+              <div class="risk-list">
+                @for (risk of plan.risks; track risk.risk) {
+                  <div class="risk-item">
+                    <div class="risk-top">
+                      <span class="risk-name">{{ risk.risk }}</span>
+                      <span class="risk-badge" [class]="getImpactColor(risk.impact)">{{ risk.impact }}</span>
+                    </div>
+                    <p class="risk-mitigation">
+                      <mat-icon>shield</mat-icon>
+                      {{ risk.mitigation }}
+                    </p>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="empty-text">No risks identified.</p>
+            }
+          </div>
+
+          <!-- Budget -->
+          <div class="card">
+            <div class="card-header">
+              <mat-icon class="text-green-600">payments</mat-icon>
+              <h3>Budget Allocation</h3>
+            </div>
+            @if (plan.budget_allocation && plan.budget_allocation.length > 0) {
+              <div class="budget-list">
+                @for (item of plan.budget_allocation; track item.category) {
+                  <div class="budget-item">
+                    <div class="budget-top">
+                      <span class="budget-category">{{ item.category }}</span>
+                      <span class="budget-pct">{{ item.percentage }}%</span>
+                    </div>
+                    <div class="budget-bar">
+                      <div class="budget-fill" [style.width.%]="item.percentage"></div>
+                    </div>
+                    <p class="budget-desc">{{ item.description }}</p>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="empty-text">No budget breakdown available.</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  } @else if (!isGenerating) {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>description</mat-icon>
+      </div>
+      <h3>No plan generated yet</h3>
+      <p>Select a project and click <strong>Generate</strong> to create an AI-powered project plan.</p>
+    </div>
+  }
+
+  @if (isGenerating) {
+    <div class="generating-state">
+      <div class="generating-spinner"></div>
+      <h3>Generating your project plan...</h3>
+      <p>This may take 10-20 seconds depending on project complexity.</p>
+    </div>
+  }
+</div>

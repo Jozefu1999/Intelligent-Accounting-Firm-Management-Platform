@@ -18,6 +18,7 @@ const aiRoutes = require('./routes/ai.routes');
 const adminRoutes = require('./routes/adminRoutes');
 const contactRoutes = require('./routes/contact.routes');
 const mlRoutes = require('./routes/ml.routes');
+const assistantsRoutes = require('./routes/assistants.routes');
 
 // Import models to register associations
 require('./models');
@@ -26,7 +27,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false,
+}));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -45,6 +49,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/ml', mlRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/assistants', assistantsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

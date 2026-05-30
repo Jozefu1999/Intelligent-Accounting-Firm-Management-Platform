@@ -1,4 +1,4 @@
-﻿<div class="space-y-6">
+<div class="space-y-6">
   @if (errorMessage) {
     <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
       {{ errorMessage }}
@@ -46,7 +46,7 @@
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-lg font-semibold text-slate-900">Assigned projects</h2>
       @if (isLoading) {
-        <span class="text-sm text-slate-500">Loading...</span>
+        <div class="h-4 w-20 animate-pulse rounded bg-slate-200"></div>
       }
     </div>
 
@@ -81,7 +81,7 @@
                     #statusSelect
                     [value]="project.status"
                     (change)="updateStatus(project, statusSelect.value)"
-                    class="rounded-xl border border-slate-200 px-2 py-1.5 text-xs text-slate-700 focus:border-cyan-500 focus:outline-none"
+                    class="rounded-xl border border-slate-200 px-2 py-1.5 text-xs text-slate-700 focus:border-blue-500 focus:outline-none"
                   >
                     @for (option of statusOptions; track option.value) {
                       <option [value]="option.value">{{ option.label }}</option>
@@ -120,7 +120,7 @@
           <label class="mb-1.5 block text-sm font-medium text-slate-700">Select the project</label>
           <select
             [(ngModel)]="selectedProjectId"
-            class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-500 focus:outline-none"
+            class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:border-blue-500 focus:outline-none"
           >
             <option [ngValue]="null">Choose a project</option>
             @for (project of projects; track project.id) {

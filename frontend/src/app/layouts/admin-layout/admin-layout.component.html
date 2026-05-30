@@ -1,7 +1,4 @@
-﻿<div class="admin-shell">
-  <div class="ambient-shape ambient-shape--one" aria-hidden="true"></div>
-  <div class="ambient-shape ambient-shape--two" aria-hidden="true"></div>
-
+﻿<div class="shell">
   <button
     type="button"
     class="sidebar-backdrop"
@@ -10,95 +7,54 @@
     (click)="closeSidebar()"
   ></button>
 
-  <aside class="admin-sidebar" [class.open]="isSidebarOpen">
-    <div class="sidebar-brand">
-      <div class="brand-mark">AF</div>
-      <div>
-        <p class="brand-eyebrow">Workspace</p>
-        <h2 class="brand-title">Admin Hub</h2>
-      </div>
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">EC</span>
+      <span class="sidebar-title">MD Audit</span>
     </div>
 
-    <section class="identity-card">
-      <p class="identity-label">Signed in as</p>
-      <p class="identity-name">{{ userDisplayName }}</p>
-      <p class="identity-date">{{ todayLabel }}</p>
-    </section>
-
-    <nav class="nav-menu">
-      <a
-        routerLink="/admin/dashboard"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon"><mat-icon>space_dashboard</mat-icon></span>
-        <span class="nav-label">Dashboard</span>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
+        <mat-icon>space_dashboard</mat-icon>
+        <span>Dashboard</span>
       </a>
-
-      <a
-        routerLink="/admin/users"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon"><mat-icon>manage_accounts</mat-icon></span>
-        <span class="nav-label">Users</span>
+      <a routerLink="/admin/users" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
+        <mat-icon>manage_accounts</mat-icon>
+        <span>Users</span>
       </a>
-
-      <a
-        routerLink="/admin/statistics"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon"><mat-icon>bar_chart</mat-icon></span>
-        <span class="nav-label">Statistics</span>
+      <a routerLink="/admin/statistics" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
+        <mat-icon>bar_chart</mat-icon>
+        <span>Statistics</span>
       </a>
-
-      <a
-        routerLink="/admin/ml"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon"><mat-icon>model_training</mat-icon></span>
-        <span class="nav-label">ML Model</span>
+      <a routerLink="/admin/ml" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" (click)="closeSidebar()">
+        <mat-icon>model_training</mat-icon>
+        <span>ML Model</span>
       </a>
     </nav>
 
-    <button type="button" class="sidebar-logout" (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Log out</span>
-    </button>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <span class="user-name">{{ fullName || 'Administrator' }}</span>
+        <span class="user-role">Admin</span>
+      </div>
+      <button type="button" class="sidebar-logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
   </aside>
 
-  <section class="admin-workspace">
-    <header class="workspace-header">
-      <div class="header-left">
-        <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
-          <mat-icon>menu</mat-icon>
-        </button>
-
-        <div>
-          <p class="workspace-eyebrow">Admin Interface</p>
-          <h1 class="workspace-title">Platform supervision</h1>
-        </div>
-      </div>
-
-      <button type="button" class="header-logout" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Log out</span>
+  <div class="main-area">
+    <header class="topbar">
+      <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Open menu">
+        <mat-icon>menu</mat-icon>
       </button>
+      <span class="topbar-title">{{ pageTitle }}</span>
+      <span class="topbar-date">{{ todayLabel }}</span>
     </header>
 
-    <main class="workspace-content">
+    <main class="content">
       <router-outlet></router-outlet>
     </main>
-  </section>
+  </div>
 </div>
 

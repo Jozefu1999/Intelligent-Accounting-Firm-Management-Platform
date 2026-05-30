@@ -4,14 +4,14 @@ const ROLE_HOME_MAP: Record<UserRole, string> = {
   expert_comptable: '/expert/dashboard',
   assistant: '/assistant/dashboard',
   administrateur: '/admin/dashboard',
-  visiteur: '/client/dashboard',
+  client: '/client/dashboard',
 };
 
 const ROLE_LABEL_MAP: Record<UserRole, string> = {
   expert_comptable: 'Expert Comptable',
   assistant: 'Assistant',
   administrateur: 'Administrateur',
-  visiteur: 'Client / Visiteur',
+  client: 'Client',
 };
 
 const roleAliases: Record<string, UserRole> = {
@@ -24,9 +24,9 @@ const roleAliases: Record<string, UserRole> = {
   administrateur: 'administrateur',
   admin: 'administrateur',
   administrator: 'administrateur',
-  visiteur: 'visiteur',
-  client: 'visiteur',
-  customer: 'visiteur',
+  client: 'client',
+  visiteur: 'client',
+  customer: 'client',
 };
 
 const normalizeRoleKey = (role: string): string => role
@@ -38,7 +38,7 @@ const normalizeRoleKey = (role: string): string => role
 
 export const normalizeRole = (role: string | undefined | null): UserRole => {
   if (!role) {
-    return 'visiteur';
+    return 'client';
   }
 
   const normalizedRole = normalizeRoleKey(role);
@@ -61,10 +61,10 @@ export const normalizeRole = (role: string | undefined | null): UserRole => {
   }
 
   if (normalizedRole.includes('client') || normalizedRole.includes('visit')) {
-    return 'visiteur';
+    return 'client';
   }
 
-  return 'visiteur';
+  return 'client';
 };
 
 export const getHomeForRole = (role: string | undefined | null): string => {

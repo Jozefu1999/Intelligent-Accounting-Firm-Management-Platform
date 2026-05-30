@@ -134,7 +134,11 @@
       <h3>User details</h3>
 
       @if (detailsLoading) {
-        <p>Loading...</p>
+        <div class="space-y-3 py-4">
+          <div class="h-4 w-3/4 animate-pulse rounded bg-slate-200"></div>
+          <div class="h-4 w-1/2 animate-pulse rounded bg-slate-200"></div>
+          <div class="h-4 w-2/3 animate-pulse rounded bg-slate-200"></div>
+        </div>
       } @else if (detailsModalUser) {
         <div class="modal-grid">
           <p><span>Full name:</span> {{ getDisplayName(detailsModalUser) }}</p>

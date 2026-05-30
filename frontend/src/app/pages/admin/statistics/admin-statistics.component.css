@@ -15,7 +15,7 @@
   border-radius: 0.75rem;
   padding: 0.7rem 0.82rem;
   border: 1px solid;
-  font-size: 0.85rem;
+  font-size: var(--fs-body);
 }
 
 .admin-alert-danger {
@@ -34,13 +34,13 @@
 .stats-header h2 {
   margin: 0;
   color: #0f172a;
-  font-size: 1.2rem;
+  font-size: var(--fs-title);
 }
 
 .stats-header p {
   margin: 0.32rem 0 0;
   color: #64748b;
-  font-size: 0.85rem;
+  font-size: var(--fs-body);
 }
 
 .range-filter {
@@ -54,8 +54,8 @@
   border: 1px solid #cbd5e1;
   background: #ffffff;
   color: #334155;
-  font-size: 0.74rem;
-  font-weight: 700;
+  font-size: var(--fs-caption);
+  font-weight: 600;
   padding: 0.3rem 0.55rem;
 }
 
@@ -81,21 +81,21 @@
   align-items: center;
   justify-content: space-between;
   color: #334155;
-  font-size: 0.78rem;
+  font-size: var(--fs-caption);
 }
 
 .summary-card strong {
   display: block;
   margin-top: 0.55rem;
   color: #0f172a;
-  font-size: 1.62rem;
+  font-size: var(--fs-heading);
 }
 
 .summary-card small {
   display: block;
   margin-top: 0.25rem;
   color: #64748b;
-  font-size: 0.73rem;
+  font-size: var(--fs-caption);
 }
 
 .card-blue mat-icon {
@@ -125,7 +125,7 @@
 .risk-projects-card h3 {
   margin: 0;
   color: #0f172a;
-  font-size: 1rem;
+  font-size: var(--fs-title);
 }
 
 .distribution-list {
@@ -140,7 +140,7 @@
   justify-content: space-between;
   align-items: center;
   color: #475569;
-  font-size: 0.8rem;
+  font-size: var(--fs-body);
   margin-bottom: 0.3rem;
 }
 
@@ -184,8 +184,8 @@
 .card-total {
   margin: 0.75rem 0 0;
   color: #475569;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: var(--fs-body);
+  font-weight: 600;
 }
 
 .timeline {
@@ -212,19 +212,19 @@
 .timeline-text {
   margin: 0;
   color: #334155;
-  font-size: 0.82rem;
+  font-size: var(--fs-body);
 }
 
 .timeline-time {
   margin: 0.15rem 0 0;
   color: #64748b;
-  font-size: 0.72rem;
+  font-size: var(--fs-caption);
 }
 
 .empty-state {
   margin: 0;
   color: #64748b;
-  font-size: 0.82rem;
+  font-size: var(--fs-body);
 }
 
 .risk-projects-card {
@@ -242,8 +242,8 @@
 .table-link {
   color: #0f766e;
   text-decoration: none;
-  font-size: 0.79rem;
-  font-weight: 700;
+  font-size: var(--fs-body);
+  font-weight: 600;
 }
 
 .table-wrap {
@@ -266,11 +266,11 @@ td {
   text-align: left;
   padding: 0.62rem;
   color: #334155;
-  font-size: 0.8rem;
+  font-size: var(--fs-body);
 }
 
 th {
-  font-size: 0.7rem;
+  font-size: var(--fs-caption);
   color: #64748b;
   letter-spacing: 0.06em;
 }
@@ -279,8 +279,8 @@ th {
   border-radius: 999px;
   background: #fee2e2;
   color: #dc2626;
-  font-size: 0.69rem;
-  font-weight: 700;
+  font-size: var(--fs-caption);
+  font-weight: 600;
   padding: 0.12rem 0.5rem;
 }
 

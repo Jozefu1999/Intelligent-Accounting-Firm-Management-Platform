@@ -1,99 +1,96 @@
-<div class="mx-auto max-w-4xl">
-	<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+<div class="mx-auto max-w-3xl">
+	<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
 		<div>
-			<p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Client management</p>
-			<h1 class="mt-1 text-2xl font-bold text-slate-900">
-				{{ isEditMode ? 'Edit client' : 'Add new client' }}
+			<h1 class="text-[1.5rem] font-bold tracking-tight text-[#0f172a]">
+				{{ isEditMode ? 'Edit client' : 'New client' }}
 			</h1>
-			<p class="mt-1 text-sm text-slate-500">Fill in client information to display it in the list page.</p>
+			<p class="mt-1 text-[0.82rem] text-[#64748b]">Fill in client information.</p>
 		</div>
 
-		<a routerLink="/clients" mat-stroked-button class="border-slate-300 text-slate-700">
-			<mat-icon>arrow_back</mat-icon>
-			Back to list
+		<a routerLink="/clients" class="inline-flex items-center gap-1.5 rounded-[0.7rem] border border-[#e2e8f0] bg-white px-3 py-2 text-[0.82rem] font-semibold text-[#64748b] hover:bg-[#f1f5f9]">
+			<mat-icon class="text-[16px]">arrow_back</mat-icon>
+			Back
 		</a>
 	</div>
 
 	@if (errorMessage) {
-		<div class="mb-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+		<div class="mb-5 flex items-start gap-2 rounded-[0.7rem] border border-red-200 bg-red-50 px-4 py-2.5 text-[0.82rem] text-red-700">
 			<mat-icon class="text-base">error_outline</mat-icon>
 			<span>{{ errorMessage }}</span>
 		</div>
 	}
 
-	<div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+	<div class="rounded-[0.75rem] border border-[#e2e8f0] bg-white p-6 sm:p-8">
 		@if (isLoading) {
-			<div class="py-12 text-center text-sm text-slate-500">Loading client data...</div>
+			<div class="py-12 text-center text-[0.82rem] text-[#94a3b8]">Loading client data...</div>
 		} @else {
-			<form (ngSubmit)="onSubmit()" class="space-y-6">
+			<form (ngSubmit)="onSubmit()" class="space-y-5">
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Name</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Name</label>
 						<input
 							type="text"
 							[(ngModel)]="name"
 							name="name"
 							required
 							placeholder="ACME SARL"
-							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						/>
 					</div>
 
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Username</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Username</label>
 						<input
 							type="text"
 							[(ngModel)]="username"
 							name="username"
 							required
 							placeholder="jdupont"
-							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						/>
 					</div>
 
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Phone</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Phone</label>
 						<input
 							type="tel"
 							[(ngModel)]="phone"
 							name="phone"
 							placeholder="+212600000000"
-							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						/>
 					</div>
 
 					<div>
-						<label class="mb-1.5 block text-sm font-medium text-slate-700">Mail</label>
+						<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Mail</label>
 						<input
 							type="email"
 							[(ngModel)]="mail"
 							name="mail"
 							placeholder="client@company.com"
-							class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+							class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 						/>
 					</div>
 				</div>
 
 				<div>
-					<label class="mb-1.5 block text-sm font-medium text-slate-700">Adresse</label>
+					<label class="mb-1 block text-[0.8rem] font-semibold text-[#0f172a]">Address</label>
 					<textarea
 						[(ngModel)]="adresse"
 						name="adresse"
 						rows="3"
 						placeholder="Street, city"
-						class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+						class="w-full rounded-[0.7rem] border border-[#cbd5e1] px-3.5 py-2.5 text-[0.84rem] text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.15)]"
 					></textarea>
 				</div>
 
-				<div class="flex flex-wrap items-center justify-end gap-3 border-t border-slate-100 pt-4">
-					<button type="button" routerLink="/clients" mat-button class="text-slate-600">Cancel</button>
+				<div class="flex flex-wrap items-center justify-end gap-3 border-t border-[#f1f5f9] pt-4">
+					<a routerLink="/clients" class="rounded-[0.7rem] px-4 py-2 text-[0.82rem] font-semibold text-[#64748b] hover:bg-[#f1f5f9]">Cancel</a>
 
-					<button type="submit" [disabled]="isSubmitting" mat-flat-button class="bg-blue-600 text-white">
+					<button type="submit" [disabled]="isSubmitting" class="inline-flex items-center gap-1.5 rounded-[0.7rem] bg-[#2563eb] px-4 py-2.5 text-[0.82rem] font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-55">
 						@if (isSubmitting) {
-							<span class="inline-flex items-center gap-1.5">
-								<mat-icon class="animate-spin text-base">refresh</mat-icon>
-								<span>{{ isEditMode ? 'Saving...' : 'Creating...' }}</span>
-							</span>
+							<mat-icon class="animate-spin text-[16px]">refresh</mat-icon>
+							<span>{{ isEditMode ? 'Saving...' : 'Creating...' }}</span>
 						} @else {
 							<span>{{ isEditMode ? 'Save client' : 'Create client' }}</span>
 						}

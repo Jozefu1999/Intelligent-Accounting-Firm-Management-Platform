@@ -1,5 +1,5 @@
 ﻿import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
@@ -40,6 +40,7 @@ export class ClientDashboardComponent implements OnInit {
   recentProjects: RecentProjectRow[] = [];
 
   isLoading = true;
+  hasProjects = false;
 
   isContactModalOpen = false;
   isSubmittingContact = false;
@@ -60,6 +61,7 @@ export class ClientDashboardComponent implements OnInit {
     private projectService: ProjectService,
     private documentService: DocumentService,
     private contactService: ContactService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -123,10 +125,12 @@ export class ClientDashboardComponent implements OnInit {
         this.contactSuccessMessage = 'Message sent successfully!';
         this.lastContactDate = new Date().toLocaleDateString('en-US');
         this.contactForm.patchValue({ sujet: '', project_id: '', message: '' });
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isSubmittingContact = false;
         this.contactErrorMessage = 'Error sending message. Please try again.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -140,11 +144,13 @@ export class ClientDashboardComponent implements OnInit {
       messages: this.contactService.getMessages().pipe(catchError(() => of<ContactMessage[]>([]))),
     }).subscribe(({ projects, documents, messages }) => {
       this.allProjects = projects;
+      this.hasProjects = projects.length > 0;
       this.recentProjects = projects.slice(0, 5).map((project) => this.mapProjectRow(project));
       this.activeProjectsCount = projects.filter((project) => this.getStatusBucket(project.status) === 'in_progress').length;
       this.documentsCount = documents.length;
       this.lastContactDate = this.extractLastContactDate(messages);
       this.isLoading = false;
+      this.cdr.detectChanges();
     });
   }
 

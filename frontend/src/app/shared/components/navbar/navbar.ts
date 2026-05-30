@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/services/auth';
 import { CommonModule } from '@angular/common';
 import { getRoleLabel } from '../../../core/utils/role-home';
+import { User } from '../../../core/models';
 
 @Component({
   selector: 'app-navbar',
@@ -28,11 +29,11 @@ export class Navbar {
     return getRoleLabel(role);
   }
 
-  getUserFirstName(user: any): string {
+  getUserFirstName(user: User): string {
     return user?.first_name || user?.prenom || '';
   }
 
-  getUserLastName(user: any): string {
+  getUserLastName(user: User): string {
     return user?.last_name || user?.nom || '';
   }
 

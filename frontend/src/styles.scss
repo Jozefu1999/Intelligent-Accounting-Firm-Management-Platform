@@ -1,9 +1,100 @@
 // Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+
+// ═══════════════════════════════════════════════════════════
+// DESIGN SYSTEM TOKENS
+// One source of truth. All pages use these.
+// ═══════════════════════════════════════════════════════════
+
+:root {
+  // ─── Color: Restrained palette ──────────────────────────
+  --c-bg: #f8f9fb;
+  --c-surface: #ffffff;
+  --c-ink: #0f1729;
+  --c-text: #1e293b;
+  --c-muted: #4b5563;
+  --c-subtle: #94a3b8;
+  --c-border: #e2e8f0;
+  --c-border-strong: #cbd5e1;
+  --c-accent: #2563eb;
+  --c-accent-hover: #1d4ed8;
+  --c-accent-subtle: #eff6ff;
+  --c-danger: #dc2626;
+  --c-danger-subtle: #fef2f2;
+  --c-success: #16a34a;
+  --c-success-subtle: #f0fdf4;
+  --c-warning: #d97706;
+  --c-warning-subtle: #fffbeb;
+
+  // ─── Spacing: 4px base grid ─────────────────────────────
+  --s-1: 0.25rem;   // 4px
+  --s-2: 0.5rem;    // 8px
+  --s-3: 0.75rem;   // 12px
+  --s-4: 1rem;      // 16px
+  --s-5: 1.25rem;   // 20px
+  --s-6: 1.5rem;    // 24px
+  --s-8: 2rem;      // 32px
+  --s-10: 2.5rem;   // 40px
+  --s-12: 3rem;     // 48px
+  --s-16: 4rem;     // 64px
+
+  // ─── Radius: Two levels ─────────────────────────────────
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-full: 9999px;
+
+  // ─── Shadows: Minimal, structural ──────────────────────
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  // ─── Transitions: Consistent interaction timing ────────
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);       // expo-out for movement
+  --ease-default: cubic-bezier(0.25, 0.1, 0.25, 1); // subtle state changes
+  --duration-fast: 120ms;
+  --duration-normal: 180ms;
+  --duration-slow: 280ms;
+
+  // ─── Typography ─────────────────────────────────────────
+  // One family. Five sizes. Three weights. Four line-heights.
+  // Contrast lives in the size + weight gap, never in decoration.
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+  // Type ramp: 12 → 14 → 18 → 24 → 32 (≈1.25–1.33 ratio)
+  --fs-caption: 0.75rem;   // 12px - metadata, badges, eyebrows, timestamps
+  --fs-body:    0.875rem;  // 14px - body, table cells, inputs, most UI
+  --fs-title:   1.125rem;  // 18px - card / panel titles, subheadings
+  --fs-heading: 1.5rem;    // 24px - page titles (the calm ceiling for text)
+  --fs-display: 2rem;      // 32px - dashboard stat numbers, hero figures only
+
+  // Weights: three roles, nothing heavier than semibold
+  --fw-regular:  400;  // body, descriptions
+  --fw-medium:   500;  // emphasis, labels, nav, table values
+  --fw-semibold: 600;  // titles, headings, display
+
+  // Line heights: tighter as size grows
+  --lh-tight:  1.2;    // display + heading
+  --lh-snug:   1.35;   // titles
+  --lh-normal: 1.55;   // body prose
+  --lh-caption: 1.4;   // small metadata
+
+  // Legacy aliases — every old token now snaps onto the 5-step ramp
+  --text-xs:   var(--fs-caption);  // 12px
+  --text-sm:   var(--fs-body);     // 14px
+  --text-base: var(--fs-body);     // 14px
+  --text-lg:   var(--fs-title);    // 18px
+  --text-xl:   var(--fs-heading);  // 24px
+  --text-2xl:  var(--fs-display);  // 32px
+
+  // ─── Sidebar ────────────────────────────────────────────
+  --sidebar-w: 256px;
+  --sidebar-bg: #0f1a2e;
+  --sidebar-text: #e2e8f0;
+  --sidebar-text-muted: #94a3b8;
+  --sidebar-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-active: rgba(37, 99, 235, 0.18);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+}
 
 html {
   height: 100%;
@@ -13,57 +104,154 @@ html {
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
-      typography: Manrope,
+      typography: Inter,
       density: 0,
     )
   );
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: #f8fafc;
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-  font-family: 'Manrope', sans-serif;
-
-  // Reset the user agent margin.
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  letter-spacing: -0.006em;
   margin: 0;
   height: 100%;
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  font-feature-settings: 'cv05' 1, 'cv11' 1, 'ss01' 1; // calmer letterforms
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 * {
   box-sizing: border-box;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Sora', 'Manrope', sans-serif;
+// ─── Headings: hierarchy by size + weight, never decoration ──
+h1, h2, h3, h4, h5, h6 {
+  font-family: inherit;
+  color: var(--c-ink);
+  font-weight: var(--fw-semibold);
+  margin: 0;
 }
 
-@keyframes soft-rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
+h1 {
+  font-size: var(--fs-heading); // 24px - the page-title ceiling
+  line-height: var(--lh-tight);
+  letter-spacing: -0.018em;
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+h2 {
+  font-size: var(--fs-title);   // 18px
+  line-height: var(--lh-snug);
+  letter-spacing: -0.011em;
+}
+
+h3, h4, h5, h6 {
+  font-size: var(--fs-body);    // 14px - distinguished by weight, not size
+  line-height: var(--lh-snug);
+  letter-spacing: -0.006em;
+}
+
+// Tabular figures everywhere numbers must align (tables, stats, money)
+table, .tabular-nums, [class*='stat'], [class*='metric'], [class*='amount'], [class*='value'] {
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+// ─── Focus ring: visible on keyboard, hidden on pointer ──
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// ─── Typographic role helpers ───────────────────────────
+.t-display {
+  font-size: var(--fs-display);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.022em;
+  font-variant-numeric: tabular-nums;
+}
+.t-heading {
+  font-size: var(--fs-heading);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.018em;
+}
+.t-title {
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.011em;
+}
+.t-body {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+}
+.t-label {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
+}
+.t-caption {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-caption);
+  color: var(--c-muted);
+}
+.t-eyebrow {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+// ─── Utility classes ────────────────────────────────────
+// Selection color — restrained accent tint
+::selection {
+  background: var(--c-accent-subtle);
+  color: var(--c-ink);
+}
+
+// Respect reduced motion globally
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 .auth-card-enter {
-  animation: soft-rise 0.55s ease-out both;
+  animation: fade-up 0.28s var(--ease-out) both;
 }
-/* You can add global styles to this file, and also import other style files */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}

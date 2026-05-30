@@ -1,1 +1,188 @@
-<p>project-detail works!</p>
+<div class="detail-workspace">
+  <!-- Back Button -->
+  <button type="button" (click)="goBack()" class="back-btn">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Projects
+  </button>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-card">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line skeleton-short"></div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (errorMessage && !isLoading) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Project Content -->
+  @if (project && !isLoading) {
+    <!-- Header -->
+    <div class="detail-header">
+      <div class="header-top">
+        <div class="header-info">
+          <h1 class="project-title">{{ project.name }}</h1>
+          <div class="header-meta">
+            <span class="status-badge" [class]="getStatusClass(project.status)">{{ getStatusLabel(project.status) }}</span>
+            <span class="priority-badge" [class]="getPriorityClass(project.priority)">{{ project.priority }} priority</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a [routerLink]="['edit']" class="btn btn--edit">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </a>
+        </div>
+      </div>
+
+      @if (project.description) {
+        <p class="project-description">{{ project.description }}</p>
+      }
+    </div>
+
+    <!-- Info Grid -->
+    <div class="info-grid">
+      <!-- Type -->
+      <div class="info-card">
+        <div class="info-card__icon">
+          <mat-icon>category</mat-icon>
+        </div>
+        <div class="info-card__content">
+          <span class="info-card__label">Type</span>
+          <span class="info-card__value">{{ getTypeLabel(project.type) }}</span>
+        </div>
+      </div>
+
+      <!-- Client -->
+      <div class="info-card">
+        <div class="info-card__icon">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="info-card__content">
+          <span class="info-card__label">Client</span>
+          <span class="info-card__value">{{ project.client?.company_name || 'Unassigned' }}</span>
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="info-card">
+        <div class="info-card__icon">
+          <mat-icon>event</mat-icon>
+        </div>
+        <div class="info-card__content">
+          <span class="info-card__label">Start Date</span>
+          <span class="info-card__value">{{ formatDate(project.start_date) }}</span>
+        </div>
+      </div>
+
+      <!-- Due Date -->
+      <div class="info-card">
+        <div class="info-card__icon">
+          <mat-icon>event_busy</mat-icon>
+        </div>
+        <div class="info-card__content">
+          <span class="info-card__label">Due Date</span>
+          <span class="info-card__value">{{ formatDate(project.due_date) }}</span>
+          @if (getDaysRemaining() !== null) {
+            <span class="info-card__sub" [class.overdue]="getDaysRemaining()! < 0">
+              @if (getDaysRemaining()! > 0) {
+                {{ getDaysRemaining() }} days remaining
+              } @else if (getDaysRemaining()! === 0) {
+                Due today
+              } @else {
+                {{ getDaysRemaining()! * -1 }} days overdue
+              }
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div class="info-card">
+        <div class="info-card__icon">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div class="info-card__content">
+          <span class="info-card__label">Estimated Budget</span>
+          <span class="info-card__value">
+            @if (project.estimated_budget) {
+              {{ project.estimated_budget | number:'1.2-2' }} MAD
+            } @else {
+              —
+            }
+          </span>
+        </div>
+      </div>
+
+      <!-- Risk Score -->
+      <div class="info-card">
+        <div class="info-card__icon">
+          <mat-icon>warning_amber</mat-icon>
+        </div>
+        <div class="info-card__content">
+          <span class="info-card__label">Risk Score</span>
+          <span class="info-card__value">
+            @if (project.risk_score !== null && project.risk_score !== undefined) {
+              <span class="risk-score" [class.risk-high]="project.risk_score >= 70" [class.risk-medium]="project.risk_score >= 40 && project.risk_score < 70" [class.risk-low]="project.risk_score < 40">
+                {{ project.risk_score }}%
+              </span>
+            } @else {
+              —
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-section">
+      <h2 class="section-title">Timeline</h2>
+      <div class="timeline-bar">
+        <div class="timeline-point">
+          <div class="timeline-dot dot--created"></div>
+          <div class="timeline-label">
+            <span class="timeline-date">{{ formatDate(project.created_at || project.createdAt) }}</span>
+            <span class="timeline-text">Created</span>
+          </div>
+        </div>
+        @if (project.start_date) {
+          <div class="timeline-connector"></div>
+          <div class="timeline-point">
+            <div class="timeline-dot dot--started"></div>
+            <div class="timeline-label">
+              <span class="timeline-date">{{ formatDate(project.start_date) }}</span>
+              <span class="timeline-text">Started</span>
+            </div>
+          </div>
+        }
+        @if (project.due_date) {
+          <div class="timeline-connector"></div>
+          <div class="timeline-point">
+            <div class="timeline-dot dot--due"></div>
+            <div class="timeline-label">
+              <span class="timeline-date">{{ formatDate(project.due_date) }}</span>
+              <span class="timeline-text">Due</span>
+            </div>
+          </div>
+        }
+        @if (project.updated_at || project.updatedAt) {
+          <div class="timeline-connector"></div>
+          <div class="timeline-point">
+            <div class="timeline-dot dot--updated"></div>
+            <div class="timeline-label">
+              <span class="timeline-date">{{ formatDate(project.updated_at || project.updatedAt) }}</span>
+              <span class="timeline-text">Last Updated</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

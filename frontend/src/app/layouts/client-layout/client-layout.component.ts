@@ -13,6 +13,8 @@ import { AuthService } from '../../core/services/auth';
   styleUrl: './client-layout.component.css',
 })
 export class ClientLayoutComponent {
+  isSidebarOpen = false;
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -26,12 +28,16 @@ export class ClientLayoutComponent {
     return `${firstName} ${lastName}`.trim() || 'Client';
   }
 
-  get initials(): string {
-    const user = this.authService.getCurrentUser();
-    const firstName = user?.prenom || user?.first_name || '';
-    const lastName = user?.nom || user?.last_name || '';
+  get todayLabel(): string {
+    return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  }
 
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'CL';
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
   }
 
   logout(): void {
